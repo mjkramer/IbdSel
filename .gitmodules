@@ -1,0 +1,3 @@
+[submodule "SelectorFramework"]
+	path = SelectorFramework
+	url = ../SelectorFramework
