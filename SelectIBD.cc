@@ -61,6 +61,9 @@ bool SelectIBD::isVetoed(const Data& event)
     if (dt_us < -PRE_VETO)              // way-after-event muon
       continue;
 
+    if (muon.detector < 5 && muon.detector != detector)
+      continue;                         // Ignore muons in other ADs
+
     if (-PRE_VETO < dt_us && dt_us < 0) // pre-muon veto
       return true;
 
