@@ -17,6 +17,7 @@ public:
   enum class Kind { WP, AD, Shower };
 
   struct Muon {
+    short detector;
     Kind kind;
     Time t;
   };
@@ -34,16 +35,20 @@ private:
 
 Status MuonAlg::consume(const EventReader::Data& e)
 {
+  auto put = [&](auto kind) {
+    muonBuf.put({e.detector, kind, e.time()});
+  };
+
   if (e.detector == 5 || e.detector == 6) {
     if (e.nHit > WP_NHIT_CUT)
-      muonBuf.put({Kind::WP, e.time()});
+      put(Kind::WP);
   }
 
   else if (e.detector < 5) {
     if (e.NominalCharge > SHOWER_CHG_CUT)
-      muonBuf.put({Kind::Shower, e.time()});
+      put(Kind::Shower);
     else if (e.NominalCharge > AD_CHG_CUT)
-      muonBuf.put({Kind::AD, e.time()});
+      put(Kind::AD);
   }
 
   return Status::Continue;

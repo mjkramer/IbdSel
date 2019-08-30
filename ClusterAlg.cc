@@ -17,7 +17,7 @@ public:
 
   Status consume(const EventReader::Data& e) override;
 
-  bool ready() const { return ready_; };
+  bool ready() const { return foundCluster; };
 
   const std::vector<EventReader::Data>& getCluster() const
   {
@@ -29,13 +29,13 @@ public:
 private:
   std::vector<EventReader::Data> events;
   EventReader::Data pendingEvent;
-  bool ready_ = false;
+  bool foundCluster = false;
 };
 
 Status ClusterAlg::consume(const EventReader::Data& e)
 {
-  if (ready_) {                 // Did we find a cluster on prev exec?
-    ready_ = false;
+  if (foundCluster) {                 // Did we find a cluster on prev exec?
+    foundCluster = false;
     events.clear();
     events.push_back(pendingEvent);
   }
@@ -60,7 +60,7 @@ Status ClusterAlg::consume(const EventReader::Data& e)
       events.push_back(e);
     } else {                    // Found a cluster
       pendingEvent = e;
-      ready_= true;
+      foundCluster= true;
     }
   } else {
     events.push_back(e);
