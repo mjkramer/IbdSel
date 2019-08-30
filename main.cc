@@ -22,7 +22,7 @@ void ibd_main(const std::vector<std::string>& inFiles = deffiles,
 
   p.addOutFile("outFile", outFile);
 
-  p.makeAlg<EventReader>().setReportInterval(10000);
+  p.makeAlg<EventReader>();
   p.makeAlg<TrigTypeCut>();
   p.makeAlg<MuonAlg>();
   p.makeAlg<FlasherCut>();

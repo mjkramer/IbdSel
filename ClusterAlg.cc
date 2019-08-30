@@ -34,6 +34,12 @@ private:
 
 Status ClusterAlg::consume(const EventReader::Data& e)
 {
+  if (ready_) {                 // Did we find a cluster on prev exec?
+    ready_ = false;
+    events.clear();
+    events.push_back(pendingEvent);
+  }
+
   if (e.detector != detector)
     return Status::Continue;
 
@@ -43,12 +49,6 @@ Status ClusterAlg::consume(const EventReader::Data& e)
   if (events.size() == 0) {     // Very first event
     events.push_back(e);
     return Status::Continue;
-  }
-
-  if (ready_) {                 // Did we find a cluster on prev exec?
-    ready_ = false;
-    events.clear();
-    events.push_back(pendingEvent);
   }
 
   const Time t_this = e.time();
@@ -62,6 +62,8 @@ Status ClusterAlg::consume(const EventReader::Data& e)
       pendingEvent = e;
       ready_= true;
     }
+  } else {
+    events.push_back(e);
   }
 
   return Status::Continue;

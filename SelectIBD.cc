@@ -136,6 +136,6 @@ Status SelectIBD::execute()
 void SelectIBD::process(const Data& prompt, const Data& delayed)
 {
   std::cout << detector << " "
-            << prompt.triggerNumber << ""
+            << prompt.triggerNumber << " "
             << delayed.triggerNumber << std::endl;
 }
