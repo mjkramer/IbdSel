@@ -9,10 +9,6 @@ using Status = Algorithm::Status;
 using Data = EventReader::Data;
 
 class SelectIBD : public Algorithm {
-  static constexpr float WP_VETO = 600;
-  static constexpr float AD_VETO = 1400;
-  static constexpr float SHOWER_VETO = 400'400;
-  static constexpr float PRE_VETO = 2;
   static constexpr float PROMPT_MIN = 0.7;
   static constexpr float PROMPT_MAX = 12;
   static constexpr float DELAYED_MIN = 6;
@@ -25,7 +21,6 @@ public:
   Status execute() override;
 
 private:
-  bool isVetoed(const Data& event);
   bool dmcOk(const std::vector<Data>& cluster,
              size_t iP, size_t iD);
   void process(const Data& prompt, const Data& delayed);
@@ -48,39 +43,6 @@ void SelectIBD::connect(Pipeline& pipeline)
   outFile = pipeline.getOutFile("outFile");
 }
 
-bool SelectIBD::isVetoed(const Data& event)
-{
-  const Time t = event.time();
-
-  for (const auto& muon : muonAlg->getBuf()) {
-    const float dt_us = t.diff_us(muon.t);
-
-    if (SHOWER_VETO < dt_us)            // no more muons worth checking
-      break;
-
-    if (dt_us < -PRE_VETO)              // way-after-event muon
-      continue;
-
-    if (muon.detector < 5 && muon.detector != detector)
-      continue;                         // Ignore muons in other ADs
-
-    if (-PRE_VETO < dt_us && dt_us < 0) // pre-muon veto
-      return true;
-
-    const auto postMuonVeto_us = [&]() -> float {
-      switch (muon.kind) {
-      case MuonAlg::Kind::WP:     return WP_VETO;
-      case MuonAlg::Kind::AD:     return AD_VETO;
-      case MuonAlg::Kind::Shower: return SHOWER_VETO;
-      } return {};              // silence compiler warning
-    }();
-
-    if (dt_us < postMuonVeto_us)
-      return true;
-  }
-
-  return false;
-}
 
 bool SelectIBD::dmcOk(const std::vector<Data>& cluster,
                       size_t iP, size_t iD)
@@ -101,7 +63,7 @@ bool SelectIBD::dmcOk(const std::vector<Data>& cluster,
 
     if (-200 < dt_us && dt_us < 0 && // after delayed
         DELAYED_MIN < eX &&
-        !isVetoed(cluster[iX]))
+        !muonAlg->isVetoed(cluster[iX]))
       return false;
   }
 
@@ -124,7 +86,7 @@ Status SelectIBD::execute()
       if (PROMPT_MIN  < eP && eP < PROMPT_MAX &&
           DELAYED_MIN < eD && eD < DELAYED_MAX &&
           dt_us < 200 &&
-          !isVetoed(cluster[iD]) &&
+          !muonAlg->isVetoed(cluster[iD]) &&
           dmcOk(cluster, iP, iD)) {
         // Got one!
         process(cluster[iP], cluster[iD]);
