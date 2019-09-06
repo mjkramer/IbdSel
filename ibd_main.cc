@@ -7,6 +7,7 @@
 #include "FlasherCut.cc"
 #include "ClusterAlg.cc"
 #include "SelectIBD.cc"
+#include "SelectSingles.cc"
 
 using Status = Algorithm::Status;
 
@@ -30,6 +31,7 @@ void ibd_main(const std::vector<std::string>& inFiles = deffiles,
   for (int detector = 1; detector <= 4; ++detector) {
     p.makeAlg<ClusterAlg>(detector);
     p.makeAlg<SelectIBD>(detector);
+    p.makeAlg<SelectSingles>(detector);
   }
 
   p.process(inFiles);

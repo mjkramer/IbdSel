@@ -33,3 +33,9 @@ bool dmcOk(const std::vector<EventReader::Data>& cluster,
 
   return true;
 }
+
+bool singlesDmcOk(const std::vector<EventReader::Data>& cluster,
+                  size_t i, const MuonAlg* muonAlg)
+{
+  return dmcOk(cluster, -1, i, muonAlg);
+}
