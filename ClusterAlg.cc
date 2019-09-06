@@ -55,13 +55,8 @@ Status ClusterAlg::consume(const EventReader::Data& e)
   const Time t_last = events.back().time();
 
   if (t_this.diff_us(t_last) > GAPSIZE_US) {
-    if (events.size() == 1) {   // Just a single?
-      events.clear();
-      events.push_back(e);
-    } else {                    // Found a cluster
-      pendingEvent = e;
-      foundCluster= true;
-    }
+    pendingEvent = e;
+    foundCluster = true;
   } else {
     events.push_back(e);
   }
