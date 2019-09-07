@@ -40,7 +40,7 @@ void SelectSingles::connect(Pipeline& pipeline)
 
   muonAlg = pipeline.getAlg<MuonAlg>();
 
-  outFile = pipeline.getOutFile("outFile");
+  outFile = pipeline.getOutFile();
 
   initHists();
 }

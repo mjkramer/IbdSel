@@ -39,7 +39,7 @@ void SelectIBD::connect(Pipeline& pipeline)
 
   muonAlg = pipeline.getAlg<MuonAlg>();
 
-  outFile = pipeline.getOutFile("outFile");
+  outFile = pipeline.getOutFile();
 }
 
 
