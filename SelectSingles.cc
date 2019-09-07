@@ -24,10 +24,12 @@ private:
   void initHists();
 
   const short detector;
+
   const ClusterAlg* clusterAlg;
   const MuonAlg* muonAlg;
-  TFile* outFile;
+  const MultCutTool* multCutTool;
 
+  TFile* outFile;
   TH1F* hist;
 };
 
@@ -39,6 +41,8 @@ void SelectSingles::connect(Pipeline& pipeline)
   clusterAlg = pipeline.getAlg<ClusterAlg>(pred);
 
   muonAlg = pipeline.getAlg<MuonAlg>();
+
+  multCutTool = pipeline.getTool<MultCutTool>();
 
   outFile = pipeline.getOutFile();
 
@@ -70,7 +74,7 @@ Status SelectSingles::execute()
 
     if (EMIN < e && e < EMAX &&
         !muonAlg->isVetoed(cluster[i]) &&
-        singlesDmcOk(cluster, i, muonAlg)) { // XXX
+        multCutTool->singleDmcOk(cluster, i)) {
       hist->Fill(e);
     }
   }

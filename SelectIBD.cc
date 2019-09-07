@@ -25,8 +25,11 @@ private:
   void process(const Data& prompt, const Data& delayed);
 
   const short detector;
+
   const ClusterAlg* clusterAlg;
   const MuonAlg* muonAlg;
+  const MultCutTool* multCutTool;
+
   TFile* outFile;
 };
 
@@ -38,6 +41,8 @@ void SelectIBD::connect(Pipeline& pipeline)
   clusterAlg = pipeline.getAlg<ClusterAlg>(pred);
 
   muonAlg = pipeline.getAlg<MuonAlg>();
+
+  multCutTool = pipeline.getTool<MultCutTool>();
 
   outFile = pipeline.getOutFile();
 }
@@ -60,7 +65,7 @@ Status SelectIBD::execute()
           DELAYED_MIN < eD && eD < DELAYED_MAX &&
           dt_us < 200 &&
           !muonAlg->isVetoed(cluster[iD]) &&
-          dmcOk(cluster, iP, iD, muonAlg)) { // XXX
+          multCutTool->pairDmcOk(cluster, iP, iD)) {
         // Got one!
         process(cluster[iP], cluster[iD]);
         return Status::Continue;

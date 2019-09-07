@@ -5,11 +5,29 @@
 #include "EventReader.cc"
 #include "MuonAlg.cc"
 
-static constexpr float PROMPT_MIN = 0.7;
-static constexpr float DELAYED_MIN = 6;
+using Data = EventReader::Data;
 
-bool dmcOk(const std::vector<EventReader::Data>& cluster,
-           size_t iP, size_t iD, const MuonAlg* muonAlg)
+class MultCutTool : public Tool {
+  static constexpr float PROMPT_MIN = 0.7;
+  static constexpr float DELAYED_MIN = 6;
+
+public:
+  void connect(Pipeline& pipeline) override;
+
+  bool pairDmcOk(const std::vector<Data>& cluster, size_t iP, size_t iD) const;
+  bool singleDmcOk(const std::vector<Data>& cluster, size_t i) const;
+
+private:
+  const MuonAlg* muonAlg;
+};
+
+void MultCutTool::connect(Pipeline& pipeline)
+{
+  muonAlg = pipeline.getAlg<MuonAlg>();
+}
+
+bool MultCutTool::pairDmcOk(const std::vector<Data>& cluster,
+                            size_t iP, size_t iD) const
 {
   for (size_t iX = 0; iX < cluster.size(); ++iX) {
     if (iX == iP || iX == iD)
@@ -34,8 +52,9 @@ bool dmcOk(const std::vector<EventReader::Data>& cluster,
   return true;
 }
 
-bool singlesDmcOk(const std::vector<EventReader::Data>& cluster,
-                  size_t i, const MuonAlg* muonAlg)
+bool MultCutTool::singleDmcOk(const std::vector<Data>& cluster,
+                               size_t i) const
 {
-  return dmcOk(cluster, -1, i, muonAlg);
+  return pairDmcOk(cluster, -1, i);
 }
+

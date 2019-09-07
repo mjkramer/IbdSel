@@ -31,5 +31,7 @@ void ibd_main(const std::vector<std::string>& inFiles = deffiles,
     p.makeAlg<SelectSingles>(detector);
   }
 
+  p.makeTool<MultCutTool>();
+
   p.process(inFiles);
 }
