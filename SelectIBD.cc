@@ -63,7 +63,7 @@ Status SelectIBD::execute()
 
       if (PROMPT_MIN  < eP && eP < PROMPT_MAX &&
           DELAYED_MIN < eD && eD < DELAYED_MAX &&
-          dt_us < 200 &&
+          1 < dt_us && dt_us < 200 &&
           !muonAlg->isVetoed(cluster[iD]) &&
           multCutTool->pairDmcOk(cluster, iP, iD)) {
         // Got one!
