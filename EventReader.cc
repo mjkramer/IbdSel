@@ -22,6 +22,8 @@ public:
     Float_t NominalCharge;
 
     Time time() const { return { triggerTimeSec, triggerTimeNanoSec }; };
+    bool isAD() const { return detector <= 4; }
+    bool isWP() const { return detector == 5 || detector == 6; }
   } data;
 
 private:
