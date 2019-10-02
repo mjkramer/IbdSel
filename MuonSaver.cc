@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SelectorFramework/core/RingBuf.cc"
-#include "SelectorFramework/core/Util.cc"
 #include "SelectorFramework/core/OutTree.cc"
 
 #include "EventReader.cc"
@@ -37,9 +35,11 @@ public:
   MuonSaver();
   void connect(Pipeline& pipeline) override;
   Status consume(const EventReader::Data& e) override;
+  bool isMuon() const { return isMuon_; }
 
 private:
   MuonTree outTree;
+  bool isMuon_;
 };
 
 MuonSaver::MuonSaver() :
@@ -55,7 +55,11 @@ void MuonSaver::connect(Pipeline& pipeline)
 
 Status MuonSaver::consume(const EventReader::Data& e)
 {
+  isMuon_ = false;
+
   auto put = [&](Float_t strength) {
+    isMuon_ = true;
+
     outTree.detector = e.detector;
     outTree.trigSec = e.time().s;
     outTree.trigNanoSec = e.time().ns;
