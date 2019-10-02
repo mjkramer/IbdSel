@@ -47,7 +47,6 @@ void SelectIBD::connect(Pipeline& pipeline)
   outFile = pipeline.getOutFile();
 }
 
-
 Status SelectIBD::execute()
 {
   if (!clusterAlg->ready())
@@ -68,7 +67,7 @@ Status SelectIBD::execute()
           multCutTool->pairDmcOk(cluster, iP, iD)) {
         // Got one!
         process(cluster[iP], cluster[iD]);
-        return Status::Continue;
+        // return Status::Continue;
       }
     }
   }
