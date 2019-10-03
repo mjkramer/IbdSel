@@ -15,8 +15,7 @@ source /global/project/projectdirs/dayabay/scratch/mkramer/apps/root-6.18.00-py2
 
 echo Running on $(hostname)
 
-# XXX
-# sleep $(( RANDOM % 200 ))       # so they don't all mob the lockfile at once on startup (400 jobs, staggered)
+sleep $(( RANDOM % 200 ))       # so they don't all mob the lockfile at once on startup (400 jobs, staggered)
 
 export PYTHONPATH=$(pwd)/../common:$PYTHONPATH
 
