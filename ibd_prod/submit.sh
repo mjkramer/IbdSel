@@ -35,4 +35,9 @@ if [ ! -d $outdir ]; then
     exit 1
 fi
 
+if [ ! -f ../selector/stage1_main_cc.so ]; then
+    echo "Compile ../selector/stage1_main.cc (in ROOT 6) first"
+    exit 1
+fi
+
 echo sbatch --array=1-$njob -o $logdir/slurm-%A_%a.out ibd_job.sl.sh $infile $outdir
