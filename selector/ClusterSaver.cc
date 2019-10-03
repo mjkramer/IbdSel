@@ -24,8 +24,8 @@ private:
 void ClusterTree::initBranches()
 {
   OB(size, "b");
-  tree()->Branch("trigSec", trigSec, "trigSec[size]/F");
-  tree()->Branch("trigNanoSec", trigNanoSec, "trigNanoSec[size]/F");
+  tree()->Branch("trigSec", trigSec, "trigSec[size]/i");
+  tree()->Branch("trigNanoSec", trigNanoSec, "trigNanoSec[size]/i");
   tree()->Branch("energy", energy, "energy[size]/F");
 }
 
