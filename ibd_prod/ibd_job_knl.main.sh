@@ -1,7 +1,27 @@
 #!/bin/bash
 
 timeout=$1; shift
+infile=$1; shift
+outdir=$1; shift
 
 source job_init.inc.sh
 
-srun -n 48 --cpu-bind=cores ./ibd_worker.py -t $timeout -c 25 $@
+sockdir=$(mktemp -d)
+echo "Sockets in $sockdir"
+
+./queue_buffer.py -t $timeout $sockdir $infile &
+qbPid=$!
+
+while [[ ! -S $sockdir/InputReader.ipc || ! -S $sockdir/DoneLogger.ipc ]]; do
+    sleep 5
+done
+
+srun -n 48 --cpu-bind=cores ./ibd_worker_knl.py -q $sockdir $infile $outdir
+
+./knl_shutdown.py $sockdir
+
+while [ -d /proc/$qbPid ]; do
+    sleep 5
+done
+
+rm -rf $sockdir
