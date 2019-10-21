@@ -2,9 +2,9 @@
 #include <vector>
 
 #include "EventReader.cc"
-#include "TrigTypeCut.cc"
+#include "TrigTypeCut.hh"
 #include "MuonSaver.cc"
-#include "FlasherCut.cc"
+#include "FlasherCut.hh"
 #include "ClusterSaver.cc"
 
 inline void stage1_main(const char* inFile, const char* outFile, int site)

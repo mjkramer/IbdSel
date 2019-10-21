@@ -12,14 +12,58 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "Setting ${CMAKE_BUILD_TYPE} build")
 
-FILE(GLOB SOURCES selector/**.cc)
-FILE(GLOB HEADERS selector/**.cc)
+SET(SOURCES
+    # core
+    selector/SelectorFramework/core/Kernel.cc
+    selector/SelectorFramework/core/OutTree.cc
+    selector/SelectorFramework/core/RingBuf.cc
+    selector/SelectorFramework/core/SeqReader.cc
+    selector/SelectorFramework/core/Util.cc
+    # selector
+    selector/ClusterAlg.cc
+    selector/ClusterSaver.cc
+    selector/EventReader.cc
+    selector/FlasherCut.cc
+    selector/ibd_main.cc
+    selector/MultCut.cc
+    selector/MuonAlg.cc
+    selector/MuonSaver.cc
+    selector/SelectIBD.cc
+    #selector/SelectorFramework/samples/SinglesVsMuons.cc
+    #selector/SelectorFramework/samples/test.cc
+    selector/SelectSingles.cc
+    selector/stage1_main.cc
+    selector/TrigTypeCut.cc
+    )
+SET(HEADERS
+    # core
+    Kernel.hh
+    OutTree.hh
+    RingBuf.hh
+    SeqReader.hh
+    Util.hh
+    # selector
+    ClusterAlg.hh
+    ClusterSaver.hh
+    EventReader.hh
+    FlasherCut.hh
+    ibd_main.hh
+    MultCut.hh
+    MuonAlg.hh
+    MuonSaver.hh
+    SelectIBD.hh
+    #SinglesVsMuons.hh
+    #test.hh
+    SelectSingles.hh
+    stage1_main.hh
+    TrigTypeCut.hh
+    )
 message(STATUS "Sources: ${SOURCES}")
 message(STATUS "HEADERS: ${HEADERS}")
 
 include_directories(
     selector/SelectorFramework/core
-    selector/SelectorFramework/samples
+    #selector/SelectorFramework/samples
     selector/
 )
 
@@ -41,9 +85,9 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 find_package(ROOT REQUIRED)
 link_directories(${ROOT_LIBRARY_DIR})
 
-#ROOT_GENERATE_DICTIONARY(Dict "${HEADERS}" OPTIONS -interpreteronly)
-#add_library(${LIBNAME} SHARED ${SOURCES} Dict.cxx)
-add_library(${LIBNAME} SHARED ${SOURCES})
+ROOT_GENERATE_DICTIONARY(Dict "${HEADERS}" OPTIONS -interpreteronly)
+add_library(${LIBNAME} SHARED ${SOURCES} Dict.cxx)
+#add_library(${LIBNAME} SHARED ${SOURCES})
 
 if(result)
     set_property(TARGET ${LIBNAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)

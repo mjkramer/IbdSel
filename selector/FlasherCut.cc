@@ -1,8 +1,6 @@
-#pragma once
+#include "FlasherCut.hh"
 
-#include "EventReader.cc"
-
-inline Algorithm::Status flasherCut(const EventReader::Data& e)
+Algorithm::Status flasherCut(const EventReader::Data& e)
 {
 #define SQ(x) pow(x, 2)
   bool flasher = SQ(e.Quadrant) + SQ(e.MaxQ / 0.45) > 1
@@ -13,4 +11,4 @@ inline Algorithm::Status flasherCut(const EventReader::Data& e)
 #undef SQ
 }
 
-using FlasherCut = PureAlg<EventReader, flasherCut>;
+//template class PureAlg<EventReader, flasherCut>;

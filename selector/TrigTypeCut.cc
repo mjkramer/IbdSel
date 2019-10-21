@@ -1,8 +1,7 @@
 #pragma once
+#include "TrigTypeCut.hh"
 
-#include "EventReader.cc"
-
-inline Algorithm::Status trigTypeCut(const EventReader::Data& e)
+Algorithm::Status trigTypeCut(const EventReader::Data& e)
 {
   const UInt_t crossMask = 0x10000002;
   bool cross = (e.triggerType & crossMask) == crossMask;
@@ -10,4 +9,4 @@ inline Algorithm::Status trigTypeCut(const EventReader::Data& e)
   return vetoIf(cross);
 }
 
-using TrigTypeCut = PureAlg<EventReader, trigTypeCut>;
+//template class PureAlg<EventReader, trigTypeCut>;

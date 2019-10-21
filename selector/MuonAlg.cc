@@ -11,10 +11,10 @@ class MuonAlg : public SimpleAlg<EventReader> {
   static constexpr unsigned N_MUONS = 1000; // how far back to remember
   static constexpr float WP_NHIT_CUT = 12;
   static constexpr float AD_CHG_CUT = 3000;
-  static constexpr float SHOWER_CHG_CUT = 300'000;
+  static constexpr float SHOWER_CHG_CUT = 300000;
   static constexpr float WP_VETO = 600;
   static constexpr float AD_VETO = 1400;
-  static constexpr float SHOWER_VETO = 400'400;
+  static constexpr float SHOWER_VETO = 400400;
   static constexpr float PRE_VETO = 2;
 
 public:
@@ -41,7 +41,7 @@ private:
 
 inline Status MuonAlg::consume(const EventReader::Data& e)
 {
-  auto put = [&](auto kind) {
+  auto put = [&](Kind kind) {
     muonBuf.put({e.detector, kind, e.time()});
   };
 
