@@ -33,7 +33,7 @@ private:
   TFile* outFile;
 };
 
-void SelectIBD::connect(Pipeline& pipeline)
+inline void SelectIBD::connect(Pipeline& pipeline)
 {
   auto pred = [this](const ClusterAlg& alg) {
     return alg.detector == detector;
@@ -47,7 +47,7 @@ void SelectIBD::connect(Pipeline& pipeline)
   outFile = pipeline.getOutFile();
 }
 
-Status SelectIBD::execute()
+inline Status SelectIBD::execute()
 {
   if (!clusterAlg->ready())
     return Status::Continue;
@@ -75,7 +75,7 @@ Status SelectIBD::execute()
   return Status::Continue;
 }
 
-void SelectIBD::process(const Data& prompt, const Data& delayed)
+inline void SelectIBD::process(const Data& prompt, const Data& delayed)
 {
   std::cout << detector << " "
             << prompt.triggerNumber << " "

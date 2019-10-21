@@ -7,7 +7,7 @@
 #include "FlasherCut.cc"
 #include "ClusterSaver.cc"
 
-void stage1_main(const char* inFile, const char* outFile, int site)
+inline void stage1_main(const char* inFile, const char* outFile, int site)
 {
   Pipeline p;
 

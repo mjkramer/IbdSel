@@ -32,7 +32,7 @@ private:
   bool useSCNL;
 };
 
-void EventReader::initBranches()
+inline void EventReader::initBranches()
 {
   BR(detector);
   BR(triggerType); BR(triggerNumber); BR(triggerTimeSec); BR(triggerTimeNanoSec);

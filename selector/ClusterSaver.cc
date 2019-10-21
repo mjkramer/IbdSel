@@ -21,7 +21,7 @@ private:
   void initBranches() override;
 };
 
-void ClusterTree::initBranches()
+inline void ClusterTree::initBranches()
 {
   OB(size, "b");
   tree()->Branch("trigSec", trigSec, "trigSec[size]/i");
@@ -47,14 +47,14 @@ private:
   const MuonSaver* muonSaver;
 };
 
-ClusterSaver::ClusterSaver(int detector) :
+inline ClusterSaver::ClusterSaver(int detector) :
   detector(detector),
   singlesTree(Form("singles_AD%d", detector)),
   clustersTree(Form("clusters_AD%d", detector))
 {
 }
 
-void ClusterSaver::connect(Pipeline& pipeline)
+inline void ClusterSaver::connect(Pipeline& pipeline)
 {
   singlesTree.connect(pipeline);
   clustersTree.connect(pipeline);
@@ -64,7 +64,7 @@ void ClusterSaver::connect(Pipeline& pipeline)
   SimpleAlg::connect(pipeline);
 }
 
-Status ClusterSaver::consume(const EventReader::Data& e)
+inline Status ClusterSaver::consume(const EventReader::Data& e)
 {
   if (e.detector != detector ||
       e.energy < 0.7 ||
@@ -89,7 +89,7 @@ Status ClusterSaver::consume(const EventReader::Data& e)
   return Status::Continue;
 }
 
-void ClusterSaver::save()
+inline void ClusterSaver::save()
 {
   const int N = events.size();
   ClusterTree& outTree = N > 1 ? clustersTree : singlesTree;

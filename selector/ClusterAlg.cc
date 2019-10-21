@@ -32,7 +32,7 @@ private:
   bool foundCluster = false;
 };
 
-Status ClusterAlg::consume(const EventReader::Data& e)
+inline Status ClusterAlg::consume(const EventReader::Data& e)
 {
   if (foundCluster) {                 // Did we find a cluster on prev exec?
     foundCluster = false;

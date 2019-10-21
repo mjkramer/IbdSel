@@ -33,7 +33,7 @@ private:
   TH1F* hist;
 };
 
-void SelectSingles::connect(Pipeline& pipeline)
+inline void SelectSingles::connect(Pipeline& pipeline)
 {
   auto pred = [this](const ClusterAlg& alg) {
     return alg.detector == detector;
@@ -49,7 +49,7 @@ void SelectSingles::connect(Pipeline& pipeline)
   initHists();
 }
 
-void SelectSingles::initHists()
+inline void SelectSingles::initHists()
 {
   outFile->cd();
 
@@ -57,12 +57,12 @@ void SelectSingles::initHists()
   hist = new TH1F(name, name, 113, 0.7, 12);
 }
 
-void SelectSingles::finalize(Pipeline& _pipeline)
+inline void SelectSingles::finalize(Pipeline& _pipeline)
 {
   hist->Write();
 }
 
-Status SelectSingles::execute()
+inline Status SelectSingles::execute()
 {
   if (!clusterAlg->ready())
     return Status::Continue;

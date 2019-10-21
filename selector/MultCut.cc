@@ -21,12 +21,12 @@ private:
   const MuonAlg* muonAlg;
 };
 
-void MultCutTool::connect(Pipeline& pipeline)
+inline void MultCutTool::connect(Pipeline& pipeline)
 {
   muonAlg = pipeline.getAlg<MuonAlg>();
 }
 
-bool MultCutTool::pairDmcOk(const std::vector<Data>& cluster,
+inline bool MultCutTool::pairDmcOk(const std::vector<Data>& cluster,
                             size_t iP, size_t iD) const
 {
   for (size_t iX = 0; iX < cluster.size(); ++iX) {
@@ -52,7 +52,7 @@ bool MultCutTool::pairDmcOk(const std::vector<Data>& cluster,
   return true;
 }
 
-bool MultCutTool::singleDmcOk(const std::vector<Data>& cluster,
+inline bool MultCutTool::singleDmcOk(const std::vector<Data>& cluster,
                                size_t i) const
 {
   return pairDmcOk(cluster, -1, i);

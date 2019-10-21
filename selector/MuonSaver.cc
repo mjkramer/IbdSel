@@ -19,7 +19,7 @@ private:
   void initBranches() override;
 };
 
-void MuonTree::initBranches()
+inline void MuonTree::initBranches()
 {
   OB(detector, "b");
   OB(trigSec, "i");
@@ -42,18 +42,18 @@ private:
   bool isMuon_;
 };
 
-MuonSaver::MuonSaver() :
+inline MuonSaver::MuonSaver() :
   outTree("muons")
 {
 }
 
-void MuonSaver::connect(Pipeline& pipeline)
+inline void MuonSaver::connect(Pipeline& pipeline)
 {
   outTree.connect(pipeline);
   SimpleAlg::connect(pipeline);
 }
 
-Status MuonSaver::consume(const EventReader::Data& e)
+inline Status MuonSaver::consume(const EventReader::Data& e)
 {
   isMuon_ = false;
 

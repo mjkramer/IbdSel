@@ -39,7 +39,7 @@ private:
 
 };
 
-Status MuonAlg::consume(const EventReader::Data& e)
+inline Status MuonAlg::consume(const EventReader::Data& e)
 {
   auto put = [&](auto kind) {
     muonBuf.put({e.detector, kind, e.time()});
@@ -60,7 +60,7 @@ Status MuonAlg::consume(const EventReader::Data& e)
   return Status::Continue;
 }
 
-bool MuonAlg::isVetoed(const EventReader::Data& event) const
+inline bool MuonAlg::isVetoed(const EventReader::Data& event) const
 {
   const Time t = event.time();
 
