@@ -1,38 +1,34 @@
 #pragma once
 
-#include "SelectorFramework/core/SeqReader.cc"
+#include "SelectorFramework/core/SyncReader.cc"
 #include "SelectorFramework/core/Util.cc"
 
-class EventReader : public SeqReader {
+class EventTree : public TreeBase {
 public:
-  EventReader(bool useSCNL=false) :
-    SeqReader{useSCNL ? "/Event/Rec/AdSimpleNL" : "/Event/Rec/AdSimple",
-              "/Event/Data/CalibStats"},
-    useSCNL(useSCNL) {}
+  EventTree() {}
+  EventTree(bool useSCNL) : useSCNL(useSCNL) {}
 
-  struct Data {
-    // RecHeader (AdSimple etc.)
-    Short_t detector;
-    UInt_t triggerType, triggerNumber, triggerTimeSec, triggerTimeNanoSec;
-    Float_t energy;
+  // RecHeader (AdSimple etc.)
+  Short_t detector;
+  UInt_t triggerType, triggerNumber, triggerTimeSec, triggerTimeNanoSec;
+  Float_t energy;
 
-    // CalibStats
-    Int_t nHit;
-    Float_t Quadrant, MaxQ, MaxQ_2inchPMT, time_PSD, time_PSD1;
-    Float_t NominalCharge;
+  // CalibStats
+  Int_t nHit;
+  Float_t Quadrant, MaxQ, MaxQ_2inchPMT, time_PSD, time_PSD1;
+  Float_t NominalCharge;
 
-    Time time() const { return { triggerTimeSec, triggerTimeNanoSec }; };
-    bool isAD() const { return detector <= 4; }
-    bool isWP() const { return detector == 5 || detector == 6; }
-  } data;
+  Time time() const { return { triggerTimeSec, triggerTimeNanoSec }; };
+  bool isAD() const { return detector <= 4; }
+  bool isWP() const { return detector == 5 || detector == 6; }
 
-private:
   void initBranches() override;
 
+private:
   bool useSCNL;
 };
 
-void EventReader::initBranches()
+void EventTree::initBranches()
 {
   BR(detector);
   BR(triggerType); BR(triggerNumber); BR(triggerTimeSec); BR(triggerTimeNanoSec);
@@ -41,5 +37,14 @@ void EventReader::initBranches()
   BR(nHit);
   BR(Quadrant); BR(MaxQ); BR(MaxQ_2inchPMT); BR(time_PSD); BR(time_PSD1);
 
-  initBranch(useSCNL ? "NominalChargeNL" : "NominalCharge", &data.NominalCharge);
+  BR_NAMED(NominalCharge, useSCNL ? "NominalChargeNL" : "NominalCharge");
 }
+
+class EventReader : public SyncReader<EventTree> {
+public:
+  EventReader(bool useSCNL=false) :
+    SyncReader({useSCNL ? "/Event/Rec/AdSimpleNL" : "/Event/Rec/AdSimple",
+                "/Event/Data/CalibStats"},
+      useSCNL /* forwarded to EventTree constructor */)
+  {}
+};

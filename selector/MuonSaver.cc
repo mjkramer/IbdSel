@@ -1,31 +1,11 @@
 #pragma once
 
-#include "SelectorFramework/core/OutTree.cc"
+#include "SelectorFramework/core/TreeWriter.cc"
 
 #include "EventReader.cc"
+#include "MuonTree.cc"
 
 using Status = Algorithm::Status;
-
-class MuonTree : public OutTree {
-public:
-  using OutTree::OutTree;
-
-  UChar_t detector;
-  UInt_t trigSec;
-  UInt_t trigNanoSec;
-  Float_t strength;
-
-private:
-  void initBranches() override;
-};
-
-void MuonTree::initBranches()
-{
-  OB(detector, "b");
-  OB(trigSec, "i");
-  OB(trigNanoSec, "i");
-  OB(strength, "F");
-}
 
 class MuonSaver : public SimpleAlg<EventReader> {
   static constexpr int WP_MIN_NHIT = 12;
@@ -38,7 +18,7 @@ public:
   bool isMuon() const { return isMuon_; }
 
 private:
-  MuonTree outTree;
+  TreeWriter<MuonTree> outTree;
   bool isMuon_;
 };
 
@@ -60,10 +40,10 @@ Status MuonSaver::consume(const EventReader::Data& e)
   auto put = [&](Float_t strength) {
     isMuon_ = true;
 
-    outTree.detector = e.detector;
-    outTree.trigSec = e.time().s;
-    outTree.trigNanoSec = e.time().ns;
-    outTree.strength = strength;
+    outTree.data.detector = e.detector;
+    outTree.data.trigSec = e.time().s;
+    outTree.data.trigNanoSec = e.time().ns;
+    outTree.data.strength = strength;
 
     outTree.fill();
   };

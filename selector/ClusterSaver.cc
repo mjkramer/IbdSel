@@ -1,33 +1,12 @@
 #pragma once
 
-#include "SelectorFramework/core/OutTree.cc"
-
 #include "EventReader.cc"
 #include "MuonSaver.cc"
+#include "ClusterTree.cc"
+
+#include "SelectorFramework/core/TreeWriter.cc"
 
 using Status = Algorithm::Status;
-
-class ClusterTree : public OutTree {
-  static constexpr int NMAX = 2048;
-public:
-  using OutTree::OutTree;
-
-  UChar_t size;
-  UInt_t trigSec[NMAX];
-  UInt_t trigNanoSec[NMAX];
-  Float_t energy[NMAX];
-
-private:
-  void initBranches() override;
-};
-
-void ClusterTree::initBranches()
-{
-  OB(size, "b");
-  tree()->Branch("trigSec", trigSec, "trigSec[size]/i");
-  tree()->Branch("trigNanoSec", trigNanoSec, "trigNanoSec[size]/i");
-  tree()->Branch("energy", energy, "energy[size]/F");
-}
 
 class ClusterSaver : public SimpleAlg<EventReader> {
   static constexpr float GAPSIZE_US = 1000;
@@ -41,7 +20,7 @@ public:
 private:
   void save();
 
-  ClusterTree singlesTree, clustersTree;
+  TreeWriter<ClusterTree> singlesTree, clustersTree;
   std::vector<EventReader::Data> events;
 
   const MuonSaver* muonSaver;
@@ -92,14 +71,14 @@ Status ClusterSaver::consume(const EventReader::Data& e)
 void ClusterSaver::save()
 {
   const int N = events.size();
-  ClusterTree& outTree = N > 1 ? clustersTree : singlesTree;
-  outTree.size = N;
+  TreeWriter<ClusterTree>& outTree = N > 1 ? clustersTree : singlesTree;
+  outTree.data.size = N;
 
   for (int i = 0; i < N; ++i) {
     const auto& e = events[i];
-    outTree.trigSec[i] = e.triggerTimeSec;
-    outTree.trigNanoSec[i] = e.triggerTimeNanoSec;
-    outTree.energy[i] = e.energy;
+    outTree.data.trigSec[i] = e.triggerTimeSec;
+    outTree.data.trigNanoSec[i] = e.triggerTimeNanoSec;
+    outTree.data.energy[i] = e.energy;
   }
 
   outTree.fill();
