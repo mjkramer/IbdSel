@@ -6,6 +6,7 @@
 #include "MuonSaver.cc"
 #include "FlasherCut.cc"
 #include "ClusterSaver.cc"
+#include "LivetimeSaver.cc"
 
 void stage1_main(const char* inFile, const char* outFile, int site)
 {
@@ -23,6 +24,8 @@ void stage1_main(const char* inFile, const char* outFile, int site)
   for (int detector = 1; detector <= maxDet; ++detector) {
     p.makeAlg<ClusterSaver>(detector);
   }
+
+  p.makeAlg<LivetimeSaver>();
 
   p.process({inFile});
 }

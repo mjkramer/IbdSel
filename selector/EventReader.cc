@@ -17,6 +17,7 @@ public:
   Int_t nHit;
   Float_t Quadrant, MaxQ, MaxQ_2inchPMT, time_PSD, time_PSD1;
   Float_t NominalCharge;
+  Float_t integralRunTime_ms;
 
   Time time() const { return { triggerTimeSec, triggerTimeNanoSec }; };
   bool isAD() const { return detector <= 4; }
@@ -36,6 +37,7 @@ void EventTree::initBranches()
 
   BR(nHit);
   BR(Quadrant); BR(MaxQ); BR(MaxQ_2inchPMT); BR(time_PSD); BR(time_PSD1);
+  BR(integralRunTime_ms);
 
   BR_NAMED(NominalCharge, useSCNL ? "NominalChargeNL" : "NominalCharge");
 }
