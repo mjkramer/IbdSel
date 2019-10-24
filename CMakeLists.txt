@@ -23,7 +23,7 @@ SET(SOURCES
     #selector/ClusterAlg.cc
     #selector/ClusterSaver.cc
     #selector/EventReader.cc
-    #selector/FlasherCut.cc
+    selector/FlasherCut.cc
     selector/ibd_main.cc
     #selector/MultCut.cc
     #selector/MuonAlg.cc
@@ -33,7 +33,7 @@ SET(SOURCES
     ##selector/SelectorFramework/samples/test.cc
     #selector/SelectSingles.cc
     selector/stage1_main.cc
-    #selector/TrigTypeCut.cc
+    selector/TrigTypeCut.cc
     )
 SET(HEADERS
     # Kernel
@@ -86,7 +86,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 find_package(ROOT REQUIRED)
 link_directories(${ROOT_LIBRARY_DIR})
 
-ROOT_GENERATE_DICTIONARY(Dict "${HEADERS}" OPTIONS -rml "lib${LIBNAME}.so" -rmf "lib${LIBNAME}.rootmap")
+ROOT_GENERATE_DICTIONARY(Dict "${HEADERS}" OPTIONS -rml "lib${LIBNAME}.so" -rmf "lib${LIBNAME}.rootmap" LINKDEF LinkDef.h)
 add_library(${LIBNAME} SHARED ${SOURCES} Dict.cxx)
 #add_library(${LIBNAME} SHARED ${SOURCES})
 
