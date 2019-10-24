@@ -1,4 +1,6 @@
-#include "SelectorFramework/core/BaseIO.cc"
+#pragma once
+
+#include "BaseIO.hh"
 
 class ClusterTree : public TreeBase {
   static constexpr int NMAX = 2048;
@@ -13,7 +15,7 @@ public:
   void initBranches() override;
 };
 
-void ClusterTree::initBranches()
+inline void ClusterTree::initBranches()
 {
   BR(size);
   BR_VARLEN(trigSec, size);

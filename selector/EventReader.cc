@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SeqReader.hh"
+#include "SyncReader.hh"
 #include "Util.hh"
 
 class EventTree : public TreeBase {
@@ -29,7 +29,7 @@ private:
   bool useSCNL;
 };
 
-inline void EventReader::initBranches()
+inline void EventTree::initBranches()
 {
   BR(detector);
   BR(triggerType); BR(triggerNumber); BR(triggerTimeSec); BR(triggerTimeNanoSec);

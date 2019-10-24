@@ -14,42 +14,30 @@ message(STATUS "Setting ${CMAKE_BUILD_TYPE} build")
 
 SET(SOURCES
     # core
-    # selector/SelectorFramework/core/Kernel.cc
-    # selector/SelectorFramework/core/OutTree.cc
-    # selector/SelectorFramework/core/RingBuf.cc
-    # selector/SelectorFramework/core/SeqReader.cc
-    # selector/SelectorFramework/core/Util.cc
-    ## selector
-    #selector/ClusterAlg.cc
-    #selector/ClusterSaver.cc
-    #selector/EventReader.cc
     selector/FlasherCut.cc
     selector/ibd_main.cc
-    #selector/MultCut.cc
-    #selector/MuonAlg.cc
-    #selector/MuonSaver.cc
-    #selector/SelectIBD.cc
-    ##selector/SelectorFramework/samples/SinglesVsMuons.cc
-    ##selector/SelectorFramework/samples/test.cc
-    #selector/SelectSingles.cc
     selector/stage1_main.cc
     selector/TrigTypeCut.cc
     )
 SET(HEADERS
     # Kernel
+    BaseIO.hh
     Kernel.hh
-    OutTree.hh
     RingBuf.hh
-    SeqReader.hh
+    SyncReader.hh
+    TreeWriter.hh
     Util.hh
     # Selector
     ClusterAlg.hh
     ClusterSaver.hh
+    ClusterTree.hh
     EventReader.hh
     FlasherCut.hh
+    LivetimeSaver.hh
     MultCut.hh
     MuonAlg.hh
     MuonSaver.hh
+    MuonTree.hh
     SelectIBD.hh
     # Functions
     stage1_main.hh

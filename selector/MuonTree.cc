@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SelectorFramework/core/BaseIO.cc"
+#include "BaseIO.hh"
 
 class MuonTree : public TreeBase {
 public:
@@ -12,7 +12,7 @@ public:
   void initBranches() override;
 };
 
-void MuonTree::initBranches()
+inline void MuonTree::initBranches()
 {
   BR(detector);
   BR(trigSec);

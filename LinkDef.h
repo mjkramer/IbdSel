@@ -15,10 +15,9 @@
 #pragma link C++ class EventReader::Data+;
 #pragma link C++ class MuonAlg+;
 #pragma link C++ class MuonSaver+;
-#pragma link C++ class OutTree+;
+#pragma link C++ class LivetimeSaver+;
 #pragma link C++ class SelectIBD+;
 #pragma link C++ class SelectSingles+;
-#pragma link C++ class SeqReader+;
 
 #pragma link C++ function stage1_main;
 #pragma link C++ function ibd_main;
