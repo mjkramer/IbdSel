@@ -4,3 +4,4 @@ build/
 .envrc
 output/
 inputs
+results.root
