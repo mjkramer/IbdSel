@@ -1,14 +1,12 @@
 #include <string>
 #include <vector>
 
-#include "stage1_main.hh"
-
 #include "EventReader.hh"
-#include "MuonSaver.hh"
-#include "ClusterSaver.hh"
-
 #include "TrigTypeCut.hh"
+#include "MuonSaver.hh"
 #include "FlasherCut.hh"
+#include "ClusterSaver.hh"
+#include "LivetimeSaver.hh"
 
 void stage1_main(const char* inFile, const char* outFile, int site)
 {
@@ -27,6 +25,7 @@ void stage1_main(const char* inFile, const char* outFile, int site)
     p.makeAlg<ClusterSaver>(detector);
   }
 
+  p.makeAlg<LivetimeSaver>();
+
   p.process({inFile});
 }
-
