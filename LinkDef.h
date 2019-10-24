@@ -4,6 +4,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ function DataTypeToChar;
+
 #pragma link C++ class Pipeline+;
 #pragma link C++ class Tool+;
 
@@ -12,7 +14,6 @@
 #pragma link C++ class ClusterAlg+;
 #pragma link C++ class ClusterSaver+;
 #pragma link C++ nestedclass EventReader+;
-#pragma link C++ class EventReader::Data+;
 #pragma link C++ class MuonAlg+;
 #pragma link C++ class MuonSaver+;
 #pragma link C++ class LivetimeSaver+;
