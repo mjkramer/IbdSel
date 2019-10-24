@@ -14,11 +14,11 @@ message(STATUS "Setting ${CMAKE_BUILD_TYPE} build")
 
 SET(SOURCES
     # core
-    #selector/SelectorFramework/core/Kernel.cc
-    #selector/SelectorFramework/core/OutTree.cc
-    #selector/SelectorFramework/core/RingBuf.cc
-    #selector/SelectorFramework/core/SeqReader.cc
-    #selector/SelectorFramework/core/Util.cc
+    # selector/SelectorFramework/core/Kernel.cc
+    # selector/SelectorFramework/core/OutTree.cc
+    # selector/SelectorFramework/core/RingBuf.cc
+    # selector/SelectorFramework/core/SeqReader.cc
+    # selector/SelectorFramework/core/Util.cc
     ## selector
     #selector/ClusterAlg.cc
     #selector/ClusterSaver.cc
@@ -42,7 +42,7 @@ SET(HEADERS
     RingBuf.hh
     SeqReader.hh
     Util.hh
-    # selector
+    # Selector
     ClusterAlg.hh
     ClusterSaver.hh
     EventReader.hh
@@ -51,6 +51,9 @@ SET(HEADERS
     MuonAlg.hh
     MuonSaver.hh
     SelectIBD.hh
+    # Functions
+    stage1_main.hh
+    ibd_main.hh
     #SelectorFramework/samples/SinglesVsMuons.hh
     #SelectorFramework/samples/test.hh
     SelectSingles.hh
@@ -83,7 +86,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 find_package(ROOT REQUIRED)
 link_directories(${ROOT_LIBRARY_DIR})
 
-ROOT_GENERATE_DICTIONARY(Dict "${HEADERS}" OPTIONS -interpreteronly)
+ROOT_GENERATE_DICTIONARY(Dict "${HEADERS}" OPTIONS -rml "lib${LIBNAME}.so" -rmf "lib${LIBNAME}.rootmap")
 add_library(${LIBNAME} SHARED ${SOURCES} Dict.cxx)
 #add_library(${LIBNAME} SHARED ${SOURCES})
 

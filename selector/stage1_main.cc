@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 
+#include "stage1_main.hh"
+
 #include "EventReader.hh"
 #include "MuonSaver.hh"
 #include "ClusterSaver.hh"
@@ -8,7 +10,7 @@
 #include "TrigTypeCut.hh"
 #include "FlasherCut.hh"
 
-inline void stage1_main(const char* inFile, const char* outFile, int site)
+void stage1_main(const char* inFile, const char* outFile, int site)
 {
   Pipeline p;
 
