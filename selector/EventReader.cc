@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SelectorFramework/core/SeqReader.cc"
-#include "SelectorFramework/core/Util.cc"
+#include "SeqReader.hh"
+#include "Util.hh"
 
 class EventReader : public SeqReader {
 public:

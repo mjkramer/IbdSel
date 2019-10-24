@@ -5,7 +5,7 @@ set(LIBNAME IbdSel)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-set(CMAKE_CXX_COMPILER, "clang++")
+#set(CMAKE_CXX_COMPILER, "clang++")
 set(CMAKE_CXX_STANDARD, 14)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -14,29 +14,29 @@ message(STATUS "Setting ${CMAKE_BUILD_TYPE} build")
 
 SET(SOURCES
     # core
-    selector/SelectorFramework/core/Kernel.cc
-    selector/SelectorFramework/core/OutTree.cc
-    selector/SelectorFramework/core/RingBuf.cc
-    selector/SelectorFramework/core/SeqReader.cc
-    selector/SelectorFramework/core/Util.cc
-    # selector
-    selector/ClusterAlg.cc
-    selector/ClusterSaver.cc
-    selector/EventReader.cc
-    selector/FlasherCut.cc
+    #selector/SelectorFramework/core/Kernel.cc
+    #selector/SelectorFramework/core/OutTree.cc
+    #selector/SelectorFramework/core/RingBuf.cc
+    #selector/SelectorFramework/core/SeqReader.cc
+    #selector/SelectorFramework/core/Util.cc
+    ## selector
+    #selector/ClusterAlg.cc
+    #selector/ClusterSaver.cc
+    #selector/EventReader.cc
+    #selector/FlasherCut.cc
     selector/ibd_main.cc
-    selector/MultCut.cc
-    selector/MuonAlg.cc
-    selector/MuonSaver.cc
-    selector/SelectIBD.cc
-    #selector/SelectorFramework/samples/SinglesVsMuons.cc
-    #selector/SelectorFramework/samples/test.cc
-    selector/SelectSingles.cc
+    #selector/MultCut.cc
+    #selector/MuonAlg.cc
+    #selector/MuonSaver.cc
+    #selector/SelectIBD.cc
+    ##selector/SelectorFramework/samples/SinglesVsMuons.cc
+    ##selector/SelectorFramework/samples/test.cc
+    #selector/SelectSingles.cc
     selector/stage1_main.cc
-    selector/TrigTypeCut.cc
+    #selector/TrigTypeCut.cc
     )
 SET(HEADERS
-    # core
+    # Kernel
     Kernel.hh
     OutTree.hh
     RingBuf.hh
@@ -47,15 +47,13 @@ SET(HEADERS
     ClusterSaver.hh
     EventReader.hh
     FlasherCut.hh
-    ibd_main.hh
     MultCut.hh
     MuonAlg.hh
     MuonSaver.hh
     SelectIBD.hh
-    #SinglesVsMuons.hh
-    #test.hh
+    #SelectorFramework/samples/SinglesVsMuons.hh
+    #SelectorFramework/samples/test.hh
     SelectSingles.hh
-    stage1_main.hh
     TrigTypeCut.hh
     )
 message(STATUS "Sources: ${SOURCES}")

@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "EventReader.cc"
-#include "MuonAlg.cc"
+#include "EventReader.hh"
+#include "MuonAlg.hh"
 
 using Data = EventReader::Data;
 

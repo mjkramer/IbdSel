@@ -2,9 +2,9 @@
 
 #include <TH1F.h>
 
-#include "ClusterAlg.cc"
-#include "MuonAlg.cc"
-#include "MultCut.cc"
+#include "ClusterAlg.hh"
+#include "MuonAlg.hh"
+#include "MultCut.hh"
 
 using Status = Algorithm::Status;
 using Data = EventReader::Data;

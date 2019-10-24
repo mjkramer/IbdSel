@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SelectorFramework/core/OutTree.cc"
+#include "OutTree.hh"
 
-#include "EventReader.cc"
-#include "MuonSaver.cc"
+#include "EventReader.hh"
+#include "MuonSaver.hh"
 
 using Status = Algorithm::Status;
 

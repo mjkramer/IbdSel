@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SelectorFramework/core/OutTree.cc"
+#include "OutTree.hh"
 
-#include "EventReader.cc"
+#include "EventReader.hh"
 
 using Status = Algorithm::Status;
 

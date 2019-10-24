@@ -1,11 +1,12 @@
 #include <string>
 #include <vector>
 
-#include "EventReader.cc"
+#include "EventReader.hh"
+#include "MuonSaver.hh"
+#include "ClusterSaver.hh"
+
 #include "TrigTypeCut.hh"
-#include "MuonSaver.cc"
 #include "FlasherCut.hh"
-#include "ClusterSaver.cc"
 
 inline void stage1_main(const char* inFile, const char* outFile, int site)
 {
@@ -26,3 +27,4 @@ inline void stage1_main(const char* inFile, const char* outFile, int site)
 
   p.process({inFile});
 }
+

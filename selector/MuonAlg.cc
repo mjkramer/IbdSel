@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SelectorFramework/core/RingBuf.cc"
-#include "SelectorFramework/core/Util.cc"
+#include "RingBuf.hh"
+#include "Util.hh"
 
-#include "EventReader.cc"
+#include "EventReader.hh"
 
 using Status = Algorithm::Status;
 

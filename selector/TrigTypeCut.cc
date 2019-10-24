@@ -1,4 +1,3 @@
-#pragma once
 #include "TrigTypeCut.hh"
 
 Algorithm::Status trigTypeCut(const EventReader::Data& e)
