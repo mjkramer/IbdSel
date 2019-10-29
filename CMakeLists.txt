@@ -14,9 +14,13 @@ message(STATUS "Setting ${CMAKE_BUILD_TYPE} build")
 
 SET(SOURCES
     # core
+    selector/ClusterAlg.cc
+    selector/ClusterSaver.cc
     selector/FlasherCut.cc
     selector/ibd_main.cc
     selector/stage1_main.cc
+    selector/SelectIBD.cc
+    selector/SelectSingles.cc
     selector/TrigTypeCut.cc
     )
 SET(HEADERS

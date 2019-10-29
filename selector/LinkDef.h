@@ -8,6 +8,7 @@
 
 #pragma link C++ class Pipeline+;
 #pragma link C++ class Tool+;
+#pragma link C++ class EventReader+;
 
 #pragma link C++ function trigTypeCut;
 
@@ -19,6 +20,10 @@
 #pragma link C++ class LivetimeSaver+;
 #pragma link C++ class SelectIBD+;
 #pragma link C++ class SelectSingles+;
+
+#pragma link C++ function makeAlg<ClusterAlg>;
+#pragma link C++ function makeAlg<SelectIBD>;
+#pragma link C++ function makeAlg<SelectSingles>;
 
 #pragma link C++ function stage1_main;
 #pragma link C++ function ibd_main;
