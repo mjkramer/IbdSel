@@ -2,3 +2,6 @@
 	path = selector/SelectorFramework
 	;url = https://github.com/mjkramer/SelectorFramework
 	url = https://github.com/maxfl/SelectorFramework
+[submodule "dag-flow"]
+	path = dag-flow
+	url = https://git.jinr.ru/maxfl/dag-flow.git
