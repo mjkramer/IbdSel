@@ -5,9 +5,8 @@ from load import ROOT as R
 from pprint import pprint
 import os
 from os import path
-from collections import OrderedDict
-
-# import cuts
+import ordered_yaml
+from stdvector import stdvector
 
 from dagflow.node_deco import NodeInstanceMember, NodeInstanceStaticMember
 from dagflow.membernode import MemberNodesHolder
@@ -150,21 +149,28 @@ class analysisManager(MemberNodesHolder):
     def InitAnalyzers(self):
         p = self.pipeline = R.Pipeline()
 
-        # p.makeOutFile(args.output)
+        # algs_pre   = ( 'EventReader', 'TrigTypeCut', 'MuonSaver', 'FlasherCut' )
+        # algs_ad    = ( 'ClusterSaver', )
+        algs_pre   = ( 'EventReader', 'TrigTypeCut', 'FlasherCut' )
+        algs_ad    = ()
+        algs_post  = ( 'LivetimeSaver', )
 
-        p.makeAlg('EventReader')()
-        p.makeAlg('TrigTypeCut')()
-        # p.makeAlg('MuonSaver')()
-        p.makeAlg('FlasherCut')()
+        for alg in algs_pre:
+            self.print(1, 'Add algorithm '+alg)
+            p.makeAlg(alg)()
 
-        # detectors = list(range(1, 5 if args.site==3 else 2))
-        # for det in detectors:
-            # R.makeAlg('ClusterSaver')(p, det)
+        # TODO
+        # detectors = list(range(1, 5 if self.opts.site==3 else 2))
+        detectors = list(range(1, 5))
+        if algs_ad:
+            for det in detectors:
+                for alg in algs_ad:
+                    self.print(1, 'Add AD algorithm {} ({})'.format(alg, det))
+                    R.makeAlg(alg)(p, det)
 
-        p.makeAlg('LivetimeSaver')()
-
-        # v = stdvector(args.input)
-        # p.process(v)
+        for alg in algs_post:
+            self.print(1, 'Add algorithm {}'.format(alg))
+            p.makeAlg(alg)()
 
     @NodeInstanceStaticMember(label='Next filename (loop)')
     def CurrentFileIteration(self):
@@ -179,8 +185,8 @@ class analysisManager(MemberNodesHolder):
         Load a single file, read data trees and set them to the TreeAnalyzer
         """
         nevents=-1
-        # TODO
-        # nevents=self.analyzer.execute(self.opts.events, self.fileinfo['run'])
+        v = stdvector((self.current_filename,))
+        self.pipeline.process(v)
 
         status = 'success'
         events = 'all'
@@ -284,26 +290,26 @@ class analysisManager(MemberNodesHolder):
         auto_title = kwargs.pop('auto_title', False)
         assert not kwargs, 'Unparsed arguments: '+str(kwargs)
 
-        # data = cuts.ordered_dump(info)
+        data = ordered_yaml.ordered_dump(info)
 
-        # if auto_title:
-            # title = str(data)
-            # if title[-1]=='\n':
-                # title = title[:-1]
-            # title = title.replace('\n', '; ')
+        if auto_title:
+            title = str(data)
+            if title[-1]=='\n':
+                title = title[:-1]
+            title = title.replace('\n', '; ')
 
-        # if title:
-            # title = title+' (yaml)'
-        # else:
-            # title = 'YAML data'
+        if title:
+            title = title+' (yaml)'
+        else:
+            title = 'YAML data'
 
-        # odata = R.TObjString(data)
-        # self.outputfile.WriteTObject(odata, name, 'overwrite')
-        # key = self.outputfile.GetKey(name)
-        # key.SetTitle(title)
+        odata = R.TObjString(data)
+        self.outputfile.WriteTObject(odata, name, 'overwrite')
+        key = self.outputfile.GetKey(name)
+        key.SetTitle(title)
 
-        # self.print(print_threshold, 'Save info as {name}: {title}'.format(name=name, title=title))
-        # self.print(print_threshold, data, end='\n')
+        self.print(print_threshold, 'Save info as {name}: {title}'.format(name=name, title=title))
+        self.print(print_threshold, data, end='\n')
 
     @NodeInstanceStaticMember(label='Create output file')
     def CreateOutputFile(self):
@@ -328,15 +334,11 @@ class analysisManager(MemberNodesHolder):
         self.print(2, 'Create output file:', output)
 
         self.outputfilename = output
+        self.outputfile = self.pipeline.makeOutFile(self.outputfilename, "", True)
+        assert not self.outputfile.IsZombie(), 'Can not create output file: '+output
 
-        # TODO
-        # self.outputfile = R.TFile(output, 'recreate')
-        # assert not self.outputfile.IsZombie(), 'Can not create output file: '+output
-
-        # self.saveInfo('fileinfo', self.fileinfo, 'Input file info')
+        self.saveInfo('fileinfo', self.fileinfo, 'Input file info')
         # self.saveInfo('cuts',     self.cuts, 'Cuts summary', 4)
-
-        # self.analyzer.newOutputFile(self.outputfile)
 
     def run(self):
         self.AnalyzeSingles.touch()

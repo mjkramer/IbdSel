@@ -28,23 +28,23 @@ def ordered_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
     OrderedDumper.add_representer(OrderedDict, _dict_representer)
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
-from glob import glob
-from os.path import splitext, basename
+# from glob import glob
+# from os.path import splitext, basename
 
-cuts_fmt = 'config/cuts/{name}.yaml'
-cuts_mask = cuts_fmt.format(name='*')
+# cuts_fmt = 'config/cuts/{name}.yaml'
+# cuts_mask = cuts_fmt.format(name='*')
 
-def available_cutsets():
-    return [splitext(basename(filename))[0] for filename in glob(cuts_mask)]
+# def available_cutsets():
+    # return [splitext(basename(filename))[0] for filename in glob(cuts_mask)]
 
-def load_cutset(name, verbose=False):
-    filename = cuts_fmt.format(name=name)
-    data = ordered_load(open(filename, 'r'))
+# def load_cutset(name, verbose=False):
+    # filename = cuts_fmt.format(name=name)
+    # data = ordered_load(open(filename, 'r'))
 
-    if verbose:
-        print('Load cuts:', name)
+    # if verbose:
+        # print('Load cuts:', name)
 
-        if verbose:
-            print(ordered_dump(data))
+        # if verbose:
+            # print(ordered_dump(data))
 
-    return data
+    # return data

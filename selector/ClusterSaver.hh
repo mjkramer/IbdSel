@@ -84,4 +84,3 @@ inline void ClusterSaver::save()
   outTree.fill();
 }
 
-ClusterSaver& makeClusterSaver(Pipeline& p, int d);

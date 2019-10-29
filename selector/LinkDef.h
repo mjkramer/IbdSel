@@ -22,6 +22,7 @@
 #pragma link C++ class SelectSingles-;
 
 #pragma link C++ function makeAlg<ClusterAlg>;
+#pragma link C++ function makeAlg<ClusterSaver>;
 #pragma link C++ function makeAlg<SelectIBD>;
 #pragma link C++ function makeAlg<SelectSingles>;
 

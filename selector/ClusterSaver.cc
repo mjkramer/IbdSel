@@ -1,6 +1,3 @@
 #include "ClusterSaver.hh"
 
-ClusterSaver& makeClusterSaver(Pipeline& p, int d){
-  return p.makeAlg<ClusterSaver>(d);
-}
-
+template ClusterSaver& makeAlg<ClusterSaver>(Pipeline&, int);
