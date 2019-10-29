@@ -1,6 +1,7 @@
 #pragma once
 
 #include <TH1F.h>
+#include <TParameter.h>
 
 #include "Kernel.hh"
 
@@ -29,4 +30,7 @@ inline void LivetimeSaver::finalize(Pipeline& _pipeline)
   auto h = new TH1F("h_livetime", "Livetime (s)", 1, 0, 1);
   h->SetBinContent(1, last_integralRunTime_ms / 1000);
   h->Write();
+
+  auto p = new TParameter<float>("p_livetime", last_integralRunTime_ms);
+  p->Write();
 }
