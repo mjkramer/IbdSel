@@ -12,12 +12,12 @@ def main(args):
 
     p.makeAlg('EventReader')()
     p.makeAlg('TrigTypeCut')()
-    # p.makeAlg('MuonSaver')()
+    p.makeAlg('MuonSaver')()
     p.makeAlg('FlasherCut')()
 
-    # detectors = list(range(1, 5 if args.site==3 else 2))
-    # for det in detectors:
-        # R.makeAlg('ClusterSaver')(p, det)
+    detectors = list(range(1, 5 if args.site==3 else 2))
+    for det in detectors:
+        R.makeAlg('ClusterSaver')(p, det)
 
     p.makeAlg('LivetimeSaver')()
 

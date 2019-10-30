@@ -149,10 +149,8 @@ class analysisManager(MemberNodesHolder):
     def InitAnalyzers(self):
         p = self.pipeline = R.Pipeline()
 
-        # algs_pre   = ( 'EventReader', 'TrigTypeCut', 'MuonSaver', 'FlasherCut' )
-        # algs_ad    = ( 'ClusterSaver', )
-        algs_pre   = ( 'EventReader', 'TrigTypeCut', 'FlasherCut' )
-        algs_ad    = ()
+        algs_pre   = ( 'EventReader', 'TrigTypeCut', 'MuonSaver', 'FlasherCut' )
+        algs_ad    = ( 'ClusterSaver', )
         algs_post  = ( 'LivetimeSaver', )
 
         for alg in algs_pre:

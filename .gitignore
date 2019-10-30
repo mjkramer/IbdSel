@@ -5,3 +5,4 @@ build/
 output/
 inputs
 results.root
+.nvimrc
