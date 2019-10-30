@@ -15,6 +15,7 @@ public:
   MuonSaver();
   void connect(Pipeline& pipeline) override;
   Status consume(const EventReader::Data& e) override;
+  void finalize(Pipeline& pipeline) override;
   bool isMuon() const { return isMuon_; }
 
 private:
@@ -55,4 +56,9 @@ inline Status MuonSaver::consume(const EventReader::Data& e)
     put(e.nHit);
 
   return Status::Continue;
+}
+
+inline void MuonSaver::finalize(Pipeline& pipeline)
+{
+  outTree.write();
 }
