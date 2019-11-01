@@ -23,17 +23,17 @@ public:
   void connect(Pipeline& p) override;
   Algorithm::Status consume(const MuonTree& e) override;
 
-  double vetoTime_s(Det detector);
+  bool isVetoed(Time t, int detector) const;
+  double vetoTime_s(Det detector) const;
 
 private:
   void initCuts(const Config* config);
-  Time endOfLastVeto(size_t idet);
-  bool isWP(const MuonTree& e);
-  bool isShower(const MuonTree& e);
-  bool isAD(const MuonTree& e);
-  float nomPostVeto_us(const MuonTree& e);
-  float effVeto_us(const MuonTree& e, size_t idet);
-  bool isVetoed(Time t, int detector);
+  Time endOfLastVeto(size_t idet) const;
+  bool isWP(const MuonTree& e) const;
+  bool isShower(const MuonTree& e) const;
+  bool isAD(const MuonTree& e) const;
+  float nomPostVeto_us(const MuonTree& e) const;
+  float effVeto_us(const MuonTree& e, size_t idet) const;
 
   Purpose purpose;
 
@@ -82,12 +82,12 @@ void MuonAlg::connect(Pipeline& p)
   } // Otherwise just use defaults
 }
 
-double MuonAlg::vetoTime_s(Det detector)
+double MuonAlg::vetoTime_s(Det detector) const
 {
   return vetoTime_s_[int(detector) - 1];
 }
 
-inline Time MuonAlg::endOfLastVeto(size_t idet)
+inline Time MuonAlg::endOfLastVeto(size_t idet) const
 {
   const Time wpEnd = lastWpTime.shifted_us(wpMuPostVeto_us);
   const Time adEnd = lastAdTime[idet].shifted_us(adMuPostVeto_us);
@@ -96,23 +96,23 @@ inline Time MuonAlg::endOfLastVeto(size_t idet)
   return std::max({wpEnd, adEnd, showerEnd});
 }
 
-inline bool MuonAlg::isWP(const MuonTree& e)
+inline bool MuonAlg::isWP(const MuonTree& e) const
 {
   return (e.detector == 5 || e.detector == 6) &&
     e.strength > wpMuNhitCut;
 }
 
-inline bool MuonAlg::isShower(const MuonTree& e)
+inline bool MuonAlg::isShower(const MuonTree& e) const
 {
   return e.detector <= 4 && e.strength > showerMuChgCut;
 }
 
-inline bool MuonAlg::isAD(const MuonTree& e)
+inline bool MuonAlg::isAD(const MuonTree& e) const
 {
   return e.detector <= 4 && e.strength > adMuChgCut && !isShower(e);
 }
 
-inline float MuonAlg::nomPostVeto_us(const MuonTree& e)
+inline float MuonAlg::nomPostVeto_us(const MuonTree& e) const
 {
   if (isWP(e))
     return wpMuPostVeto_us;
@@ -124,7 +124,7 @@ inline float MuonAlg::nomPostVeto_us(const MuonTree& e)
     return 0;
 }
 
-float MuonAlg::effVeto_us(const MuonTree& e, size_t idet)
+float MuonAlg::effVeto_us(const MuonTree& e, size_t idet) const
 {
   const Time lastEnd = endOfLastVeto(idet);
   const double delta_us = e.time().diff_us(lastEnd);
@@ -168,7 +168,7 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
   return Status::Continue;
 }
 
-bool MuonAlg::isVetoed(Time t, int detector)
+bool MuonAlg::isVetoed(Time t, int detector) const
 {
   for (const auto& muon : muonBuf) {
     const float dt_us = t.diff_us(muon.time());
