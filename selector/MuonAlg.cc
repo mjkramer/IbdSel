@@ -1,93 +1,191 @@
 #pragma once
 
+#include "Readers.cc"
+#include "Constants.cc"
+
+#include "SelectorFramework/core/ConfigTool.cc"
 #include "SelectorFramework/core/RingBuf.cc"
 #include "SelectorFramework/core/Util.cc"
 
-#include "EventReader.cc"
+#include <algorithm>
 
-using Status = Algorithm::Status;
-
-class MuonAlg : public SimpleAlg<EventReader> {
-  static constexpr unsigned N_MUONS = 1000; // how far back to remember
-  static constexpr float WP_NHIT_CUT = 12;
-  static constexpr float AD_CHG_CUT = 3000;
-  static constexpr float SHOWER_CHG_CUT = 300'000;
-  static constexpr float WP_VETO = 600;
-  static constexpr float AD_VETO = 1400;
-  static constexpr float SHOWER_VETO = 400'400;
-  static constexpr float PRE_VETO = 2;
+class MuonAlg : public SimpleAlg<MuonReader> {
+  static constexpr unsigned BUF_SIZE = 1000;
 
 public:
-  enum class Kind { WP, AD, Shower };
+  enum class Purpose { ForIBDs, ForSingles };
 
-  struct Muon {
-    short detector;
-    Kind kind;
-    Time t;
-  };
+  MuonAlg(Purpose purp) :
+    purpose(purp), muonBuf(BUF_SIZE) {}
 
-  MuonAlg() : muonBuf(N_MUONS) {}
+  int getTag() override { return int(purpose); }
 
-  Status consume(const EventReader::Data& e) override;
+  void connect(Pipeline& p) override;
+  Algorithm::Status consume(const MuonTree& e) override;
 
-  bool isVetoed(const EventReader::Data& e) const;
-
-  const RingBuf<Muon>& getBuf() const { return muonBuf; }
+  double vetoTime_s(Det detector);
 
 private:
-  RingBuf<Muon> muonBuf;
+  void initCuts(const Config* config);
+  Time endOfLastVeto(size_t idet);
+  bool isWP(const MuonTree& e);
+  bool isShower(const MuonTree& e);
+  bool isAD(const MuonTree& e);
+  float nomPostVeto_us(const MuonTree& e);
+  float effVeto_us(const MuonTree& e, size_t idet);
+  bool isVetoed(Time t, int detector);
 
+  Purpose purpose;
+
+  double muPreVeto_us = 2;
+
+  int wpMuNhitCut = 12;
+  double wpMuPostVeto_us = 600;
+
+  double adMuChgCut = 3000;
+  double adMuPostVeto_us = 1400;
+
+  double showerMuChgCut = 300'000 ;
+  double showerMuPostVeto_us = 400'400;
+
+  Time lastWpTime;
+  Time lastAdTime[4];
+  Time lastShowerTime[4];
+
+  RingBuf<MuonTree> muonBuf;
+  double vetoTime_s_[4] = {0};
 };
 
-Status MuonAlg::consume(const EventReader::Data& e)
+void MuonAlg::initCuts(const Config* config)
 {
-  auto put = [&](auto kind) {
-    muonBuf.put({e.detector, kind, e.time()});
-  };
+  BEGIN_CONFIG(config);
 
-  if (e.detector == 5 || e.detector == 6) {
-    if (e.nHit > WP_NHIT_CUT)
-      put(Kind::WP);
+  CONFIG(muPreVeto_us);
+
+  CONFIG(wpMuNhitCut);
+  CONFIG(wpMuPostVeto_us);
+
+  CONFIG(adMuChgCut);
+  CONFIG(adMuPostVeto_us);
+
+  CONFIG(showerMuChgCut);
+  CONFIG(showerMuPostVeto_us);
+
+  END_CONFIG();
+}
+
+void MuonAlg::connect(Pipeline& p)
+{
+  if (purpose == Purpose::ForIBDs) {
+    auto config = p.getTool<Config>();
+    initCuts(config);
+  } // Otherwise just use defaults
+}
+
+double MuonAlg::vetoTime_s(Det detector)
+{
+  return vetoTime_s_[int(detector) - 1];
+}
+
+inline Time MuonAlg::endOfLastVeto(size_t idet)
+{
+  const Time wpEnd = lastWpTime.shifted_us(wpMuPostVeto_us);
+  const Time adEnd = lastAdTime[idet].shifted_us(adMuPostVeto_us);
+  const Time showerEnd = lastShowerTime[idet].shifted_us(showerMuPostVeto_us);
+
+  return std::max({wpEnd, adEnd, showerEnd});
+}
+
+inline bool MuonAlg::isWP(const MuonTree& e)
+{
+  return (e.detector == 5 || e.detector == 6) &&
+    e.strength > wpMuNhitCut;
+}
+
+inline bool MuonAlg::isShower(const MuonTree& e)
+{
+  return e.detector <= 4 && e.strength > showerMuChgCut;
+}
+
+inline bool MuonAlg::isAD(const MuonTree& e)
+{
+  return e.detector <= 4 && e.strength > adMuChgCut && !isShower(e);
+}
+
+inline float MuonAlg::nomPostVeto_us(const MuonTree& e)
+{
+  if (isWP(e))
+    return wpMuPostVeto_us;
+  else if (isShower(e))
+    return showerMuPostVeto_us;
+  else if (isAD(e))
+    return adMuPostVeto_us;
+  else
+    return 0;
+}
+
+float MuonAlg::effVeto_us(const MuonTree& e, size_t idet)
+{
+  const Time lastEnd = endOfLastVeto(idet);
+  const double delta_us = e.time().diff_us(lastEnd);
+  const double post_us = nomPostVeto_us(e);
+
+  if (delta_us >= muPreVeto_us)
+    return muPreVeto_us + post_us;
+
+  if (0 <= delta_us && delta_us < muPreVeto_us)
+    return delta_us + post_us;
+
+  if (-post_us <= delta_us && delta_us < 0)
+    return delta_us + post_us;
+
+  else                          // delta_us < -post_us
+    return 0;
+}
+
+Algorithm::Status MuonAlg::consume(const MuonTree& e)
+{
+  if (!isWP(e) && !isAD(e) && !isShower(e))
+    return Status::Continue;
+
+  if (isWP(e)) {
+    lastWpTime = e.time();
+    for (size_t idet = 0; idet < 4; ++idet)
+      vetoTime_s_[idet] += 1e-6 * effVeto_us(e, idet);
   }
 
-  else if (e.detector < 5) {
-    if (e.NominalCharge > SHOWER_CHG_CUT)
-      put(Kind::Shower);
-    else if (e.NominalCharge > AD_CHG_CUT)
-      put(Kind::AD);
+  else if (isAD(e) || isShower(e)) {
+    const size_t idet = e.detector - 1;
+    vetoTime_s_[idet] += 1e-6 * effVeto_us(e, idet);
+    if (isShower(e))
+      lastShowerTime[idet] = e.time();
+    else
+      lastAdTime[idet] = e.time();
   }
+
+  muonBuf.put(e);
 
   return Status::Continue;
 }
 
-bool MuonAlg::isVetoed(const EventReader::Data& event) const
+bool MuonAlg::isVetoed(Time t, int detector)
 {
-  const Time t = event.time();
-
   for (const auto& muon : muonBuf) {
-    const float dt_us = t.diff_us(muon.t);
+    const float dt_us = t.diff_us(muon.time());
 
-    if (SHOWER_VETO < dt_us)            // no more muons worth checking
+    if (showerMuPostVeto_us < dt_us)    // no more muons worth checking
       break;
 
-    if (dt_us < -PRE_VETO)              // way-after-event muon
+    if (dt_us < -muPreVeto_us)  // way-after-event muon
       continue;
 
-    if (muon.detector < 5 && muon.detector != event.detector)
-      continue;                         // Ignore muons in other ADs
+    if (muon.detector <= 4 && muon.detector != detector)
+      continue;                 // Ignore muons in other ADs
 
-    if (-PRE_VETO < dt_us && dt_us < 0) // pre-muon veto
+    if (-muPreVeto_us < dt_us && dt_us < 0) // pre-muon veto
       return true;
 
-    const auto postMuonVeto_us = [&]() -> float {
-      switch (muon.kind) {
-      case MuonAlg::Kind::WP:     return WP_VETO;
-      case MuonAlg::Kind::AD:     return AD_VETO;
-      case MuonAlg::Kind::Shower: return SHOWER_VETO;
-      } return {};              // silence compiler warning
-    }();
-
-    if (dt_us < postMuonVeto_us)
+    if (dt_us < nomPostVeto_us(muon))
       return true;
   }
 
