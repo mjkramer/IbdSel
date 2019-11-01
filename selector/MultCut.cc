@@ -1,11 +1,12 @@
 #pragma once
 
 #include <vector>
+#include <cassert>
 
-#include "EventReader.cc"
+#include "Readers.cc"
 #include "MuonAlg.cc"
 
-using Data = EventReader::Data;
+using Data = ClusterTree;
 
 class MultCutTool : public Tool {
   static constexpr float PROMPT_MIN = 0.7;
@@ -14,8 +15,10 @@ class MultCutTool : public Tool {
 public:
   void connect(Pipeline& pipeline) override;
 
-  bool pairDmcOk(const std::vector<Data>& cluster, size_t iP, size_t iD) const;
-  bool singleDmcOk(const std::vector<Data>& cluster, size_t i) const;
+  bool pairDmcOk(const Data& cluster, int detector,
+                 size_t iP, size_t iD) const;
+  bool singleDmcOk(const Data& cluster, int detector,
+                   size_t i) const;
 
 private:
   const MuonAlg* muonAlg;
@@ -24,17 +27,18 @@ private:
 void MultCutTool::connect(Pipeline& pipeline)
 {
   muonAlg = pipeline.getAlg<MuonAlg>();
+  assert(muonAlg->getTag() == MuonAlg::Purpose::ForIBDs);
 }
 
-bool MultCutTool::pairDmcOk(const std::vector<Data>& cluster,
+bool MultCutTool::pairDmcOk(const Data& cluster, int detector,
                             size_t iP, size_t iD) const
 {
-  for (size_t iX = 0; iX < cluster.size(); ++iX) {
+  for (size_t iX = 0; iX < cluster.size; ++iX) {
     if (iX == iP || iX == iD)
       continue;
 
-    const float dt_us = cluster[iD].time().diff_us(cluster[iX].time());
-    const float eX = cluster[iX].energy;
+    const float dt_us = cluster.time(iD).diff_us(cluster.time(iX));
+    const float eX = cluster.energy[iX];
 
     // Note: We don't apply an upper cut on energy of "extra" event
     // This avoids introducing the double-neutron background
@@ -45,16 +49,16 @@ bool MultCutTool::pairDmcOk(const std::vector<Data>& cluster,
 
     if (-200 < dt_us && dt_us < 0 && // after delayed
         DELAYED_MIN < eX &&
-        !muonAlg->isVetoed(cluster[iX]))
+        !muonAlg->isVetoed(cluster.time(iX), detector))
       return false;
   }
 
   return true;
 }
 
-bool MultCutTool::singleDmcOk(const std::vector<Data>& cluster,
+// Do we need this?
+bool MultCutTool::singleDmcOk(const Data& cluster, int detector,
                                size_t i) const
 {
-  return pairDmcOk(cluster, -1, i);
+  return pairDmcOk(cluster, detector, -1, i);
 }
-
