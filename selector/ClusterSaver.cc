@@ -9,8 +9,9 @@
 using Status = Algorithm::Status;
 
 class ClusterSaver : public SimpleAlg<EventReader> {
-  static constexpr float GAPSIZE_US = 1000;
 public:
+  static constexpr float GAPSIZE_US = 1000;
+
   ClusterSaver(int detector);
   void connect(Pipeline& pipeline) override;
   Status consume(const EventReader::Data& e) override;
