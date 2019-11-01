@@ -1,3 +1,5 @@
+#pragma once
+
 #include "SelectorFramework/core/BaseIO.cc"
 
 class ClusterTree : public TreeBase {
@@ -9,6 +11,11 @@ public:
   Buf<UInt_t> trigSec;
   Buf<UInt_t> trigNanoSec;
   Buf<Float_t> energy;
+
+  Time time(UChar_t i)
+  {
+    return { trigSec[i], trigNanoSec[i] };
+  }
 
   void initBranches() override;
 };

@@ -9,6 +9,8 @@ public:
   UInt_t trigNanoSec;
   Float_t strength;             // charge (AD) or nhit (WP)
 
+  Time time() const { return {trigSec, trigNanoSec}; }
+
   void initBranches() override;
 };
 
