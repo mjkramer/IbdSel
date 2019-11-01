@@ -12,7 +12,7 @@ public:
   Buf<UInt_t> trigNanoSec;
   Buf<Float_t> energy;
 
-  Time time(UChar_t i)
+  Time time(UChar_t i) const
   {
     return { trigSec[i], trigNanoSec[i] };
   }

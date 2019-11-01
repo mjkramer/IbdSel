@@ -2,6 +2,7 @@
 
 #include "SelectorFramework/core/TimeSyncReader.cc"
 
+#include "Constants.cc"
 #include "MuonTree.cc"
 #include "ClusterTree.cc"
 
@@ -24,36 +25,39 @@ public:
 // Don't forget to put a PrefetchHelper<MuonReader> somewhere between MuonReader
 // and ClusterReader in the pipeline!
 
-class ClusterReader : public TimeSyncReader<ClusterTree> {
+class BaseClusterReader : public TimeSyncReader<ClusterTree> {
 public:
-  ClusterReader(int detector) :
-    TimeSyncReader({Form("clusters_AD%d", detector)}),
-    detector(detector)
+  BaseClusterReader(Det detector, const char* treeNameTemplate) :
+    detector(detector),
+    TimeSyncReader({Form(treeNameTemplate, int(detector))}) {}
+
+  int getTag() override
+  {
+    return int(detector);
+  }
+
+  Time timeInTree() override
+  {
+    return data.time(data.size - 1);
+  }
+
+  const Det detector;
+};
+
+class ClusterReader : public BaseClusterReader {
+public:
+  ClusterReader(Det detector) :
+    BaseClusterReader(detector, "clusters_AD%d")
   {
     setClockMode(ClockMode::ClockReader);
     setEpsilon_us(1000);
   }
-
-  const int detector;
-
-  Time timeInTree() override
-  {
-    return data.time(data.size - 1);
-  }
 };
 
-class SingleReader : public TimeSyncReader<ClusterTree> {
-  SingleReader(int detector) :
-    TimeSyncReader({Form("singles_AD%d", detector)}),
-    detector(detector)
+class SingleReader : public BaseClusterReader {
+  SingleReader(Det detector) :
+    BaseClusterReader(detector, "singles_AD%d")
   {
     setClockMode(ClockMode::ClockWriter);
-  }
-
-  const int detector;
-
-  Time timeInTree() override
-  {
-    return data.time(data.size - 1);
   }
 };
