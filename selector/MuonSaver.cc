@@ -40,7 +40,7 @@ Status MuonSaver::consume(const EventReader::Data& e)
   auto put = [&](Float_t strength) {
     isMuon_ = true;
 
-    outTree.data.detector = e.detector;
+    outTree.data.detector = Det(e.detector);
     outTree.data.trigSec = e.time().s;
     outTree.data.trigNanoSec = e.time().ns;
     outTree.data.strength = strength;

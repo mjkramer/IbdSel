@@ -23,7 +23,7 @@ public:
   void connect(Pipeline& p) override;
   Algorithm::Status consume(const MuonTree& e) override;
 
-  bool isVetoed(Time t, int detector) const;
+  bool isVetoed(Time t, Det detector) const;
   double vetoTime_s(Det detector) const;
 
 private:
@@ -98,18 +98,17 @@ inline Time MuonAlg::endOfLastVeto(size_t idet) const
 
 inline bool MuonAlg::isWP(const MuonTree& e) const
 {
-  return (e.detector == 5 || e.detector == 6) &&
-    e.strength > wpMuNhitCut;
+  return e.inWP() && e.strength > wpMuNhitCut;
 }
 
 inline bool MuonAlg::isShower(const MuonTree& e) const
 {
-  return e.detector <= 4 && e.strength > showerMuChgCut;
+  return e.inAD() && e.strength > showerMuChgCut;
 }
 
 inline bool MuonAlg::isAD(const MuonTree& e) const
 {
-  return e.detector <= 4 && e.strength > adMuChgCut && !isShower(e);
+  return e.inAD() && e.strength > adMuChgCut && !isShower(e);
 }
 
 inline float MuonAlg::nomPostVeto_us(const MuonTree& e) const
@@ -155,7 +154,7 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
   }
 
   else if (isAD(e) || isShower(e)) {
-    const size_t idet = e.detector - 1;
+    const size_t idet = idx_of(e.detector);
     vetoTime_s_[idet] += 1e-6 * effVeto_us(e, idet);
     if (isShower(e))
       lastShowerTime[idet] = e.time();
@@ -168,7 +167,7 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
   return Status::Continue;
 }
 
-bool MuonAlg::isVetoed(Time t, int detector) const
+bool MuonAlg::isVetoed(Time t, Det detector) const
 {
   for (const auto& muon : muonBuf) {
     const float dt_us = t.diff_us(muon.time());
@@ -179,7 +178,7 @@ bool MuonAlg::isVetoed(Time t, int detector) const
     if (dt_us < -muPreVeto_us)  // way-after-event muon
       continue;
 
-    if (muon.detector <= 4 && muon.detector != detector)
+    if (muon.inAD() && muon.detector != detector)
       continue;                 // Ignore muons in other ADs
 
     if (-muPreVeto_us < dt_us && dt_us < 0) // pre-muon veto
