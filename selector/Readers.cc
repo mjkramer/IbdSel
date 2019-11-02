@@ -31,7 +31,7 @@ public:
     detector(detector),
     TimeSyncReader({Form(treeNameTemplate, int(detector))}) {}
 
-  int getTag() override
+  int getTag() const override
   {
     return int(detector);
   }

@@ -3,6 +3,7 @@
 #include <vector>
 #include <cassert>
 
+#include "Constants.cc"
 #include "Readers.cc"
 #include "MuonAlg.cc"
 
@@ -15,9 +16,9 @@ class MultCutTool : public Tool {
 public:
   void connect(Pipeline& pipeline) override;
 
-  bool pairDmcOk(const Data& cluster, int detector,
+  bool pairDmcOk(const Data& cluster, Det detector,
                  size_t iP, size_t iD) const;
-  bool singleDmcOk(const Data& cluster, int detector,
+  bool singleDmcOk(const Data& cluster, Det detector,
                    size_t i) const;
 
 private:
@@ -30,7 +31,7 @@ void MultCutTool::connect(Pipeline& pipeline)
   assert(muonAlg->getTag() == MuonAlg::Purpose::ForIBDs);
 }
 
-bool MultCutTool::pairDmcOk(const Data& cluster, int detector,
+bool MultCutTool::pairDmcOk(const Data& cluster, Det detector,
                             size_t iP, size_t iD) const
 {
   for (size_t iX = 0; iX < cluster.size; ++iX) {
@@ -57,7 +58,7 @@ bool MultCutTool::pairDmcOk(const Data& cluster, int detector,
 }
 
 // Do we need this?
-bool MultCutTool::singleDmcOk(const Data& cluster, int detector,
+bool MultCutTool::singleDmcOk(const Data& cluster, Det detector,
                                size_t i) const
 {
   return pairDmcOk(cluster, detector, -1, i);

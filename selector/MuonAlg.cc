@@ -18,7 +18,7 @@ public:
   MuonAlg(Purpose purp) :
     purpose(purp), muonBuf(BUF_SIZE) {}
 
-  int getTag() override { return int(purpose); }
+  int getTag() const override { return int(purpose); }
 
   void connect(Pipeline& p) override;
   Algorithm::Status consume(const MuonTree& e) override;
