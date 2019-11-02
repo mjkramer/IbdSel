@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Constants.cc"
+
 #include "SelectorFramework/core/SyncReader.cc"
 #include "SelectorFramework/core/Util.cc"
 
@@ -19,6 +21,7 @@ public:
   Float_t NominalCharge;
   Float_t integralRunTime_ms;
 
+  Det det() const { return Det(detector); }
   Time time() const { return { triggerTimeSec, triggerTimeNanoSec }; };
   bool isAD() const { return detector <= 4; }
   bool isWP() const { return detector == 5 || detector == 6; }

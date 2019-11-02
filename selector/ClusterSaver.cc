@@ -3,6 +3,7 @@
 #include "EventReader.cc"
 #include "MuonSaver.cc"
 #include "ClusterTree.cc"
+#include "Constants.cc"
 
 #include "SelectorFramework/core/TreeWriter.cc"
 
@@ -12,11 +13,11 @@ class ClusterSaver : public SimpleAlg<EventReader> {
 public:
   static constexpr float GAPSIZE_US = 1000;
 
-  ClusterSaver(int detector);
+  ClusterSaver(Det detector);
   void connect(Pipeline& pipeline) override;
   Status consume(const EventReader::Data& e) override;
 
-  const short detector;
+  const Det detector;
 
 private:
   void save();
@@ -27,10 +28,10 @@ private:
   const MuonSaver* muonSaver;
 };
 
-ClusterSaver::ClusterSaver(int detector) :
+ClusterSaver::ClusterSaver(Det detector) :
   detector(detector),
-  singlesTree(Form("singles_AD%d", detector)),
-  clustersTree(Form("clusters_AD%d", detector))
+  singlesTree(Form("singles_AD%d", int(detector))),
+  clustersTree(Form("clusters_AD%d", int(detector)))
 {
 }
 
@@ -46,7 +47,7 @@ void ClusterSaver::connect(Pipeline& pipeline)
 
 Status ClusterSaver::consume(const EventReader::Data& e)
 {
-  if (e.detector != detector ||
+  if (e.det() != detector ||
       e.energy < 0.7 ||
       muonSaver->isMuon())
     return Status::Continue;

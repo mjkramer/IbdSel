@@ -7,8 +7,9 @@
 #include "FlasherCut.cc"
 #include "ClusterSaver.cc"
 #include "LivetimeSaver.cc"
+#include "Misc.cc"
 
-void stage1_main(const char* inFile, const char* outFile, int site)
+void stage1_main(const char* inFile, const char* outFile, Stage stage, Site site)
 {
   Pipeline p;
 
@@ -19,9 +20,7 @@ void stage1_main(const char* inFile, const char* outFile, int site)
   p.makeAlg<MuonSaver>();
   p.makeAlg<FlasherCut>();
 
-  const int maxDet = site == 3 ? 4 : 2;
-
-  for (int detector = 1; detector <= maxDet; ++detector) {
+  for (Det detector : util::ADsFor(site, stage)) {
     p.makeAlg<ClusterSaver>(detector);
   }
 
