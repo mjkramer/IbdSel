@@ -55,6 +55,7 @@ public:
 };
 
 class SingleReader : public BaseClusterReader {
+public:
   SingleReader(Det detector) :
     BaseClusterReader(detector, "singles_AD%d")
   {
