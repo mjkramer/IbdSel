@@ -10,7 +10,9 @@
 template <class ReaderT>
 class SelectorBase : public SimpleAlg<ReaderT> {
 public:
-  SelectorBase(Det detector) : detector(detector) {}
+  SelectorBase(Det detector, MuonAlg::Purpose purpose) :
+    detector(detector), purpose(purpose) {}
+
   void connect(Pipeline& p) override;
   int getTag() const override { return int(detector); }
 
@@ -19,13 +21,16 @@ public:
 protected:
   const MuonAlg* muonAlg;
   const MultCutTool* multCutTool;
+
+private:
+  const MuonAlg::Purpose purpose;
 };
 
 template <class ReaderT>
 void SelectorBase<ReaderT>::connect(Pipeline& p)
 {
   this->reader = p.getAlg<ReaderT>(detector);
-  muonAlg = p.getAlg<MuonAlg>();
+  muonAlg = p.getAlg<MuonAlg>(purpose);
   multCutTool = p.getTool<MultCutTool>();
 }
 
@@ -43,7 +48,7 @@ public:
 };
 
 SingleSelector::SingleSelector(Det detector) :
-  SelectorBase(detector)
+  SelectorBase(detector, MuonAlg::Purpose::ForSingles)
 {
   auto hname = Form("h_single_d%d", int(detector));
   hist = new TH1F(hname, hname, 113, 0.7, 12);
@@ -89,7 +94,7 @@ public:
 };
 
 IbdSelector::IbdSelector(Det detector) :
-  SelectorBase(detector)
+  SelectorBase(detector, MuonAlg::Purpose::ForIBDs)
 {
   auto hname = Form("h_ibd_d%hhu", detector);
   hist = new TH1F(hname, hname, 113, 0.7, 12);
