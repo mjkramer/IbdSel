@@ -28,7 +28,7 @@ private:
 void MultCutTool::connect(Pipeline& pipeline)
 {
   muonAlg = pipeline.getAlg<MuonAlg>();
-  assert(muonAlg->getTag() == MuonAlg::Purpose::ForIBDs);
+  assert(muonAlg->getTag() == int(MuonAlg::Purpose::ForIBDs));
 }
 
 bool MultCutTool::pairDmcOk(const Data& cluster, Det detector,
