@@ -80,6 +80,8 @@ void MuonAlg::connect(Pipeline& p)
     auto config = p.getTool<Config>();
     initCuts(config);
   } // Otherwise just use defaults
+
+  SimpleAlg::connect(p);
 }
 
 double MuonAlg::vetoTime_s(Det detector) const
