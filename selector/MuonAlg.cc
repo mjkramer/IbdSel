@@ -120,7 +120,7 @@ inline float MuonAlg::nomPostVeto_us(const MuonTree& e) const
   else if (isAD(e))
     return adMuPostVeto_us;
   else
-    return 0;
+    throw std::runtime_error("What kind of muon is this?");
 }
 
 float MuonAlg::effVeto_us(const MuonTree& e, size_t idet) const
