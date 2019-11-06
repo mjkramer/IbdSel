@@ -81,6 +81,8 @@ void ClusterSaver::save()
     outTree.data.trigSec[i] = e.triggerTimeSec;
     outTree.data.trigNanoSec[i] = e.triggerTimeNanoSec;
     outTree.data.energy[i] = e.energy;
+
+    outTree.data.trigNo[i] = e.triggerNumber;
   }
 
   outTree.fill();

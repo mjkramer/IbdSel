@@ -12,6 +12,8 @@ public:
   Buf<UInt_t> trigNanoSec;
   Buf<Float_t> energy;
 
+  Buf<UInt_t> trigNo;           // XXX
+
   Time time(UChar_t i) const
   {
     return { trigSec[i], trigNanoSec[i] };
@@ -26,4 +28,6 @@ void ClusterTree::initBranches()
   BR_VARLEN(trigSec, size);
   BR_VARLEN(trigNanoSec, size);
   BR_VARLEN(energy, size);
+
+  BR_VARLEN(trigNo, size);
 }

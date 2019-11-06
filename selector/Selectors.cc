@@ -119,6 +119,9 @@ Algorithm::Status IbdSelector::consume(const ClusterTree& cluster)
           !muonAlg->isVetoed(cluster.time(iD), detector) &&
           multCutTool->pairDmcOk(cluster, detector, iP, iD)) {
 
+        std::cout << Form("IBD AD%d %d %d\n", int(detector),
+                          cluster.trigNo[iP], cluster.trigNo[iD]);
+
         hist->Fill(eP);
       }
     }
