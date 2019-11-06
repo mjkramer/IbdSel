@@ -12,7 +12,7 @@ public:
     TimeSyncReader({"muons"})
   {
     setClockMode(ClockMode::ClockReader);
-    setEpsilon_us(1'000'000);
+    setEpsilon_us(500'000);
     setPrefetch_us(1'000'000);
   }
 
