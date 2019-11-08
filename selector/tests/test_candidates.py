@@ -93,11 +93,10 @@ class Runner(object):
                 print("MISSING: AD%d %d %d" % (det, trigP, trigD))
 
     def randfile(self):
-        allcas = pd.concat([r.candis[i] for i in [1, 2, 3]])
+        allcas = pd.concat([self.candis[i] for i in [1, 2, 3]])
         allrfs = allcas[['RunNo', 'FileNo']].drop_duplicates()
 
-		return [int(_) for _ in allrfs.sample(1).values[0]]
+        return [int(_) for _ in allrfs.sample(1).values[0]]
 
     def compare_rand(self):
-        return copare(randfile())
-
+        return self.compare(*self.randfile())
