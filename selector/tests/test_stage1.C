@@ -1,5 +1,6 @@
 void test_stage1(int runno, int fileno, int stage, int site)
 {
+  gROOT->ProcessLine(".x LoadBoost.C");
   gSystem->Load("/usr/common/software/python/2.7-anaconda-2019.07/lib/libsqlite3.so");
   gROOT->ProcessLine(".L tests/FileFinder.cc+");
   gROOT->ProcessLine(".L stage1_main.cc+g");

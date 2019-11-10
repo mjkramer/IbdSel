@@ -7,6 +7,10 @@
 
 #include "SelectorFramework/core/TreeWriter.cc"
 
+#include <tuple>
+#include <boost/algorithm/string.hpp>
+#include <cstdlib>
+
 using Status = Algorithm::Status;
 
 class ClusterSaver : public SimpleAlg<EventReader> {
@@ -21,6 +25,8 @@ public:
 
 private:
   void save();
+
+  std::tuple<UInt_t, UShort_t> runAndFile() const;
 
   TreeWriter<ClusterTree> singlesTree, clustersTree;
   std::vector<EventReader::Data> events;
@@ -37,8 +43,14 @@ ClusterSaver::ClusterSaver(Det detector) :
 
 void ClusterSaver::connect(Pipeline& pipeline)
 {
-  singlesTree.connect(pipeline);
-  clustersTree.connect(pipeline);
+  const auto [runNo, fileNo] = runAndFile();
+
+  for (auto tree : { &singlesTree, &clustersTree }) {
+    tree->connect(pipeline);
+
+    tree->data.runNo = runNo;
+    tree->data.fileNo = fileNo;
+  }
 
   muonSaver = pipeline.getAlg<MuonSaver>();
 
@@ -86,4 +98,21 @@ void ClusterSaver::save()
   }
 
   outTree.fill();
+}
+
+std::tuple<UInt_t, UShort_t> runAndFile(const std::string& path)
+{
+  namespace A = boost::algorithm;
+
+  auto base = path.substr(path.find_last_of("/") + 1);
+  std::vector<std::string> parts;
+  A::split(parts, base, A::is_any_of("."));
+
+  return { atoi(parts[2].c_str()), atoi(&parts[6].c_str()[1]) };
+}
+
+std::tuple<UInt_t, UShort_t> ClusterSaver::runAndFile() const
+{
+  const char* path = pipe().inFile()->GetName();
+  return ::runAndFile(path);
 }

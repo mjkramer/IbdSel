@@ -14,6 +14,9 @@ public:
 
   Buf<UInt_t> trigNo;           // XXX
 
+  UInt_t runNo;
+  UShort_t fileNo;
+
   Time time(UChar_t i) const
   {
     return { trigSec[i], trigNanoSec[i] };
@@ -30,4 +33,7 @@ void ClusterTree::initBranches()
   BR_VARLEN(energy, size);
 
   BR_VARLEN(trigNo, size);
+
+  BR(runNo);
+  BR(fileNo);
 }
