@@ -6,6 +6,9 @@
 #include "Readers.cc"
 #include "MuonAlg.cc"
 #include "MultCut.cc"
+#include "IbdTree.cc"
+
+#include "SelectorFramework/core/TreeWriter.cc"
 
 template <class ReaderT>
 class SelectorBase : public SimpleAlg<ReaderT> {
@@ -88,21 +91,44 @@ public:
   IbdSelector(Det detector);
 
   Algorithm::Status consume(const ClusterTree& e) override;
+  void connect(Pipeline& p) override;
   void finalize(Pipeline& p) override;
 
   TH1F* hist;
+
+private:
+  void save(const ClusterTree& cluster, size_t iP, size_t iD);
+
+  TreeWriter<IbdTree> ibdTree;
 };
 
 IbdSelector::IbdSelector(Det detector) :
-  SelectorBase(detector, MuonAlg::Purpose::ForIBDs)
+  SelectorBase(detector, MuonAlg::Purpose::ForIBDs),
+  ibdTree(Form("ibd_AD%d", int(detector)))
 {
   auto hname = Form("h_ibd_d%hhu", detector);
   hist = new TH1F(hname, hname, 113, 0.7, 12);
 }
 
+void IbdSelector::connect(Pipeline& p)
+{
+  ibdTree.connect(p);
+  SelectorBase::connect(p);
+}
+
 void IbdSelector::finalize(Pipeline& p)
 {
   hist->Write();
+}
+
+void IbdSelector::save(const ClusterTree& cluster, size_t iP, size_t iD)
+{
+  ibdTree.data.runNo = cluster.runNo;
+  ibdTree.data.fileNo = cluster.fileNo;
+  ibdTree.data.trigP = cluster.trigNo[iP];
+  ibdTree.data.trigD = cluster.trigNo[iD];
+
+  ibdTree.fill();
 }
 
 Algorithm::Status IbdSelector::consume(const ClusterTree& cluster)
@@ -119,8 +145,10 @@ Algorithm::Status IbdSelector::consume(const ClusterTree& cluster)
           !muonAlg->isVetoed(cluster.time(iD), detector) &&
           multCutTool->pairDmcOk(cluster, detector, iP, iD)) {
 
-        std::cout << Form("IBD AD%d %d %d\n", int(detector),
-                          cluster.trigNo[iP], cluster.trigNo[iD]);
+        // std::cout << Form("IBD AD%d %d %d\n", int(detector),
+        //                   cluster.trigNo[iP], cluster.trigNo[iD]);
+
+        save(cluster, iP, iD);
 
         hist->Fill(eP);
       }
