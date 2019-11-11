@@ -10,7 +10,7 @@
 #include <algorithm>
 
 class MuonAlg : public SimpleAlg<MuonReader> {
-  static constexpr unsigned BUF_SIZE = 1000;
+  static constexpr unsigned BUF_SIZE = 10000;
 
 public:
   enum class Purpose { ForIBDs, ForSingles };
@@ -170,36 +170,33 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
 }
 
 struct maybe_cout {
-  maybe_cout(bool on) : on_(on) {}
+  maybe_cout(bool on, Det detector) : on_(on), det_(int(detector))  {}
 
   template <class T>
   maybe_cout& operator<<(const T& t)
   {
-    if (on_)
-      std::cout << t;
+    if (newline_) {
+      newline_ = false;
+      if (on_) std::cout << "AD" << det_ << " ";
+    }
+    if (on_) std::cout << t;
     return *this;
   }
 
   // for endl: https://stackoverflow.com/questions/1134388/stdendl-is-of-unknown-type-when-overloading-operator
 
-  template <class T> using Manip = T& (*)(T&);
+  using endl_t = decltype(std::endl<char, std::char_traits<char>>);
 
-  maybe_cout& operator<<(Manip<std::ostream> m)
+  maybe_cout& operator<<(endl_t endl)
   {
-    return operator<< <Manip<std::ostream>> (m);
-  }
-
-  maybe_cout& operator<<(Manip<std::basic_ios<char>> m)
-  {
-    return operator<< <Manip<std::basic_ios<char>>> (m);
-  }
-
-  maybe_cout& operator<<(Manip<std::ios_base> m)
-  {
-    return operator<< <Manip<std::ios_base>> (m);
+    operator<< <endl_t> (*endl);
+    newline_ = true;
+    return *this;
   }
 
   bool on_;
+  int det_;
+  bool newline_ = true;
 };
 
 // template <class T>
@@ -214,7 +211,9 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
 {
   bool xfirst = true;
   size_t xx = 0;
-  maybe_cout xcout(purpose == Purpose::ForIBDs);
+  maybe_cout xcout(getenv("DIAG_IBDS") ? (purpose == Purpose::ForIBDs)
+                   : (purpose == Purpose::ForSingles),
+                   detector);
 
   for (const auto& muon : muonBuf) {
     const float dt_us = t.diff_us(muon.time());
