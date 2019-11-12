@@ -187,6 +187,7 @@ void Calculator::writeValues()
   for (Det detector : util::ADsFor(site, stage)) {
     w.data.detector = detector;
     w.data.vetoEff = vetoEff(detector);
+    w.data.dmcEff = dmcEff(detector);
     w.data.accDaily = accDaily(detector);
     w.data.accDailyErr = accDailyErr(detector);
     w.data.li9Daily = li9Daily(detector);
