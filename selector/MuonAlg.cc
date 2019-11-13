@@ -150,9 +150,9 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
     return Status::Continue;
 
   if (isWP(e)) {
-    lastWpTime = e.time();
     for (size_t idet = 0; idet < 4; ++idet)
       vetoTime_s_[idet] += 1e-6 * effVeto_us(e, idet);
+    lastWpTime = e.time();
   }
 
   else if (isAD(e) || isShower(e)) {
