@@ -193,6 +193,14 @@ void Calculator::writeValues()
     w.data.li9Daily = li9Daily(detector);
     w.data.li9DailyErr = li9DailyErr(detector);
 
+    // XXX diagnostics
+    w.data.nPlusLikeSingles = nPlusLikeSingles(detector);
+    w.data.nPromptLikeSingles = nPromptLikeSingles(detector);
+    w.data.nDelayedLikeSingles = nDelayedLikeSingles(detector);
+    w.data.promptLikeHz = promptLikeHz(detector);
+    w.data.delayedLikeHz = delayedLikeHz(detector);
+    w.data.dmcEffSingles = dmcEffSingles(detector);
+
     w.fill();
   }
 }

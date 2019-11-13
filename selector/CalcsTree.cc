@@ -18,6 +18,10 @@ public:
   Site site;
   Det detector;
 
+  // XXX diagnostics
+  Float_t nPlusLikeSingles, nPromptLikeSingles, nDelayedLikeSingles;
+  Float_t promptLikeHz, delayedLikeHz, dmcEffSingles;
+
   void initBranches() override;
 };
 
@@ -34,4 +38,8 @@ void CalcsTree::initBranches()
   BR(stage);
   BR(site);
   BR(detector);
+
+  // XXX diagnostics
+  BR(nPlusLikeSingles); BR(nPromptLikeSingles); BR(nDelayedLikeSingles);
+  BR(promptLikeHz); BR(delayedLikeHz); BR(dmcEffSingles);
 }
