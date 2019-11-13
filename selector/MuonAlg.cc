@@ -254,7 +254,9 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
 
   // xcout << "exhausted after muon " << xx << std::endl;
 
-  std::cout << xheader << "MuonAlg is exhausted!" << std::endl;
+  if (muonBuf.full()) {
+    std::cout << xheader << "MuonAlg is exhausted!" << std::endl;
+  }
 
   return false;
 }
