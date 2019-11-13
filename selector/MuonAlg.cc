@@ -210,23 +210,28 @@ struct maybe_cout {
 bool MuonAlg::isVetoed(Time t, Det detector) const
 {
   bool xfirst = true;
-  size_t xx = 0;
-  maybe_cout xcout(getenv("DIAG_IBDS") ? (purpose == Purpose::ForIBDs)
-                   : (purpose == Purpose::ForSingles),
-                   detector);
+  // size_t xx = 0;
+  // maybe_cout xcout(getenv("DIAG_IBDS") ? (purpose == Purpose::ForIBDs)
+  //                  : (purpose == Purpose::ForSingles),
+  //                  detector);
+  const char* xpurp = (purpose == Purpose::ForIBDs) ? "IBDs" : "singles";
+  const char* xheader = Form("AD%d %s: ", int(detector), xpurp);
 
   for (const auto& muon : muonBuf) {
     const float dt_us = t.diff_us(muon.time());
 
     if (xfirst) {
-      xcout << "first dt " << dt_us << std::endl;
+    //   xcout << "first dt " << dt_us << std::endl;
       xfirst = false;
+      if (dt_us > 0) {
+        std::cout << xheader << "MuonAlg is behind!" << std::endl;
+      }
     }
 
-    ++xx;
+    // ++xx;
 
     if (showerMuPostVeto_us < dt_us) {  // no more muons worth checking
-      xcout << "end at muon " << xx << std::endl;
+      // xcout << "end at muon " << xx << std::endl;
       return false;
     }
 
@@ -237,17 +242,19 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
       continue;                 // Ignore muons in other ADs
 
     if (-muPreVeto_us < dt_us && dt_us < 0) { // pre-muon veto
-      xcout << "veto before muon " << xx << std::endl;
+      // xcout << "veto before muon " << xx << std::endl;
       return true;
     }
 
     if (dt_us < nomPostVeto_us(muon)) {
-      xcout << "veto after muon " << xx << std::endl;
+      // xcout << "veto after muon " << xx << std::endl;
       return true;
     }
   }
 
-  xcout << "exhausted after muon " << xx << std::endl;
+  // xcout << "exhausted after muon " << xx << std::endl;
+
+  std::cout << xheader << "MuonAlg is exhausted!" << std::endl;
 
   return false;
 }
