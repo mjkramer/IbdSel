@@ -56,9 +56,14 @@ public:
 
 class SingleReader : public BaseClusterReader {
 public:
-  SingleReader(Det detector) :
+  SingleReader(Det detector, bool clockWriter) :
     BaseClusterReader(detector, "singles_AD%d")
   {
-    setClockMode(ClockMode::ClockWriter);
+    if (clockWriter) {
+      setClockMode(ClockMode::ClockWriter);
+    } else {
+      setClockMode(ClockMode::ClockReader);
+      setEpsilon_us(1000);
+    }
   }
 };

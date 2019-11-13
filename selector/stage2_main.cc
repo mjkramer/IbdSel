@@ -21,8 +21,12 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   p.makeAlg<MuonAlg>(MuonAlg::Purpose::ForSingles);
   p.makeAlg<PrefetchLooper<MuonReader>>(); // build up a lookahead buffer
 
-  for (Det detector : util::ADsFor(site, stage)) {
-    p.makeAlg<SingleReader>(detector);
+  std::vector<Det> allADs = util::ADsFor(site, stage);
+
+  for (Det detector : allADs) {
+    bool firstAD = detector == allADs[0];
+
+    p.makeAlg<SingleReader>(detector, firstAD); // ClockWriter if firstAD
     p.makeAlg<SingleSelector>(detector);
 
     p.makeAlg<ClusterReader>(detector);
