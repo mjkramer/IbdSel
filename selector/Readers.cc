@@ -12,8 +12,8 @@ public:
     TimeSyncReader({"muons"})
   {
     setClockMode(ClockMode::ClockReader);
-    setEpsilon_us(500'000);
-    setPrefetch_us(1'000'000);
+    setEpsilon_us(2'000'000);
+    setPrefetch_us(4'000'000);
   }
 
   Time timeInTree() override
@@ -50,8 +50,8 @@ public:
     BaseClusterReader(detector, "clusters_AD%d")
   {
     setClockMode(ClockMode::ClockReader);
-    setEpsilon_us(10000);
-    setPrefetch_us(20000);
+    setEpsilon_us(1000);
+    setPrefetch_us(2000);
   }
 };
 
@@ -64,8 +64,8 @@ public:
       setClockMode(ClockMode::ClockWriter);
     } else {
       setClockMode(ClockMode::ClockReader);
-      setEpsilon_us(10000);
-      setPrefetch_us(20000);
+      setEpsilon_us(5000);
+      setPrefetch_us(10000);
     }
   }
 };
