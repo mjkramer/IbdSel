@@ -54,6 +54,8 @@ private:
 
   RingBuf<MuonTree> muonBuf;
   double vetoTime_s_[4] = {0};
+
+  mutable size_t lastBufDepth[4] = {0};
 };
 
 void MuonAlg::initCuts(const Config* config)
@@ -217,13 +219,24 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
   const char* xpurp = (purpose == Purpose::ForIBDs) ? "IBDs" : "singles";
   const char* xheader = Form("AD%d %s: ", int(detector), xpurp);
 
-  for (const auto& muon : muonBuf) {
+  const size_t idet = size_t(detector) - size_t(Det::AD1);
+  size_t i = lastBufDepth[idet];
+
+  for (; i > 0; --i) {          // going forward in time
+    const auto& muon = muonBuf.at(i);
+    const float dt_us = t.diff_us(muon.time());
+    if (dt_us < -muPreVeto_us)
+      break;
+  }
+
+  for (; i < muonBuf.size(); ++i) { // going back in time
+    const auto& muon = muonBuf.at(i);
     const float dt_us = t.diff_us(muon.time());
 
     if (xfirst) {
     //   xcout << "first dt " << dt_us << std::endl;
       xfirst = false;
-      if (dt_us > 0) {
+      if (dt_us > -muPreVeto_us) {
         std::cout << xheader << Form("MuonAlg is behind! %.3f", dt_us) << std::endl;
       }
     }
@@ -243,11 +256,13 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
 
     if (-muPreVeto_us < dt_us && dt_us < 0) { // pre-muon veto
       // xcout << "veto before muon " << xx << std::endl;
+      lastBufDepth[idet] = i;
       return true;
     }
 
     if (dt_us < nomPostVeto_us(muon)) {
       // xcout << "veto after muon " << xx << std::endl;
+      lastBufDepth[idet] = i;
       return true;
     }
   }
