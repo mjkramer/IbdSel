@@ -46,18 +46,22 @@ public:
 
 class ClusterReader : public BaseClusterReader {
 public:
-  ClusterReader(Det detector) :
+  ClusterReader(Det detector, bool clockWriter = false) :
     BaseClusterReader(detector, "clusters_AD%d")
   {
-    setClockMode(ClockMode::ClockReader);
-    setEpsilon_us(1000);
-    setPrefetch_us(2000);
+    if (clockWriter) {
+      setClockMode(ClockMode::ClockWriter);
+    } else {
+      setClockMode(ClockMode::ClockReader);
+      setEpsilon_us(1000);
+      setPrefetch_us(2000);
+    }
   }
 };
 
 class SingleReader : public BaseClusterReader {
 public:
-  SingleReader(Det detector, bool clockWriter) :
+  SingleReader(Det detector, bool clockWriter = false) :
     BaseClusterReader(detector, "singles_AD%d")
   {
     if (clockWriter) {

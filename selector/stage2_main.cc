@@ -25,19 +25,18 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
 
   for (Det detector : allADs) {
     bool lastAD = detector == allADs.back();
-    // bool firstAD = detector == allADs.front();
 
-    p.makeAlg<ClusterReader>(detector);
-    p.makeAlg<IbdSelector>(detector);
-
-    p.makeAlg<PrefetchLooper<ClusterReader, Det>>(detector);
-
-    p.makeAlg<SingleReader>(detector, lastAD); // ClockWriter if lastAD
-    // p.makeAlg<SingleReader>(detector, firstAD);
+    p.makeAlg<SingleReader>(detector);
     p.makeAlg<SingleSelector>(detector);
 
+    p.makeAlg<PrefetchLooper<SingleReader, Det>>(detector);
+
+    p.makeAlg<ClusterReader>(detector, lastAD); // ClockWriter if lastAD
+    p.makeAlg<IbdSelector>(detector);
+
     if (not lastAD)
-      p.makeAlg<PrefetchLooper<SingleReader, Det>>(detector);
+      p.makeAlg<PrefetchLooper<ClusterReader, Det>>(detector);
+
   }
 
   // Clock is needed for TimeSyncTool (i.e. all the readers)
