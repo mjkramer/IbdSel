@@ -24,13 +24,18 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   std::vector<Det> allADs = util::ADsFor(site, stage);
 
   for (Det detector : allADs) {
-    bool firstAD = detector == allADs[0];
-
-    p.makeAlg<SingleReader>(detector, firstAD); // ClockWriter if firstAD
-    p.makeAlg<SingleSelector>(detector);
+    bool lastAD = detector == allADs.back();
 
     p.makeAlg<ClusterReader>(detector);
     p.makeAlg<IbdSelector>(detector);
+
+    p.makeAlg<PrefetchLooper<ClusterReader, Det>>(detector);
+
+    p.makeAlg<SingleReader>(detector, lastAD); // ClockWriter if lastAD
+    p.makeAlg<SingleSelector>(detector);
+
+    if (not lastAD)
+      p.makeAlg<PrefetchLooper<SingleReader, Det>>(detector);
   }
 
   // Clock is needed for TimeSyncTool (i.e. all the readers)
