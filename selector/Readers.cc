@@ -50,7 +50,8 @@ public:
     BaseClusterReader(detector, "clusters_AD%d")
   {
     setClockMode(ClockMode::ClockReader);
-    setEpsilon_us(1000);
+    setEpsilon_us(10000);
+    setPrefetch_us(20000);
   }
 };
 
@@ -63,7 +64,8 @@ public:
       setClockMode(ClockMode::ClockWriter);
     } else {
       setClockMode(ClockMode::ClockReader);
-      setEpsilon_us(1000);
+      setEpsilon_us(10000);
+      setPrefetch_us(20000);
     }
   }
 };
