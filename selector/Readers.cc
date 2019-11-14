@@ -12,8 +12,8 @@ public:
     TimeSyncReader({"muons"})
   {
     setClockMode(ClockMode::ClockReader);
-    setEpsilon_us(2'000'000);
-    setPrefetch_us(4'000'000);
+    setEpsilon_us(3'000'000);
+    setPrefetch_us(4'500'000);
   }
 
   Time timeInTree() override

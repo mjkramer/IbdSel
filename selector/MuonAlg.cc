@@ -224,7 +224,7 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
     //   xcout << "first dt " << dt_us << std::endl;
       xfirst = false;
       if (dt_us > 0) {
-        std::cout << xheader << "MuonAlg is behind!" << std::endl;
+        std::cout << xheader << Form("MuonAlg is behind! %.3f", dt_us) << std::endl;
       }
     }
 
