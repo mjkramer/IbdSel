@@ -1,8 +1,16 @@
-*.pyc
-build/
+# local configuration
 .local/
 .envrc
+.nvimrc
+
+# cmake specific
+build
+builds
+
+# python files
+*.pyc
+
+# other files
 output/
 inputs
 results.root
-.nvimrc
