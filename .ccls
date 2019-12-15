@@ -1,0 +1,6 @@
+clang
+-std=c++1z
+-m64
+-pthread
+-I/global/homes/m/mkramer/projscratch/apps/root-6.18.00-py37/include
+-I/global/homes/m/mkramer/dunescratch/opt-cori/include
