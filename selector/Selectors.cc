@@ -11,10 +11,12 @@
 #include "SelectorFramework/core/TreeWriter.cc"
 
 template <class ReaderT>
-class SelectorBase : public SimpleAlg<ReaderT> {
+class SelectorBase : public SimpleAlg<ReaderT, Det> {
 public:
   SelectorBase(Det detector, MuonAlg::Purpose purpose) :
-    detector(detector), purpose(purpose) {}
+    SimpleAlg<ReaderT, Det>(detector),
+    detector(detector),
+    purpose(purpose) {}
 
   void connect(Pipeline& p) override;
   int getTag() const override { return int(detector); }
@@ -32,7 +34,8 @@ private:
 template <class ReaderT>
 void SelectorBase<ReaderT>::connect(Pipeline& p)
 {
-  this->reader = p.getAlg<ReaderT>(detector);
+  SimpleAlg<ReaderT, Det>::connect(p);
+
   muonAlg = p.getAlg<MuonAlg>(purpose);
   multCutTool = p.getTool<MultCutTool>();
 }
