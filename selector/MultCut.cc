@@ -1,65 +1,86 @@
 #pragma once
 
-#include <vector>
 #include <cassert>
 
 #include "Constants.cc"
-#include "Readers.cc"
+#include "AdBuffer.cc"
 #include "MuonAlg.cc"
-
-using Data = ClusterTree;
 
 class MultCutTool : public Tool {
   static constexpr float PROMPT_MIN = 0.7;
   static constexpr float DELAYED_MIN = 6;
+  static constexpr int IBD_USEC_BEFORE = 400;
+  static constexpr int IBD_USEC_AFTER = 200;
+  static constexpr int SINGLE_USEC_BEFORE = 1000;
+  static constexpr int SINGLE_USEC_AFTER = SINGLE_USEC_BEFORE;
+
+  using Iter = AdBuffer::Iter;
 
 public:
   void connect(Pipeline& pipeline) override;
 
-  bool pairDmcOk(const Data& cluster, Det detector,
-                 size_t iP, size_t iD) const;
-  bool singleDmcOk(const Data& cluster, Det detector,
-                   size_t i) const;
+  bool ibdDmcOk(Iter itP, Iter itD, Det det) const;
+  bool singleDmcOk(Iter it, Det det) const;
 
 private:
+  struct Cuts {
+    float usec_before, usec_after, emin_before, emin_after;
+  };
+
+  bool dmcOk(std::optional<Iter> optItP,
+             Iter itD,
+             Det det,
+             Cuts cuts) const;
+
   const MuonAlg* muonAlg;
 };
 
 void MultCutTool::connect(Pipeline& pipeline)
 {
-  muonAlg = pipeline.getAlg<MuonAlg>();
-  assert(muonAlg->getTag() == int(MuonAlg::Purpose::ForIBDs));
+  muonAlg = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForIBDs);
+  assert(muonAlg->rawTag() == int(MuonAlg::Purpose::ForIBDs));
 }
 
-bool MultCutTool::pairDmcOk(const Data& cluster, Det detector,
-                            size_t iP, size_t iD) const
+bool MultCutTool::dmcOk(std::optional<Iter> optItP,
+                        Iter itD,
+                        Det det,
+                        Cuts cuts) const
 {
-  for (size_t iX = 0; iX < cluster.size; ++iX) {
-    if (iX == iP || iX == iD)
+  for (Iter other = itD.earlier();
+       itD->time().diff_us(other->time()) < cuts.usec_before;
+       other = other.earlier()) {
+
+    if (optItP && other == *optItP)
       continue;
 
-    const float dt_us = cluster.time(iD).diff_us(cluster.time(iX));
-    const float eX = cluster.energy[iX];
-
-    // Note: We don't apply an upper cut on energy of "extra" event
-    // This avoids introducing the double-neutron background
-
-    if (0 < dt_us && dt_us < 400 &&  // before delayed
-        PROMPT_MIN < eX)
+    if (other->energy > cuts.emin_after) {
       return false;
+    }
+  }
 
-    if (-200 < dt_us && dt_us < 0 && // after delayed
-        DELAYED_MIN < eX &&
-        !muonAlg->isVetoed(cluster.time(iX), detector))
+  for (Iter other = itD.later();
+       other->time().diff_us(itD->time()) < cuts.usec_after;
+       other = other.later()) {
+
+    if (other->energy > cuts.emin_after
+        // XXX remove the following if we restore the "full DMC" 200us pre-veto
+        && not muonAlg->isVetoed(other->time(), det)) {
+
       return false;
+    }
   }
 
   return true;
 }
 
-// Do we need this?
-bool MultCutTool::singleDmcOk(const Data& cluster, Det detector,
-                               size_t i) const
+inline bool MultCutTool::ibdDmcOk(Iter itP, Iter itD, Det det) const
 {
-  return pairDmcOk(cluster, detector, -1, i);
+  Cuts cuts {IBD_USEC_BEFORE, IBD_USEC_AFTER, PROMPT_MIN, DELAYED_MIN};
+  return dmcOk(itP, itD, det, cuts);
+}
+
+inline bool MultCutTool::singleDmcOk(Iter it, Det det) const
+{
+  Cuts cuts {SINGLE_USEC_BEFORE, SINGLE_USEC_AFTER, PROMPT_MIN, PROMPT_MIN};
+  return dmcOk(std::nullopt, it, det, cuts);
 }

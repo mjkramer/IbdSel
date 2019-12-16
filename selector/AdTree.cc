@@ -12,7 +12,7 @@ public:
   UInt_t runNo;
   UShort_t fileNo;
 
-  Time time() { return { trigSec, trigNanoSec }; }
+  Time time() const { return { trigSec, trigNanoSec }; }
 
   void initBranches() override;
 };

@@ -18,7 +18,8 @@ public:
   MuonAlg(Purpose purp) :
     purpose(purp), muonBuf(BUF_SIZE) {}
 
-  int getTag() const override { return int(purpose); }
+  // So we can select MuonAlg by its purpose
+  int rawTag() const override { return int(purpose); }
 
   void connect(Pipeline& p) override;
   Algorithm::Status consume(const MuonTree& e) override;

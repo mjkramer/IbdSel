@@ -4,7 +4,7 @@
 
 #include "Constants.cc"
 #include "MuonTree.cc"
-#include "ClusterTree.cc"
+#include "AdTree.cc"
 
 class MuonReader : public TimeSyncReader<MuonTree> {
 public:
@@ -22,54 +22,16 @@ public:
   }
 };
 
-// Don't forget to put a PrefetchHelper<MuonReader> somewhere between MuonReader
-// and ClusterReader in the pipeline!
-
-class BaseClusterReader : public TimeSyncReader<ClusterTree> {
+class AdReader : public TimeSyncReader<AdTree> {
 public:
-  BaseClusterReader(Det detector, const char* treeNameTemplate) :
-    detector(detector),
-    TimeSyncReader({Form(treeNameTemplate, int(detector))}) {}
+  AdReader(Det det, bool clockWriter = false) :
+    TimeSyncReader({Form("physics_AD%d", int(det))},
+                   clockWriter),
+    det(det) {}
 
-  int getTag() const override
-  {
-    return int(detector);
-  }
+  int rawTag() const override { return int(det); }
 
-  Time timeInTree() override
-  {
-    return data.time(data.size - 1);
-  }
+  Time timeInTree() override { return data.time(); }
 
-  const Det detector;
-};
-
-class ClusterReader : public BaseClusterReader {
-public:
-  ClusterReader(Det detector, bool clockWriter = false) :
-    BaseClusterReader(detector, "clusters_AD%d")
-  {
-    if (clockWriter) {
-      setClockMode(ClockMode::ClockWriter);
-    } else {
-      setClockMode(ClockMode::ClockReader);
-      setEpsilon_us(1000);
-      setPrefetch_us(2000);
-    }
-  }
-};
-
-class SingleReader : public BaseClusterReader {
-public:
-  SingleReader(Det detector, bool clockWriter = false) :
-    BaseClusterReader(detector, "singles_AD%d")
-  {
-    if (clockWriter) {
-      setClockMode(ClockMode::ClockWriter);
-    } else {
-      setClockMode(ClockMode::ClockReader);
-      setEpsilon_us(5000);
-      setPrefetch_us(10000);
-    }
-  }
+  const Det det;
 };
