@@ -1,5 +1,7 @@
 #pragma once
 
+#include <TROOT.h>
+
 enum class Stage : UChar_t { k6AD = 1, k8AD, k7AD };
 
 enum class Site : UChar_t { EH1 = 1, EH2, EH3 };
