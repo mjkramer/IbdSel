@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
 #include "Constants.cc"
 
@@ -31,6 +32,17 @@ std::vector<Det> ADsFor(Site site, Stage stage)
   }
 
   throw std::runtime_error("Invalid site/stage in ADsFor");
+}
+
+std::tuple<UInt_t, UShort_t> runAndFile(const std::string& path)
+{
+  namespace A = boost::algorithm;
+
+  auto base = path.substr(path.find_last_of("/") + 1);
+  std::vector<std::string> parts;
+  A::split(parts, base, A::is_any_of("."));
+
+  return { atoi(parts[2].c_str()), atoi(&parts[6].c_str()[1]) };
 }
 
 } // namespace util

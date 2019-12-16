@@ -4,11 +4,11 @@
 #include "MuonSaver.cc"
 #include "ClusterTree.cc"
 #include "Constants.cc"
+#include "Misc.cc"
 
 #include "SelectorFramework/core/TreeWriter.cc"
 
 #include <tuple>
-#include <boost/algorithm/string.hpp>
 #include <cstdlib>
 
 using Status = Algorithm::Status;
@@ -100,19 +100,8 @@ void ClusterSaver::save()
   outTree.fill();
 }
 
-std::tuple<UInt_t, UShort_t> runAndFile(const std::string& path)
-{
-  namespace A = boost::algorithm;
-
-  auto base = path.substr(path.find_last_of("/") + 1);
-  std::vector<std::string> parts;
-  A::split(parts, base, A::is_any_of("."));
-
-  return { atoi(parts[2].c_str()), atoi(&parts[6].c_str()[1]) };
-}
-
 std::tuple<UInt_t, UShort_t> ClusterSaver::runAndFile() const
 {
   const char* path = pipe().inFile()->GetName();
-  return ::runAndFile(path);
+  return util::runAndFile(path);
 }
