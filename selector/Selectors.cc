@@ -3,109 +3,107 @@
 #include <TH1F.h>
 
 #include "Constants.cc"
-#include "Readers.cc"
 #include "MuonAlg.cc"
 #include "MultCut.cc"
 #include "IbdTree.cc"
+#include "AdBuffer.cc"
 
 #include "SelectorFramework/core/TreeWriter.cc"
 
-template <class ReaderT>
-class SelectorBase : public SimpleAlg<ReaderT, Det> {
+class SelectorBase : public BufferedSimpleAlg<AdBuffer, Det> {
 public:
-  SelectorBase(Det detector, MuonAlg::Purpose purpose) :
-    SimpleAlg<ReaderT, Det>(detector),
-    detector(detector),
+  using Iter = AdBuffer::Iter;
+
+  SelectorBase(Det det, MuonAlg::Purpose purpose) :
+    BufferedSimpleAlg<AdBuffer, Det>(det),
+    det(det),
     purpose(purpose) {}
 
   void connect(Pipeline& p) override;
-  int getTag() const override { return int(detector); }
 
-  const Det detector;
+  const Det det;
 
 protected:
   const MuonAlg* muonAlg;
-  const MultCutTool* multCutTool;
+  const MultCutTool* multCut;
 
 private:
   const MuonAlg::Purpose purpose;
 };
 
-template <class ReaderT>
-void SelectorBase<ReaderT>::connect(Pipeline& p)
+void SelectorBase::connect(Pipeline &p)
 {
-  SimpleAlg<ReaderT, Det>::connect(p);
+  BufferedSimpleAlg<AdBuffer, Det>::connect(p);
 
   muonAlg = p.getAlg<MuonAlg>(purpose);
-  multCutTool = p.getTool<MultCutTool>();
+  assert(muonAlg->rawTag() == int(purpose));
+
+  multCut = p.getTool<MultCutTool>();
 }
 
-class SingleSelector : public SelectorBase<SingleReader> {
+// ----------------------------------------------------------------------
+
+class SingleSel : public SelectorBase {
   static constexpr float EMIN = 0.7;
   static constexpr float EMAX = 12;
 
 public:
-  SingleSelector(Det detector);
-
-  Algorithm::Status consume(const ClusterTree& e) override;
+  SingleSel(Det det);
+  Algorithm::Status consume_iter(Iter it) override;
   void finalize(Pipeline& p) override;
 
   TH1F* hist;
 };
 
-SingleSelector::SingleSelector(Det detector) :
-  SelectorBase(detector, MuonAlg::Purpose::ForSingles)
+SingleSel::SingleSel(Det det) :
+  SelectorBase(det, MuonAlg::Purpose::ForSingles)
 {
-  auto hname = Form("h_single_d%d", int(detector));
+  auto hname = Form("h_single_d%d", int(det));
   hist = new TH1F(hname, hname, 113, 0.7, 12);
 }
 
-void SingleSelector::finalize(Pipeline& _p)
+void SingleSel::finalize(Pipeline& _p)
 {
   hist->Write();
 }
 
-Algorithm::Status SingleSelector::consume(const ClusterTree& cluster)
+Algorithm::Status SingleSel::consume_iter(Iter it)
 {
-  for (size_t i = 0; i < cluster.size; ++i) {
-    const float e = cluster.energy[i];
+  if (EMIN < it->energy && it->energy < EMAX &&
+      not muonAlg->isVetoed(it->time(), det) &&
+      multCut->singleDmcOk(it, det)) {
 
-    if (EMIN < e && e < EMAX &&
-        !muonAlg->isVetoed(cluster.time(i), detector) &&
-        // In current implementation, mult cut is unnecessary since
-        // "singles" are isolated by 1000 us by definition.
-        // If we want a smaller isolation cut, we need to look at
-        // clusters_ADx tree and then apply singleDmcOk
-        multCutTool->singleDmcOk(cluster, detector, 0)) {
-      hist->Fill(e);
-    }
+    hist->Fill(it->energy);
   }
 
   return Status::Continue;
 }
 
-class IbdSelector : public SelectorBase<ClusterReader> {
+// ----------------------------------------------------------------------
+
+class IbdSel : public SelectorBase {
   static constexpr float PROMPT_MIN = 0.7;
   static constexpr float PROMPT_MAX = 12;
   static constexpr float DELAYED_MIN = 6;
   static constexpr float DELAYED_MAX = 12;
+  static constexpr unsigned DT_MIN_US = 1;
+  static constexpr unsigned DT_MAX_US = 200;
 
 public:
-  IbdSelector(Det detector);
-
-  Algorithm::Status consume(const ClusterTree& e) override;
+  IbdSel(Det detector);
   void connect(Pipeline& p) override;
+  Algorithm::Status consume_iter(Iter it) override;
   void finalize(Pipeline& p) override;
 
   TH1F* hist;
 
 private:
-  void save(const ClusterTree& cluster, size_t iP, size_t iD);
+  void save(Iter prompt, Iter delayed);
 
   TreeWriter<IbdTree> ibdTree;
 };
 
-IbdSelector::IbdSelector(Det detector) :
+IbdSel::IbdSel(Det detector) :
   SelectorBase(detector, MuonAlg::Purpose::ForIBDs),
   ibdTree(Form("ibd_AD%d", int(detector)))
 {
@@ -113,47 +111,45 @@ IbdSelector::IbdSelector(Det detector) :
   hist = new TH1F(hname, hname, 113, 0.7, 12);
 }
 
-void IbdSelector::connect(Pipeline& p)
+void IbdSel::connect(Pipeline& p)
 {
   ibdTree.connect(p);
   SelectorBase::connect(p);
 }
 
-void IbdSelector::finalize(Pipeline& p)
+void IbdSel::finalize(Pipeline& p)
 {
   hist->Write();
 }
 
-void IbdSelector::save(const ClusterTree& cluster, size_t iP, size_t iD)
+void IbdSel::save(Iter prompt, Iter delayed)
 {
-  ibdTree.data.runNo = cluster.runNo;
-  ibdTree.data.fileNo = cluster.fileNo;
-  ibdTree.data.trigP = cluster.trigNo[iP];
-  ibdTree.data.trigD = cluster.trigNo[iD];
+  ibdTree.data.runNo = delayed->runNo;
+  ibdTree.data.fileNo = delayed->fileNo;
+  ibdTree.data.trigP = prompt->trigNo;
+  ibdTree.data.trigD = delayed->trigNo;
 
   ibdTree.fill();
 }
 
-Algorithm::Status IbdSelector::consume(const ClusterTree& cluster)
+Algorithm::Status IbdSel::consume_iter(Iter it)
 {
-  for (size_t iP = 0; iP < unsigned(cluster.size - 1); ++iP) {
-    for (size_t iD = iP+1; iD < cluster.size; ++iD) {
-      const float eP = cluster.energy[iP];
-      const float eD = cluster.energy[iD];
-      const float dt_us = cluster.time(iD).diff_us(cluster.time(iP));
+  auto dt_us = [&](Iter other) { return it->time().diff_us(other->time()); };
 
-      if (PROMPT_MIN  < eP && eP < PROMPT_MAX &&
-          DELAYED_MIN < eD && eD < DELAYED_MAX &&
-          1 < dt_us && dt_us < 200 &&
-          !muonAlg->isVetoed(cluster.time(iD), detector) &&
-          multCutTool->pairDmcOk(cluster, detector, iP, iD)) {
+  if (DELAYED_MIN < it->energy && it->energy < DELAYED_MAX &&
+      not muonAlg->isVetoed(it->time(), det)) {
 
-        // std::cout << Form("IBD AD%d %d %d\n", int(detector),
-        //                   cluster.trigNo[iP], cluster.trigNo[iD]);
+    for (Iter prompt = it.earlier();
+         dt_us(prompt) < DT_MAX_US;
+         prompt = prompt.earlier()) {
 
-        save(cluster, iP, iD);
+      if (PROMPT_MIN < prompt->energy && prompt->energy < PROMPT_MAX &&
+          dt_us(prompt) > 1 &&
+          multCut->ibdDmcOk(prompt, it, det)) {
 
-        hist->Fill(eP);
+        save(prompt, it);
+
+        hist->Fill(prompt->energy);
       }
     }
   }
