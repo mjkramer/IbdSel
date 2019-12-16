@@ -5,7 +5,7 @@
 #include "TrigTypeCut.cc"
 #include "MuonSaver.cc"
 #include "FlasherCut.cc"
-#include "ClusterSaver.cc"
+#include "AdSaver.cc"
 #include "LivetimeSaver.cc"
 #include "Misc.cc"
 
@@ -21,7 +21,7 @@ void stage1_main(const char* inFile, const char* outFile, Stage stage, Site site
   p.makeAlg<FlasherCut>();
 
   for (Det detector : util::ADsFor(site, stage)) {
-    p.makeAlg<ClusterSaver>(detector);
+    p.makeAlg<AdSaver>(detector);
   }
 
   p.makeAlg<LivetimeSaver>();
