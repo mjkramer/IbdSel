@@ -107,7 +107,7 @@ IbdSel::IbdSel(Det detector) :
   SelectorBase(detector, MuonAlg::Purpose::ForIBDs),
   ibdTree(Form("ibd_AD%d", int(detector)))
 {
-  auto hname = Form("h_ibd_d%hhu", detector);
+  auto hname = Form("h_ibd_d%d", detector);
   hist = new TH1F(hname, hname, 113, 0.7, 12);
 }
 

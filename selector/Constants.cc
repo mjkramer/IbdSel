@@ -2,11 +2,14 @@
 
 #include <TROOT.h>
 
-enum class Stage : UChar_t { k6AD = 1, k8AD, k7AD };
+// These used to be ": UChar_t", but PyROOT then chokes when dealing with
+// vectors of them, assuming they are the default size.
 
-enum class Site : UChar_t { EH1 = 1, EH2, EH3 };
+enum class Stage { k6AD = 1, k8AD, k7AD };
 
-enum class Det : UChar_t { AD1 = 1, AD2, AD3, AD4, IWS, OWS };
+enum class Site { EH1 = 1, EH2, EH3 };
+
+enum class Det { AD1 = 1, AD2, AD3, AD4, IWS, OWS };
 
 size_t idx_of(Det d)
 {
