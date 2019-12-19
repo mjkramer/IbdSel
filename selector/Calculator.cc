@@ -3,7 +3,7 @@
 #include "Constants.cc"
 #include "Selectors.cc"
 #include "MuonAlg.cc"
-#include "ClusterSaver.cc"
+#include "MultCut.cc"
 #include "CalcsTree.cc"
 #include "Misc.cc"
 
@@ -61,7 +61,7 @@ double Calculator::vetoEff(Det detector, MuonAlg::Purpose purp)
 
 TH1F* Calculator::singlesHist(Det detector)
 {
-  const auto alg = pipe.getAlg<SingleSelector>(detector);
+  const auto alg = pipe.getAlg<SingleSel>(detector);
   return alg->hist;
 }
 
@@ -87,7 +87,8 @@ double Calculator::nDelayedLikeSingles(Det detector)
 double Calculator::dmcEffSingles(Det detector)
 {
   const double nPlus = nPlusLikeSingles(detector);
-  const double t = 2 * ClusterSaver::GAPSIZE_US * 1e-6;
+  const double t = 1e-6 * (MultCutTool::SINGLE_USEC_BEFORE +
+                           MultCutTool::SINGLE_USEC_AFTER);
   const double eMuSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
   const double T = livetime_s();
 

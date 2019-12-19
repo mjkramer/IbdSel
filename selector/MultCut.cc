@@ -7,6 +7,7 @@
 #include "MuonAlg.cc"
 
 class MultCutTool : public Tool {
+public:
   static constexpr float PROMPT_MIN = 0.7;
   static constexpr float DELAYED_MIN = 6;
   static constexpr int IBD_USEC_BEFORE = 400;
@@ -16,7 +17,6 @@ class MultCutTool : public Tool {
 
   using Iter = AdBuffer::Iter;
 
-public:
   void connect(Pipeline& pipeline) override;
 
   bool ibdDmcOk(Iter itP, Iter itD, Det det) const;
