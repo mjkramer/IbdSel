@@ -1,4 +1,4 @@
-void test_stage1(int runno, int fileno, int stage, int site)
+void test_stage1(int runno, int fileno, int site, int stage)
 {
   const char* debug = getenv("IBDSEL_DEBUG") ? "g" : "";
   gROOT->ProcessLine(".x LoadBoost.C");
@@ -6,7 +6,7 @@ void test_stage1(int runno, int fileno, int stage, int site)
   gROOT->ProcessLine(".L tests/FileFinder.cc+");
   gROOT->ProcessLine(Form(".L stage1_main.cc+%s", debug));
 
-  auto line = Form(".x tests/test_stage1_impl.C(%d, %d, %d, %d)", runno, fileno, stage, site);
+  auto line = Form(".x tests/test_stage1_impl.C(%d, %d, %d, %d)", runno, fileno, site, stage);
 
   gROOT->ProcessLine(line);
 }

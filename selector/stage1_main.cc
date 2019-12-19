@@ -9,7 +9,7 @@
 #include "LivetimeSaver.cc"
 #include "Misc.cc"
 
-void stage1_main(const char* inFile, const char* outFile, Stage stage, Site site)
+void stage1_main(const char* inFile, const char* outFile, Site site, Stage stage)
 {
   Pipeline p;
 

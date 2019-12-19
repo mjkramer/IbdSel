@@ -9,8 +9,10 @@
 #include "SelectorFramework/core/Kernel.cc"
 #include "SelectorFramework/core/ConfigTool.cc"
 
+#include <iostream>              // XXX
+
 void stage2_main(const char* confFile, const char* inFile, const char* outFile,
-                 Stage stage, UInt_t seq, Site site)
+                 Site site, Stage stage, UInt_t seq)
 {
   Pipeline p;
 
@@ -24,6 +26,7 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   p.makeAlg<PrefetchLooper<MuonReader>>(); // build up a lookahead buffer
 
   std::vector<Det> allADs = util::ADsFor(site, stage);
+  // std::reverse(allADs.begin(), allADs.end()); // XXX
 
   for (Det detector : allADs) {
     bool lastAD = detector == allADs.back();
