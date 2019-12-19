@@ -19,7 +19,7 @@ public:
 
   // Det det() { return tag(); };
 
-  bool enough() const override;
+  bool enough() const final override;
 };
 
 bool AdBuffer::enough() const

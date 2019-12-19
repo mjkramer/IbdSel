@@ -144,7 +144,7 @@ Algorithm::Status IbdSel::consume_iter(Iter it)
          prompt = prompt.earlier()) {
 
       if (PROMPT_MIN < prompt->energy && prompt->energy < PROMPT_MAX &&
-          dt_us(prompt) > 1 &&
+          dt_us(prompt) > DT_MIN_US &&
           multCut->ibdDmcOk(prompt, it, det)) {
 
         save(prompt, it);
