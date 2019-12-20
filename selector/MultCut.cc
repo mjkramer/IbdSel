@@ -53,7 +53,7 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
     if (optItP && other == *optItP)
       continue;
 
-    if (other->energy > cuts.emin_after) {
+    if (other->energy > cuts.emin_before) {
       return false;
     }
   }
