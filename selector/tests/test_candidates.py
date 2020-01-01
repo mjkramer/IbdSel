@@ -62,7 +62,7 @@ def run_stage1(runno, fileno, site, stage):
 
 def run_stage2(site, stage):
     output = os.system("root -l -q 'tests/test_stage2.C(%d, %d)'" % (site, stage))
-    return read_stage2_output(site, stage, )
+    return read_stage2_output(site, stage)
 
 def run_all(runno, fileno, site, stage):
     run_stage1(runno, fileno, site, stage)
