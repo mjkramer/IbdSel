@@ -1,0 +1,89 @@
+- We're seeing ~8s interactively (Haswell) for stage 1+2 on one file.
+- Let's say Cori KNL, at scale, takes 60s to run stage2 (fairly conservative).
+
+#+begin_src ipython :session :exports both :results raw drawer
+cpuSecPerFile = 60              # cori KNL?
+filesPerDaqHour = 6             # EH1
+yearsOfDaq = 5.5                # p17b?
+
+totFiles = filesPerDaqHour * 24 * 365 * yearsOfDaq
+
+totCpuDays = totFiles * cpuSecPerFile / 60 / 60 / 24
+totCpuDays
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[2]:
+: 200.75
+:end:
+
+#+begin_src ipython :session :exports both :results raw drawer
+coriCoresPerNode = 68
+parallelEff = 0.5
+
+totNodeDays = totCpuDays / coriCoresPerNode / parallelEff
+totNodeDays
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[3]:
+: 5.904411764705882
+:end:
+
+#+begin_src ipython :session :exports both :results raw drawer
+numCutPoints = 16
+
+nodeDaysEH1manyCuts = totNodeDays * numCutPoints
+nodeDaysEH1manyCuts
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[4]:
+: 94.47058823529412
+:end:
+
+#+begin_src ipython :session :exports both :results raw drawer
+allHallsFactor = 3              # conservative since lower rate in EH3
+fullStudyNodeDays = allHallsFactor * nodeDaysEH1manyCuts
+fullStudyNodeDays
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[5]:
+: 283.4117647058823
+:end:
+
+So, in conclusion, we'll need about 300 node-days on KNL to evaluate 16 points in cut space. That sucks. What percentage is that?
+
+#+begin_src ipython :session :exports both :results raw drawer
+totCoriNodes = 9668
+fullStudyNodeDays / totCoriNodes
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[6]:
+: 0.029314415050256757
+:end:
+
+So, to get results in one day, we'll need to occupy 3% of the machine.
+
+What's the cost in MPP hours?
+
+#+begin_src ipython :session :exports both :results raw drawer
+chgFactor = 90                  # knl, regular qos
+mppHours = fullStudyNodeDays * 24 * chgFactor
+mppHours
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[7]:
+: 612169.4117647058
+:end:
+
+I have 735k in my allocation (20% of project). Total for dayabay is 3M. I'm screwed.
