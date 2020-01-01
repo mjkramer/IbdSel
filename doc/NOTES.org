@@ -1,0 +1,3 @@
+* Usage with PyROOT
+...(for, e.g., using test_candidates.py)
+With current janky environment, do not compile C++ from within PyROOT! The "wrong" dynamic libs get linked in. Compile code from "plain" ROOT, then load the .so from PyROOT. This applies to things like test/FileFinder.cc too.
