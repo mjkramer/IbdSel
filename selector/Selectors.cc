@@ -38,8 +38,7 @@ void SelectorBase::connect(Pipeline &p)
   muonAlg = p.getAlg<MuonAlg>(purpose);
   assert(muonAlg->rawTag() == int(purpose));
 
-  multCut = p.getTool<MultCutTool>(purpose);
-  assert(multCut->rawTag() == int(purpose));
+  multCut = p.getTool<MultCutTool>();
 }
 
 // ----------------------------------------------------------------------

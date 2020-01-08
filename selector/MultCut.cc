@@ -17,11 +17,6 @@ public:
 
   using Iter = AdBuffer::Iter;
 
-  MultCutTool(MuonAlg::Purpose muonAlgTag) :
-    muonAlgTag(muonAlgTag) {}
-
-  int rawTag() const override { return int(muonAlgTag); }
-
   void connect(Pipeline& pipeline) override;
 
   bool ibdDmcOk(Iter itP, Iter itD, Det det) const;
@@ -37,14 +32,13 @@ private:
              Det det,
              Cuts cuts) const;
 
-  const MuonAlg::Purpose muonAlgTag;
   const MuonAlg* muonAlg;
 };
 
 void MultCutTool::connect(Pipeline& pipeline)
 {
-  muonAlg = pipeline.getAlg<MuonAlg>(muonAlgTag);
-  assert(muonAlg->rawTag() == int(muonAlgTag));
+  muonAlg = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForIBDs);
+  assert(muonAlg->rawTag() == int(MuonAlg::Purpose::ForIBDs));
 }
 
 bool MultCutTool::dmcOk(std::optional<Iter> optItP,
