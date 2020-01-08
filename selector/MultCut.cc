@@ -30,21 +30,26 @@ private:
   bool dmcOk(std::optional<Iter> optItP,
              Iter itD,
              Det det,
-             Cuts cuts) const;
+             Cuts cuts,
+             const MuonAlg* muonAlg) const;
 
-  const MuonAlg* muonAlg;
+  const MuonAlg* muonAlgIBDs;
+  const MuonAlg* muonAlgSingles;
 };
 
 void MultCutTool::connect(Pipeline& pipeline)
 {
-  muonAlg = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForIBDs);
-  assert(muonAlg->rawTag() == int(MuonAlg::Purpose::ForIBDs));
+  muonAlgIBDs = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForIBDs);
+  assert(muonAlgIBDs->rawTag() == int(MuonAlg::Purpose::ForIBDs));
+  muonAlgSingles = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForSingles);
+  assert(muonAlgSingles->rawTag() == int(MuonAlg::Purpose::ForSingles));
 }
 
 bool MultCutTool::dmcOk(std::optional<Iter> optItP,
                         Iter itD,
                         Det det,
-                        Cuts cuts) const
+                        Cuts cuts,
+                        const MuonAlg* muonAlg) const
 {
   for (Iter other = itD.earlier();
        itD->time().diff_us(other->time()) < cuts.usec_before;
@@ -76,11 +81,11 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
 inline bool MultCutTool::ibdDmcOk(Iter itP, Iter itD, Det det) const
 {
   Cuts cuts {IBD_USEC_BEFORE, IBD_USEC_AFTER, PROMPT_MIN, DELAYED_MIN};
-  return dmcOk(itP, itD, det, cuts);
+  return dmcOk(itP, itD, det, cuts, muonAlgIBDs);
 }
 
 inline bool MultCutTool::singleDmcOk(Iter it, Det det) const
 {
   Cuts cuts {SINGLE_USEC_BEFORE, SINGLE_USEC_AFTER, PROMPT_MIN, PROMPT_MIN};
-  return dmcOk(std::nullopt, it, det, cuts);
+  return dmcOk(std::nullopt, it, det, cuts, muonAlgSingles);
 }
