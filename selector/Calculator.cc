@@ -36,6 +36,7 @@ private:
   double nDelayedLikeSingles(Det detector);
   double singlesHz(Det detector, double N);
   double promptLikeHz(Det detector);
+  double plusLikeHz(Det detector);
   double delayedLikeHz(Det detector);
   double dmcEffSingles(Det detector);
 
@@ -111,6 +112,12 @@ double Calculator::promptLikeHz(Det detector)
   return singlesHz(detector, N);
 }
 
+double Calculator::plusLikeHz(Det detector)
+{
+  const double N = nPlusLikeSingles(detector);
+  return singlesHz(detector, N);
+}
+
 double Calculator::delayedLikeHz(Det detector)
 {
   const double N = nDelayedLikeSingles(detector);
@@ -119,12 +126,12 @@ double Calculator::delayedLikeHz(Det detector)
 
 double Calculator::dmcEff(Det detector)
 {
-  const double tL = 400 * 1e-6;
-  const double tR = 200 * 1e-6;
-  const double Rp = promptLikeHz(detector);
+  const double tL = 1e-6 * MultCutTool::IBD_USEC_BEFORE;
+  const double tR = 1e-6 * MultCutTool::IBD_USEC_AFTER;
+  const double Rplu = plusLikeHz(detector);
   const double Rd = delayedLikeHz(detector);
 
-  const double arg = (Rp * tL) + (Rd * tR);
+  const double arg = (Rplu * tL) + (Rd * tR);
   return exp(-arg);
 }
 
@@ -134,18 +141,27 @@ double Calculator::dmcEff(Det detector)
 // used in the fitter's "Theta13" input file.
 double Calculator::accDaily(Det detector)
 {
-  const double Rp = promptLikeHz(detector);
+  const double Rpro = promptLikeHz(detector);
+  const double Rplu = plusLikeHz(detector);
   const double Rd = delayedLikeHz(detector);
-  const double t = 200 * 1e-6;
 
+  const double promptWindow = 1e-6 * IbdSel::DT_MAX_US;
+  const double prePromptWindowEmptyWindow =
+    (1e-6 * MultCutTool::IBD_USEC_BEFORE) - promptWindow;
+  const double postDelayedEmptyWindow = 1e-6 * MultCutTool::IBD_USEC_AFTER;
 
-  const double probOneP = (Rp * t) * exp(-Rp * t);
-  const double probZeroP = exp(-Rp * t);
-  const double probZeroD = exp(-Rd * t);
+  // sanity checks, assuming standard DMC
+  assert(promptWindow == 200e-6);
+  assert(prePromptWindowEmptyWindow == 200e-6);
+  assert(postDelayedEmptyWindow == 200e-6);
+
+  const double probOnePro = (Rpro * promptWindow) * exp(-Rpro * promptWindow);
+  const double probZeroPlu = exp(-Rplu * prePromptWindowEmptyWindow);
+  const double probZeroD = exp(-Rd * postDelayedEmptyWindow);
 
   // XXX In principle we should account for the dt > 1 requirement or else
   // remove that cut. Extra factor ~ exp(-20 * 1e-6) = 0.99998 meh who cares
-  const double R = Rd * probOneP * probZeroP * probZeroD;
+  const double R = Rd * probOnePro * probZeroPlu * probZeroD;
 
   // This R assumes veto eff. of 1 (i.e. uncorrected for it) while R IS
   // corrected for DMC eff by construction (i.e. we are predicting what we'd see
