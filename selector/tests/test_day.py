@@ -2,9 +2,16 @@
 
 import ROOT as R
 import os
+import sys
+
+sys.path.insert(0, '../ibd_prod')
+from prod_util import DailyRunList
+
+from test_candidates import stage_for
 
 # For FileFinder
-R.gSystem.Load("/usr/common/software/python/2.7-anaconda-2019.07/lib/libsqlite3.so")
+# R.gSystem.Load("/usr/common/software/python/2.7-anaconda-2019.07/lib/libsqlite3.so")
+# No need to do that when using PyROOT since Python is linked to libsqlite3
 
 for line in ['.x LoadBoost.C',
              '.L tests/FileFinder.cc+',
@@ -14,22 +21,27 @@ for line in ['.x LoadBoost.C',
 R.Stage, R.Site                 # preload
 
 FF = R.FileFinder()
+DRL = DailyRunList()
 
-def process1(fileno):
-    outpath = "tests/out.test_day/stage1.%04d.root" % fileno
-    inpath = FF.find(21221, fileno)
-    R.stage1_main(inpath, outpath, R.k6AD, R.EH1)
+def process1(site, runno, fileno):
+    outpath = "tests/out.test_day/stage1.%06d.%04d.root" % (runno, fileno)
+    inpath = FF.find(int(runno), int(fileno))
+    R.stage1_main(inpath, outpath, site, stage_for(runno))
 
-def main():
-    for fileno in range(58, 210 + 1):
-        print(fileno)
-        process1(fileno)
+def go(site, day):
+    os.system('rm -f tests/out.test_day/*')
 
-    cmd = "hadd -f tests/out_stage1.root tests/out.test_day/stage1.*.root"
-    os.system(cmd)
+    for runno, fileno in DRL.daily(day=day, site=site):
+        print(runno, fileno)
+        process1(site, runno, fileno)
 
-    cmd = "root -b -q -l 'tests/test_stage2.C(1, 1)'"
-    os.system(cmd)
+    for cmd in [
+            "hadd -f tests/out_stage1.root tests/out.test_day/stage1.*.root",
+            "root -b -q -l 'tests/test_stage2.C(%d, %d)'" % (site, stage_for(runno)),
+            "mv tests/out_stage2.root tests/out_stage2_%d_%04d.root" % (site, day)
+    ]:
+        os.system(cmd)
 
-if __name__ == '__main__':
-    main()
+    f = R.TFile('tests/out_stage2_%d_%04d.root' % (site, day))
+    f.results.Scan()
+    f.Close()
