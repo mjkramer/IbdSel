@@ -175,8 +175,24 @@ double Calculator::accDaily(Det detector)
 
 double Calculator::accDailyErr(Det detector)
 {
-  // Conservative estimate
-  return 0.01 * accDaily(detector);
+  // TODO implement proper statistical calculation. For now, use empirical
+  // formula based on old LBNL selection (assuming full day's worth of
+  // statistics). In the final fit, we will probably just override the
+  // statistical uncertainty with a 1% systematic based on IHEP's comparisons of
+  // different methods for calculating the accidentals rate.
+
+  const double rate = accDaily(detector);
+
+  switch (site) {
+  case Site::EH1:
+    return 0.04 * rate;
+  case Site::EH2:
+    return 0.05 * rate;
+  case Site::EH3:
+    return 0.10 * rate;
+  }
+
+  throw;
 }
 
 // TODO: Use the (IBD) muon veto parameters to get li9 rate
