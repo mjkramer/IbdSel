@@ -31,6 +31,9 @@ public:
 
 private:
   TH1F* singlesHist(Det detector);
+  double singlesIntegral(Det detector,
+                         double lowE,
+                         std::optional<double> optUpperE = std::nullopt);
   double nPlusLikeSingles(Det detector);
   double nPromptLikeSingles(Det detector);
   double nDelayedLikeSingles(Det detector);
@@ -66,23 +69,31 @@ TH1F* Calculator::singlesHist(Det detector)
   return alg->hist;
 }
 
-double Calculator::nPlusLikeSingles(Det detector)
+double Calculator::singlesIntegral(Det detector,
+                                   double lowE,
+                                   std::optional<double> optUpperE)
 {
   const auto h = singlesHist(detector);
-  // Include overflow bin:
-  return h->Integral(h->FindBin(0.7), h->GetNbinsX() + 1);
+  const int lowBin = h->FindBin(lowE);
+  const int highBin = optUpperE ? h->FindBin(*optUpperE) :
+    h->GetNbinsX() + 1;         // include overflow bin
+
+  return h->Integral(lowBin, highBin);
+}
+
+double Calculator::nPlusLikeSingles(Det detector)
+{
+  return singlesIntegral(detector, 0.7);
 }
 
 double Calculator::nPromptLikeSingles(Det detector)
 {
-  const auto h = singlesHist(detector);
-  return h->Integral(h->FindBin(0.7), h->FindBin(12));
+  return singlesIntegral(detector, 0.7, 12);
 }
 
 double Calculator::nDelayedLikeSingles(Det detector)
 {
-  const auto h = singlesHist(detector);
-  return h->Integral(h->FindBin(6), h->FindBin(12));
+  return singlesIntegral(detector, 6, 12);
 }
 
 double Calculator::dmcEffSingles(Det detector)
