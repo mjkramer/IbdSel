@@ -44,10 +44,10 @@ void SelectorBase::connect(Pipeline &p)
 // ----------------------------------------------------------------------
 
 class SingleSel : public SelectorBase {
+public:
   static constexpr float EMIN = 0.7;
   static constexpr float EMAX = 12;
 
-public:
   SingleSel(Det det);
   Algorithm::Status consume_iter(Iter it) override;
   void finalize(Pipeline& p) override;
@@ -82,6 +82,7 @@ Algorithm::Status SingleSel::consume_iter(Iter it)
 // ----------------------------------------------------------------------
 
 class IbdSel : public SelectorBase {
+public:
   static constexpr float PROMPT_MIN = 0.7;
   static constexpr float PROMPT_MAX = 12;
   static constexpr float DELAYED_MIN = 6;
@@ -89,7 +90,6 @@ class IbdSel : public SelectorBase {
   static constexpr unsigned DT_MIN_US = 1;
   static constexpr unsigned DT_MAX_US = 200;
 
-public:
   IbdSel(Det detector);
   void connect(Pipeline& p) override;
   Algorithm::Status consume_iter(Iter it) override;

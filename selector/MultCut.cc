@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <limits>
 
 #include "Constants.cc"
 #include "AdBuffer.cc"
@@ -10,6 +11,7 @@ class MultCutTool : public Tool {
 public:
   static constexpr float PROMPT_MIN = 0.7;
   static constexpr float DELAYED_MIN = 6;
+  static constexpr float DELAYED_MAX = 12;
   static constexpr int IBD_USEC_BEFORE = 400;
   static constexpr int IBD_USEC_AFTER = 200;
   static constexpr int SINGLE_USEC_BEFORE = 1000;
@@ -24,7 +26,7 @@ public:
 
 private:
   struct Cuts {
-    float usec_before, usec_after, emin_before, emin_after;
+    float usec_before, usec_after, emin_before, emin_after, emax_after;
   };
 
   bool dmcOk(std::optional<Iter> optItP,
@@ -67,9 +69,10 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
        other->time().diff_us(itD->time()) < cuts.usec_after;
        other = other.later()) {
 
-    if (other->energy > cuts.emin_after
+    if (other->energy > cuts.emin_after &&
+        other->energy < cuts.emax_after &&
         // XXX remove the following if we restore the "full DMC" 200us pre-veto
-        && not muonAlg->isVetoed(other->time(), det)) {
+        not muonAlg->isVetoed(other->time(), det)) {
 
       return false;
     }
@@ -80,12 +83,14 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
 
 inline bool MultCutTool::ibdDmcOk(Iter itP, Iter itD, Det det) const
 {
-  Cuts cuts {IBD_USEC_BEFORE, IBD_USEC_AFTER, PROMPT_MIN, DELAYED_MIN};
+  Cuts cuts {IBD_USEC_BEFORE, IBD_USEC_AFTER, PROMPT_MIN, DELAYED_MIN,
+    DELAYED_MAX};
   return dmcOk(itP, itD, det, cuts, muonAlgIBDs);
 }
 
 inline bool MultCutTool::singleDmcOk(Iter it, Det det) const
 {
-  Cuts cuts {SINGLE_USEC_BEFORE, SINGLE_USEC_AFTER, PROMPT_MIN, PROMPT_MIN};
+  Cuts cuts {SINGLE_USEC_BEFORE, SINGLE_USEC_AFTER, PROMPT_MIN, PROMPT_MIN,
+    std::numeric_limits<float>::max()};
   return dmcOk(std::nullopt, it, det, cuts, muonAlgSingles);
 }
