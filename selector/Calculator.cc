@@ -31,6 +31,7 @@ public:
 
 private:
   TH1F* singlesHist(Det detector);
+  double nPreMuons(Det detector);
   double singlesIntegral(Det detector,
                          double lowE,
                          std::optional<double> optUpperE = std::nullopt);
@@ -38,6 +39,7 @@ private:
   double nPromptLikeSingles(Det detector);
   double nDelayedLikeSingles(Det detector);
   double singlesHz(Det detector, double N);
+  double preMuonHz(Det detector);
   double promptLikeHz(Det detector);
   double plusLikeHz(Det detector);
   double delayedLikeHz(Det detector);
@@ -81,6 +83,11 @@ double Calculator::singlesIntegral(Det detector,
   return h->Integral(lowBin, highBin);
 }
 
+double Calculator::nPreMuons(Det detector)
+{
+  return singlesIntegral(detector, 12);
+}
+
 double Calculator::nPlusLikeSingles(Det detector)
 {
   return singlesIntegral(detector, 0.7);
@@ -115,6 +122,12 @@ double Calculator::singlesHz(Det detector, double N)
   const double T = livetime_s();
 
   return N / (eDmcSingles * eMuSingles * T);
+}
+
+double Calculator::preMuonHz(Det detector)
+{
+  const double N = nPreMuons(detector);
+  return singlesHz(detector, N);
 }
 
 double Calculator::promptLikeHz(Det detector)
@@ -154,6 +167,7 @@ double Calculator::accDaily(Det detector)
 {
   const double Rpro = promptLikeHz(detector);
   const double Rplu = plusLikeHz(detector);
+  const double RpreMu = preMuonHz(detector);
   const double Rd = delayedLikeHz(detector);
 
   const double promptWindow = 1e-6 * IbdSel::DT_MAX_US;
@@ -167,12 +181,13 @@ double Calculator::accDaily(Det detector)
   assert(postDelayedEmptyWindow == 200e-6);
 
   const double probOnePro = (Rpro * promptWindow) * exp(-Rpro * promptWindow);
+  const double probZeroPreMu = exp(-RpreMu * promptWindow);
   const double probZeroPlu = exp(-Rplu * prePromptWindowEmptyWindow);
   const double probZeroD = exp(-Rd * postDelayedEmptyWindow);
 
   // XXX In principle we should account for the dt > 1 requirement or else
   // remove that cut. Extra factor ~ exp(-20 * 1e-6) = 0.99998 meh who cares
-  const double R = Rd * probOnePro * probZeroPlu * probZeroD;
+  const double R = Rd * probOnePro * probZeroPreMu * probZeroPlu * probZeroD;
 
   // This R assumes veto eff. of 1 (i.e. uncorrected for it) while R IS
   // corrected for DMC eff by construction (i.e. we are predicting what we'd see
