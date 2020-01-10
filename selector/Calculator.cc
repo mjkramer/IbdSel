@@ -6,6 +6,7 @@
 #include "MultCut.cc"
 #include "CalcsTree.cc"
 #include "Misc.cc"
+#include "Li9Calc.cc"
 
 #include "external/FukushimaLambertW.cc"
 
@@ -49,6 +50,8 @@ private:
   Stage stage;
   UInt_t seq;
   Site site;
+
+  Li9Calc li9calc;
 };
 
 double Calculator::livetime_s()
@@ -221,15 +224,18 @@ double Calculator::accDailyErr(Det detector)
   throw;
 }
 
-// TODO: Use the (IBD) muon veto parameters to get li9 rate
 double Calculator::li9Daily(Det detector)
 {
-  return 1;                     // XXX
+  const Config* config = pipe.getTool<Config>();
+  const unsigned shower_pe = config->get<double>("showerMuChgCut");
+  const double showerVeto_ms = 1e-3 * config->get<double>("showerMuPostVeto_us");
+
+  return li9calc.li9daily(site, shower_pe, showerVeto_ms);
 }
 
 double Calculator::li9DailyErr(Det detector)
 {
-  return 0.5;                   // XXX
+  return 0.3 * li9Daily(detector);
 }
 
 void Calculator::writeValues()
