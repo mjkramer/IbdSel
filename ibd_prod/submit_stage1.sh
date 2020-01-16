@@ -6,16 +6,25 @@ if (env | grep LD_LIBRARY_PATH | grep mkramer >/dev/null 2>&1); then
     exit 1
 fi
 
-tag=$1; shift
-njob=$1; shift
-
-if [ -z $tag ]; then
-    echo "Specify a tag"
+# If we're invoked by something in examples/
+if [ $# -eq 3 ]; then
+    echo "Need two more args: tag and njob"
     exit 1
 fi
 
-if [ -z $njob ]; then
-    echo "Specify # of jobs"
+if [ $# -ne 5 ]; then
+    echo "Usage: submit.sh slurmfile walltime timeout tag njob"
+    exit 1
+fi
+
+slurmfile=$1; shift
+walltime=$1; shift
+timeout=$1; shift
+tag=$1; shift
+njob=$1; shift
+
+if [ ! -f $slurmfile ]; then
+    echo "Slurm file does not exist. Bailing."
     exit 1
 fi
 
@@ -40,4 +49,4 @@ if [ ! -f ../selector/stage1_main_cc.so ]; then
     exit 1
 fi
 
-echo sbatch --array=1-$njob -o $logdir/slurm-%A_%a.out ibd_job.sl.sh $infile $outdir
+echo sbatch -t $walltime --array=1-$njob -o $logdir/slurm-%A_%a.out $slurmfile $timeout $infile $outdir
