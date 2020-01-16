@@ -4,7 +4,7 @@ import ROOT as R
 import os
 import sys
 
-sys.path.insert(0, '../ibd_prod')
+sys.path.insert(0, '../ibd_prod/python')
 from prod_util import DailyRunList
 
 from test_candidates import stage_for
