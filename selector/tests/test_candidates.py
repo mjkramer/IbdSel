@@ -2,8 +2,6 @@
 
 # Run me from ..
 
-from __future__ import print_function
-
 import os
 from subprocess import check_output
 import pandas as pd
