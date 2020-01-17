@@ -1,9 +1,7 @@
-from __future__ import print_function
-
 import os, sys, time
 from itertools import islice
 
-class ParallelListReader(object):
+class ParallelListReader:
     def __init__(self, filename, chunksize=1, timeout_secs=None, retry_delay=5):
         self._filename = filename
         self._chunksize = chunksize
@@ -17,7 +15,7 @@ class ParallelListReader(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if not self._cache:
             self._load()
             if not self._cache:
@@ -39,7 +37,7 @@ class ParallelListReader(object):
         open(self._filename, 'w').writelines(rest)
         os.system('rm -f %s.lock' % self._filename)
 
-class ParallelListWriter(object):
+class ParallelListWriter:
     def __init__(self, filename, chunksize=1, retry_delay=5):
         self._filename = filename
         self._chunksize = chunksize
@@ -83,3 +81,12 @@ def sysload():
 
 def unbuf_stdout():
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
+def stage_for(runno):
+    if 21221 <= runno <= 26694:
+        return 1
+    if 34523 <= runno <= 67012:
+        return 2
+    if 67625 <= runno:
+        return 3
+    raise "Nonsensical run number"

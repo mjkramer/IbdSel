@@ -7,7 +7,7 @@ if [ -z $tag ]; then
     exit 1
 fi
 
-source bash/set_vars.inc.sh
+source bashlib/set_vars.inc.sh
 set_vars $tag
 
 rm $indir/input.ibd.done.txt

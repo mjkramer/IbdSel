@@ -8,6 +8,9 @@ import pandas as pd
 import ROOT as R
 from root_pandas import read_root
 
+sys.path.insert(0, '../ibd_prod/python')
+from prod_util import stage_for
+
 R.gErrorIgnoreLevel = R.kError    # suppress warnings of empty trees
 
 CANDIDIR = "/global/project/projectdirs/dayabay/scratch/mkramer/p17b/data_ana_lbnl/output/v3.noSCNL/candidates/lists/AdSimple"
@@ -26,16 +29,6 @@ R.gROOT.ProcessLine(".L stage1_main.cc+" + ("g" if DEBUG_MODE else ""))
 
 # force pyroot to load R.k6AD etc.
 R.Stage
-
-# sigh: https://sft.its.cern.ch/jira/browse/ROOT-7240
-def stage_for(runno):
-    if 21221 <= runno <= 26694:
-        return R.k6AD
-    if 34523 <= runno <= 67012:
-        return R.k8AD
-    if 67625 <= runno <= 72455:
-        return R.k7AD
-    raise "Nonsensical run number"
 
 def site_for(filename):
     return int(filename.split('/')[-1].split('.')[4][2])

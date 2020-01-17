@@ -1,8 +1,8 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 """
 Provides a buffer between this KNL node's workers and the
-lockfile-controlled resources (input/done list). See ibd_job_knl.main.sh and
-ibd_worker(_knl).py for invocation.
+lockfile-controlled resources (input/done list). See bashlib/stage1_job.sh for
+invocation.
 
 """
 
@@ -11,14 +11,14 @@ import time
 from multiprocessing import Process
 import zmq
 
-from common import ParallelListReader, ParallelListWriter
+from prod_util import ParallelListReader, ParallelListWriter
 
 CHUNKSIZE = 300
 
 DONELOGGER_SOCK_NAME = 'DoneLogger'
 INPUTREADER_SOCK_NAME = 'InputReader'
 
-class BufferedParallelListReader(object):
+class BufferedParallelListReader:
     def __init__(self, sockdir):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.REQ)
@@ -27,14 +27,14 @@ class BufferedParallelListReader(object):
     def __iter__(self):
         return self
 
-    def next(self):
-        self.sock.send('')
-        item = self.sock.recv()
+    def __next__(self):
+        self.sock.send_string('')
+        item = self.sock.recv_string()
         if item == '':
             raise StopIteration
         return item
 
-class BufferedParallelListWriter(object):
+class BufferedParallelListWriter:
     def __init__(self, sockdir):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.PUSH)
@@ -47,14 +47,14 @@ class BufferedParallelListWriter(object):
         pass
 
     def put(self, line):
-        self.sock.send(line)
+        self.sock.send_string(line)
 
 class BufferedDoneLogger(BufferedParallelListWriter):
     def log(self, path):
         tstamp = time.strftime('%Y-%m-%dT%H:%M:%S')
         self.put(tstamp + ' ' + path)
 
-class InputBuffer(object):
+class InputBuffer:
     def __init__(self, sockdir, infile, chunksize, timeout_secs=None):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.REP)
@@ -65,7 +65,7 @@ class InputBuffer(object):
 
     def serve(self):
         while True:
-            msg = self.sock.recv()
+            msg = self.sock.recv_string()
 
             if msg == 'QUIT':
                 return
@@ -74,13 +74,13 @@ class InputBuffer(object):
 
             if not self.done:
                 try:
-                    item = self.plr.next()
+                    item = next(self.plr)
                 except StopIteration:  # timed out or drained input
                     self.done = True
 
-            self.sock.send(item)
+            self.sock.send_string(item)
 
-class OutputBuffer(object):
+class OutputBuffer:
     def __init__(self, sockdir, outfile, chunksize):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.PULL)
@@ -90,7 +90,7 @@ class OutputBuffer(object):
 
     def serve(self):
         while True:
-            item = self.sock.recv()
+            item = self.sock.recv_string()
 
             if item == 'QUIT':
                 if self.plw._cache:
@@ -109,8 +109,9 @@ def main():
     args = ap.parse_args()
 
     def serve_inbuf():
+        timeout_secs = None if args.timeout == -1 else 3600 * args.timeout
         ib = InputBuffer(args.sockdir, args.infile, args.chunksize,
-                         timeout_secs=3600*args.timeout)
+                         timeout_secs=timeout_secs)
         ib.serve()
 
     def serve_outbuf():
