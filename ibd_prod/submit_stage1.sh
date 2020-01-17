@@ -28,11 +28,9 @@ if [ ! -f $slurmfile ]; then
     exit 1
 fi
 
-logdir=../../log/ibd_prod/$tag
 infile=../../data/prod_input/$tag/input.ibd.txt
 outdir=../../data/ibd_fbf/$tag
-
-mkdir -p $logdir
+logdir=../../log/ibd_prod/$tag
 
 if [ ! -f $infile ]; then
     echo "$infile does not exist. Bailing."
@@ -44,9 +42,14 @@ if [ ! -d $outdir ]; then
     exit 1
 fi
 
+if [ ! -d $logdir ]; then
+    echo "$logdir does not exist. Bailing."
+    exit 1
+fi
+
 if [ ! -f ../selector/stage1_main_cc.so ]; then
     echo "Compile ../selector/stage1_main.cc (in ROOT 6) first"
     exit 1
 fi
 
-echo sbatch -t $walltime --array=1-$njob -o $logdir/slurm-%A_%a.out $slurmfile $timeout $infile $outdir
+echo sbatch -t $walltime --array=1-$njob -o $logdir/slurm-%A_%a.out $slurmfile $timeout $tag

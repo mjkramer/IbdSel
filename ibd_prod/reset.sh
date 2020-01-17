@@ -7,11 +7,13 @@ if [ -z $tag ]; then
     exit 1
 fi
 
-inp=../../data/prod_input/$tag
+source bash/set_vars.inc.sh
+set_vars $tag
 
-rm $inp/input.ibd.done.txt
-cp $inp/input.ibd.orig.txt $inp/input.ibd.txt
+rm $indir/input.ibd.done.txt
+cp $infile.orig $infile
 
-outp=../../data/ibd_fbf/$tag
+rm -rf $outdir/EH1 $outdir/EH2 $outdir/EH3
 
-rm -rf $outp/EH1 $outp/EH2 $outp/EH3
+rm $logdir/*
+

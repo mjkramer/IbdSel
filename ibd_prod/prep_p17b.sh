@@ -7,12 +7,16 @@ if [ -z $tag ]; then
     exit 1
 fi
 
-outdir=$SCRATCH/p17b/ibd_fbf/$tag
-mkdir -p $outdir
-mkdir -p ../../data/ibd_fbf
-ln -s $outdir ../../data/ibd_fbf/$tag
+source bash/set_vars.inc.sh
+set_vars $tag
 
-indir=../../data/prod_input/$tag
+mkdir -p $trueOutdir
+mkdir -p ../../data/ibd_fbf
+ln -s $trueOutdir $outdir
+
 mkdir -p $indir
-cp ../../data/prod_input/orig/paths.physics.good.p17b.v3.sync.txt $indir/input.ibd.txt
-chmod +w $indir/input.ibd.txt
+ln -s ../orig/paths.physics.good.p17b.v3.sync.txt $infile.orig
+cp $infile.orig $infile
+chmod +w $infile
+
+mkdir -p $logdir
