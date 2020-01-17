@@ -1,6 +1,4 @@
-#!/usr/bin/env python2.7
-
-from __future__ import print_function
+#!/usr/bin/env python3
 
 import argparse
 import zmq
@@ -17,7 +15,7 @@ def main():
     def send_quit(name, socktype):
         sock = ctx.socket(socktype)
         sock.connect('ipc://%s/%s.ipc' % (args.sockdir, name))
-        sock.send('QUIT')
+        sock.send_string('QUIT')
 
     send_quit(INPUTREADER_SOCK_NAME, zmq.REQ)
     send_quit(DONELOGGER_SOCK_NAME, zmq.PUSH)

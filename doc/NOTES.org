@@ -1,3 +1,18 @@
 * Usage with PyROOT
 ...(for, e.g., using test_candidates.py)
 With current janky environment, do not compile C++ from within PyROOT! The "wrong" dynamic libs get linked in. Compile code from "plain" ROOT, then load the .so from PyROOT. This applies to things like test/FileFinder.cc too.
+
+* Testing stage1
+** Generating smaller input
+- First 10 files:
+scripts/prep_p17b.sh -f "head -n -10" some_tag
+
+- Random 10 files:
+scripts/prep_p17b.sh -f "shuf -n 10" some_tag
+
+** Running interactively (one process)
+newenv
+bashlib/stage1_job.sh -1 some_tag
+
+** Cleaning up
+eval `scripts/clear.sh some_tag`

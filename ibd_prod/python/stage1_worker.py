@@ -1,10 +1,10 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 # Recommend using 50
 CHUNKSIZE = 50   # how many input files to pop off the list at a time (default)
 
 import os, re, argparse, random
-from common import ParallelListReader, DoneLogger, parse_path, sysload
+from prod_util import ParallelListReader, DoneLogger, parse_path, sysload, stage_for
 from queue_buffer import BufferedParallelListReader, BufferedDoneLogger
 
 def process(path, outdir):
@@ -12,9 +12,9 @@ def process(path, outdir):
     subdir = runno / 100 * 100
     outpath = os.path.join(outdir, 'EH%d' % site, '%07d' % subdir,
                            'pre_ibd.%07d.%04d.root' % (runno, fileno))
-    os.system('mkdir -p %s' % outpath)  # this actually works because ROOT will delete empty dir when open TFile w/ "RECREATE" lol
-    os.system('time root -b -q "../selector/stage1_main.cc+(\\"%s\\", \\"%s\\", %d)"' %
-              (path, outpath, site))
+    os.system('mkdir -p %s' % os.path.dirname(outpath))
+    os.system('time root -l -b -q "cling/run_stage1.C(\\"%s\\", \\"%s\\", %d, %d)"' %
+              (path, outpath, site, stage_for(runno)))
 
 def main():
     ap = argparse.ArgumentParser()
