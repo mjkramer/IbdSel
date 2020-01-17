@@ -110,7 +110,7 @@ std::string Li9Calc::dataPath(const char* filename)
 {
   std::string srcCodePath = __FILE__;
   std::string dir = srcCodePath.substr(0, srcCodePath.rfind('/'));
-  return dir + "/../data/" + filename;
+  return dir + "/data/" + filename;
 }
 
 double Li9Calc::extrapolate(unsigned shower_pe,
