@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-# Recommend using 50
-CHUNKSIZE = 50   # how many input files to pop off the list at a time (default)
+# for a "node" (queue_buffer) chunksize of 600, recommend a "task" (this here)
+# chunksize of 8, assuming 68 tasks per node, since 600/68 ~ 8.8
+CHUNKSIZE = 8   # how many input files to pull at a time (default)
 
 import os, re, argparse, random
 from prod_util import ParallelListReader, DoneLogger, parse_path, sysload, stage_for
@@ -37,7 +38,7 @@ def main():
 
     with getDL() as logger:
         for path in getPLR():
-            if random.random() < 0.1:
+            if random.random() < 0.01:
                 sysload()
             process(path, args.outputdir)
             logger.log(path)

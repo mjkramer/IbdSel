@@ -11,6 +11,8 @@ source bashlib/job_init.inc.sh
 sockdir=$(mktemp -d)
 echo "Sockets in $sockdir"
 
+sleep $(( RANDOM % 120 ))       # prevent lockfile contention (200 jobs)
+
 python/queue_buffer.py -t $timeout $sockdir $infile &
 qbPid=$!
 
