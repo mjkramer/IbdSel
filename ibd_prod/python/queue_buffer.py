@@ -13,7 +13,7 @@ import zmq
 
 from prod_util import ParallelListReader, ParallelListWriter
 
-CHUNKSIZE = 300
+CHUNKSIZE = 600
 
 DONELOGGER_SOCK_NAME = 'DoneLogger'
 INPUTREADER_SOCK_NAME = 'InputReader'
