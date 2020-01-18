@@ -1,8 +1,16 @@
-- We're seeing ~8s interactively (Haswell) for stage 1+2 on one file.
-- Let's say Cori KNL, at scale, takes 60s to run stage2 (fairly conservative).
+* Preliminaries
 
+- We're seeing ~8s interactively (Haswell) for stage 1+2 on one file.
+- This seems to be 5-6s stage1 + 2-3s stage2.
+- stage1 is negligible in the limit of studying many cuts
+
+* Expected stage2 walltime per file on KNL at scale
+
+Haswell takes 2-3 sec, interactively, when machine is quiet. Expect factor of 2-3 degradation when machine is busy and I'm running multiple jobs. Add factor of 6-10 to account for Haswell/KNL gulf. Total factor of 12-30 on 2-3 sec gives anywhere from 24 to 90 sec per file.
+
+* Estimated MPP requirements
 #+begin_src ipython :session :exports both :results raw drawer
-cpuSecPerFile = 60              # cori KNL?
+cpuSecPerFile = 60              # cori KNL at scale
 filesPerDaqHour = 6             # EH1
 yearsOfDaq = 5.5                # p17b?
 
@@ -14,22 +22,21 @@ totCpuDays
 
 #+RESULTS:
 :results:
-# Out[2]:
+# Out[1]:
 : 200.75
 :end:
 
 #+begin_src ipython :session :exports both :results raw drawer
 coriCoresPerNode = 68
-parallelEff = 0.5
 
-totNodeDays = totCpuDays / coriCoresPerNode / parallelEff
+totNodeDays = totCpuDays / coriCoresPerNode
 totNodeDays
 #+end_src
 
 #+RESULTS:
 :results:
-# Out[3]:
-: 5.904411764705882
+# Out[2]:
+: 2.952205882352941
 :end:
 
 #+begin_src ipython :session :exports both :results raw drawer
@@ -41,8 +48,8 @@ nodeDaysEH1manyCuts
 
 #+RESULTS:
 :results:
-# Out[4]:
-: 94.47058823529412
+# Out[3]:
+: 47.23529411764706
 :end:
 
 #+begin_src ipython :session :exports both :results raw drawer
@@ -53,8 +60,8 @@ fullStudyNodeDays
 
 #+RESULTS:
 :results:
-# Out[5]:
-: 283.4117647058823
+# Out[4]:
+: 141.70588235294116
 :end:
 
 So, in conclusion, we'll need about 300 node-days on KNL to evaluate 16 points in cut space. That sucks. What percentage is that?
@@ -66,13 +73,13 @@ fullStudyNodeDays / totCoriNodes
 
 #+RESULTS:
 :results:
-# Out[6]:
-: 0.029314415050256757
+# Out[5]:
+: 0.014657207525128379
 :end:
 
-So, to get results in one day, we'll need to occupy 3% of the machine.
+That's the fraction the machine we'd need to occupy to perform the study in one day.
 
-What's the cost in MPP hours?
+What's the cost in MPP hours? (NB: chgFactor was recently lowered to 80 from 90.)
 
 #+begin_src ipython :session :exports both :results raw drawer
 chgFactor = 90                  # knl, regular qos
@@ -82,8 +89,116 @@ mppHours
 
 #+RESULTS:
 :results:
-# Out[7]:
-: 612169.4117647058
+# Out[6]:
+: 306084.7058823529
 :end:
 
-I have 735k in my allocation (20% of project). Total for dayabay is 3M. I'm screwed.
+I have 735k in my allocation (20% of dayabay project). Total for dayabay is 3M. I'm potentially screwed. Possible sources of relief:
+
+- Having cpuSecPerFile below 60 (up to 50% relief)
+- Having allHallsFactor below 3 (up to 25% relief)
+- Preloading stage1 files into burst buffer (relief probably minimal)
+- Using crappier QOS with lower charge factor (up to 75% relief)
+
+Possible sources of pain:
+
+- Having cpuSecPerFile be closer to 90 (50% more pain)
+
+So in the best case (assuming regular QOS) we can expect /100k MPP hours/ to study 16 cuts. In the worst case, /500k MPP hours./ Or, in terms of using up our allocation, that's 23 - 115 cuts we can study using our whole allocation.
+
+And during testing, we can expect 6k - 31k MPP hours for a single cut (70 - 350 node hours), best guess around 215 node hours or 9 node days. Suggest requesting 16-32 nodes for 24 hours?
+* KNL benchmarking
+- One node, 48 tasks => 100 files in 2.5 minutes
+- Can hope for maybe 1000 files in 30 minutes (max walltime in debug queue)
+- 500 files is a conservative choice for debug queue
+
+** Big benchmarking
+500 files takes 8 minutes for 48, 68, 136 tasks
+Crashes at 272 tasks
+
+#+begin_src ipython :session :exports both :results raw drawer
+nodeSecPerFile = 8 * 60 / 500
+nodeSecPerFile
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[7]:
+: 0.96
+:end:
+
+benchmark.500.6KE.008
+Beginning at 1579256568 = Fri Jan 17 02:22:48 PST 2020
+benchmark.500.6KE.016
+Beginning at 1579256574 = Fri Jan 17 02:22:54 PST 2020
+Ending at 1579257552 = Fri Jan 17 02:39:12 PST 2020
+benchmark.500.6KE.024
+Beginning at 1579257574 = Fri Jan 17 02:39:34 PST 2020
+Ending at 1579258316 = Fri Jan 17 02:51:56 PST 2020
+benchmark.500.6KE.032
+Beginning at 1579258339 = Fri Jan 17 02:52:19 PST 2020
+Ending at 1579258905 = Fri Jan 17 03:01:45 PST 2020
+benchmark.500.CP8.272
+Beginning at 1579255830 = Fri Jan 17 02:10:30 PST 2020
+Ending at 1579256026 = Fri Jan 17 02:13:46 PST 2020
+benchmark.500.pFR.048
+Beginning at 1579252589 = Fri Jan 17 01:16:29 PST 2020
+Ending at 1579253048 = Fri Jan 17 01:24:08 PST 2020
+benchmark.500.pFR.068
+Beginning at 1579253214 = Fri Jan 17 01:26:54 PST 2020
+Ending at 1579253691 = Fri Jan 17 01:34:51 PST 2020
+benchmark.500.pFR.136
+Beginning at 1579252700 = Fri Jan 17 01:18:20 PST 2020
+Ending at 1579253188 = Fri Jan 17 01:26:28 PST 2020
+benchmark.500.pFR.272
+Beginning at 1579253085 = Fri Jan 17 01:24:45 PST 2020
+Ending at 1579253326 = Fri Jan 17 01:28:46 PST 2020
+
+** Todo before we submit stage1
+*** TODO Plan njobs, walltime, timeout, chunksize, delay (in stage1_job or queue_buffer, prob QB)
+Let "node chunksize" denote the larger one (used by queue_buffer) and "task chunksize" denote the smaller one (used by stage1_worker)
+
+#+begin_src ipython :session :exports both :results none
+%precision 3
+#+end_src
+
+#+begin_src ipython :session :exports both :results none
+NFILES = 560792
+MPP_FACTOR = 80
+
+def hours(nodeSecPerFile):           # for one node
+    wall_hrs = NFILES * nodeSecPerFile / 3600
+    return wall_hrs, MPP_FACTOR * wall_hrs
+
+def scale(k, l):
+    return [k * x for x in l]
+#+end_src
+
+#+begin_src ipython :session :exports both :results raw drawer
+[hours(1), hours(2)]
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[10]:
+: [(155.776, 12462.044), (311.551, 24924.089)]
+:end:
+
+- 300 node-hours = 12.5 node-days. Suppose we request 2-hour jobs.
+- That's 150 jobs ideally, 200+ more realistically.
+- Each node (i.e. job) will process at most 0.5-1 files per second
+- With a node chunksize of 300, that's 5-10 minutes per chunk
+- With 200 jobs, that's a lockfile rate of 200 / 300 - 200 / 600 = 0.3-0.7 Hz. A bit close for comfort.
+- Let's go with a node chunksize of 600, i.e. 10-20 minutes per chunk
+- Then we can set a timeout (for 2 hrs) of 1.5 hrs
+- 600 / 68 = 8.8. So let's go with a task chunksize of 8.
+- 200 jobs starting up. We want lockfile rate below 0.25 Hz, so need to spread them out over 800 seconds. WASTE. In reality job startups are staggered by the scheduler anyway. Let's go with a random delay of 0-120 seconds.
+
+**** Final decision (using submit_knl_short.sh):
+- [X] Walltime = 2 hrs
+- [X] Timeout = 1.5 hrs
+- [X] Delay = rand() % 2 minutes (in stage1_job before queue_buffer)
+- [X] Node chunksize = 600
+- [X] Task chunksize = 8
+- [ ] Expect 75-200 jobs needed, 10k - 25k MPP hours
+

@@ -1,6 +1,38 @@
+* Things to do
+** DONE Fix accidentals/DMC calc and compare 1+ daily value to LBNL [3/4]
+CLOSED: [2020-01-15 Wed 23:30]
+- [X] Ensure singles sel/calc use consistent muon veto
+- [X] Apply stashed corrections to calc
+Still not fully consistent with technote, see (1.10) [FIXED]
+- [X] Process one day in each hall, compare to LBNL
+Should check more extensively?
+- [ ] Fix acc rate error? [WONTFIX]
+** DONE Implement Li9 rate calculation [1/2]
+CLOSED: [2020-01-15 Wed 23:30]
+- [X] Write code
+- [ ] Test code
+** TODO Check implementation of other backgrounds
+In fit_prep? c.f. 
+** DONE Add accidentals spectrum?
+CLOSED: [2020-01-16 Thu 12:17]
+Already have the singles histograms, dur.
+** TODO Run checks of daily everything vs LBNL
+** TODO Update job script for stage1
+** TODO Update stage1 merge job?
+** TODO Write/test job script to do stage2 + merge + fit
+** TODO Run stage1 (+ merge?) on P17B
+** TODO Do one fit, to test
+** TODO Do another N fits
+
 * Usage with PyROOT
 ...(for, e.g., using test_candidates.py)
 With current janky environment, do not compile C++ from within PyROOT! The "wrong" dynamic libs get linked in. Compile code from "plain" ROOT, then load the .so from PyROOT. This applies to things like test/FileFinder.cc too.
+
+* PyROOT bugs
+- [[https://sft.its.cern.ch/jira/browse/ROOT-7240][Scoped enums]]
+
+* Multiple input files?
+Problem is in stage1: AdSaver needs to be able to know when the input file has changed so that it can update the run/file in the output tree. SyncReader needs to be able to notify downstream algs when the input file changes to the next one in the chain. Stage2 is fine as-is.
 
 * Testing stage1
 ** Generating smaller input
@@ -16,3 +48,21 @@ bashlib/stage1_job.sh -1 some_tag
 
 ** Cleaning up
 eval `scripts/clear.sh some_tag`
+
+* Submitting stage1
+Do everything from ibd_prod directory, within a fresh shell environment
+
+** Safety check
+Make sure stage1_main.cc.so is the newest file in selector/, and be sure that you didn't compile it from PyROOT
+
+** Prepare dirs
+#+begin_src bash
+scripts/prep_p17b.sh v1
+#+end_src
+
+** Get sbatch command
+10 jobs:
+#+begin_src bash
+examples/submit_knl_short.sh v1 10
+#+end_src
+Check, copy, and paste
