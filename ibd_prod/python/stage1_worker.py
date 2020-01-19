@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-import os, re, argparse, random
-from prod_util import ParallelListReader, DoneLogger, parse_path, sysload, stage_for
-from queue_buffer import BufferedParallelListReader, BufferedDoneLogger
+import os, argparse, random
+
+from prod_util import parse_path, sysload, stage_for
+from prod_io import LockfileListReader, LockfileListWriter
+from zmq_fan import ZmqListReader, ZmqListWriter
 
 def process(path, outdir):
     runno, fileno, site = parse_path(path)
@@ -18,7 +20,7 @@ def main():
     ap.add_argument('inputlist')
     ap.add_argument('outputdir')
     ap.add_argument('-q', '--sockdir',
-                    help='Socket dir if using queue_buffer.py to buffer the listfile')
+                    help='Socket dir if using zmq_fan.py to buffer the listfile')
     ap.add_argument('-t', '--timeout', type=float, default=18,
                     help='Timeout when reading directly from listfile (i.e. not using -q)')
     ap.add_argument('-c', '--chunksize', type=int, default=50,
@@ -26,16 +28,17 @@ def main():
     args = ap.parse_args()
 
     if args.sockdir:
-        getPLR = lambda: BufferedParallelListReader(args.sockdir)
-        getDL = lambda: BufferedDoneLogger(args.sockdir)
+        reader = ZmqListReader(args.sockdir)
+        logger = ZmqListWriter(args.sockdir)
     else:
-        donelist = re.sub(r'\.txt$', '.done.txt', args.inputlist)
-        getPLR = lambda: ParallelListReader(args.inputlist, chunksize=args.chunksize,
-                                            timeout_secs=args.timeout*3600)
-        getDL = lambda: DoneLogger(donelist, chunksize=args.chunksize)
+        reader = LockfileListReader(args.inputlist,
+                                    chunksize=args.chunksize,
+                                    timeout_secs=args.timeout*3600)
+        logger = LockfileListWriter(args.inputlist + '.done',
+                                    chunksize=args.chunksize)
 
-    with getDL() as logger:
-        for path in getPLR():
+    with logger:
+        for path in reader:
             if random.random() < 0.01:
                 sysload()
             process(path, args.outputdir)

@@ -3,7 +3,7 @@
 import argparse
 import zmq
 
-from queue_buffer import INPUTREADER_SOCK_NAME, DONELOGGER_SOCK_NAME
+from zmq_fan import INPUTREADER_SOCK_NAME, DONELOGGER_SOCK_NAME
 
 def main():
     ap = argparse.ArgumentParser()

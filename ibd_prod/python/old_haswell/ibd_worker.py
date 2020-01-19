@@ -3,8 +3,8 @@
 # Recommend using 50
 CHUNKSIZE = 50   # how many input files to pop off the list at a time (default)
 
-import os, time, re, argparse
-from common import ParallelListReader, DoneLogger, parse_path
+import os, time, argparse
+from common import LockfileListReader, DoneLogger, parse_path
 
 def process(path, outdir):
     runno, fileno, site = parse_path(path)
@@ -23,10 +23,10 @@ def main():
     ap.add_argument('-c', '--chunksize', type=int, default=CHUNKSIZE)
     args = ap.parse_args()
 
-    donelist = re.sub(r'\.txt$', '.done.txt', args.inputlist)
+    donelist = args.inputlist + '.done'
 
     with DoneLogger(donelist, chunksize=args.chunksize) as logger:
-        for path in ParallelListReader(args.inputlist, chunksize=args.chunksize,
+        for path in LockfileListReader(args.inputlist, chunksize=args.chunksize,
                                        timeout_secs = args.timeout * 3600):
             # sysload()
             process(path, args.outputdir)

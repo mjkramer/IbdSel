@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 
-# XXX check f-strings
-
-import os, sys, re, argparse, random
-from tempfile import TemporaryDirectory
+import os, argparse, random
 import ROOT as R
 R.PyConfig.IgnoreCommandLineOptions = True
 
 from daily_runlist import DailyRunList
-from prod_util import ParallelListReader, DoneLogger, parse_path, sysload, \
-    gen2list, chunk_list, log_time, dets_for
+from prod_util import sysload, gen2list, log_time, dets_for
+from prod_io import LockfileListReader, LockfileListWriter
+from hadd import hadd_chunked
 
 JOB_CHUNKSIZE = 10
 HADD_CHUNKSIZE = 50
@@ -37,13 +35,12 @@ class Merger:
 
     @staticmethod
     def is_readable(path, site, runno):
-        things = things2check(site, runno)
         try:
             f = R.TFile(path)
-            for thing in things:
+            for thing in Merger.things2check(site, runno):
                 if not f.Get(thing):
                     return False
-        except:
+        except Exception:       # pylint: disable=broad-except
             return False
         return True
 
@@ -56,41 +53,23 @@ class Merger:
             else:
                 print(f'CRAPPY {site} {day} {runno} {path}')
 
-    @staticmethod
-    def hadd(paths, outpath):
-        inputs = ' '.join(paths)
-        os.system(f'hadd -f {outpath} {inputs}')
-
-    @staticmethod
-    def hadd_chunked(paths, outpath):
-        chunks = chunk_list(paths, HADD_CHUNKSIZE)
-
-        with TemporaryDirectory() as tmpdir:
-            def hadd_chunk(i, chunk):
-                tmppath = os.path.join(tmpdir, 'tmp.{i}.root')
-                self.hadd(chunk, tmppath)
-                return tmppath
-
-            tmp_outputs = [hadd_chunk(i, chunk)
-                           for i, chunk in enumerate(chunks)]
-
-            os.system('mkdir -p ' + os.path.dirname(outpath))
-            self.hadd(tmp_outputs, outpath)
-
     @log_time
     def merge(self, site, day):
-        print('MERGING', site, day)
+        print(f'MERGING {site} {day}')
 
         paths = self.readable_files(site, day)
         outpath = self.output_path(site, day)
-        self.hadd_chunked(paths, outpath)
+        hadd_chunked(paths, outpath, HADD_CHUNKSIZE)
 
     def loop(self):
-        donelist = re.sub(r'\.txt$', '.done.txt', self.cmd_args.inputlist)
+        reader = LockfileListReader(self.cmd_args.inputlist,
+                                    chunksize=JOB_CHUNKSIZE,
+                                    timeout_secs=self.cmd_args.timeout * 3600)
+        logger = LockfileListWriter(self.cmd_args.inputlist + '.done',
+                                    chunksize=JOB_CHUNKSIZE)
 
-        with DoneLogger(donelist, chunksize=JOB_CHUNKSIZE) as logger:
-            for line in ParallelListReader(cmd_args.inputlist, chunksize=JOB_CHUNKSIZE,
-                                           timeout_secs=cmd_args.timeout * 3600):
+        with logger:
+            for line in reader:
                 if random.random() < 0.1:
                     sysload()
                 site, day = map(int, line.split()[:2])

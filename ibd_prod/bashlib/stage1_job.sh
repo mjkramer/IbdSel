@@ -14,7 +14,7 @@ echo "Sockets in $sockdir"
 # prevent lockfile contention (200 jobs)
 [ -n "$SLURM_JOB_ID" ] && sleep $(( RANDOM % 120 ))
 
-python/queue_buffer.py -t $timeout $sockdir $infile &
+python/zmq_fan.py -t $timeout $sockdir $infile &
 qbPid=$!
 
 while [[ ! -S $sockdir/InputReader.ipc || ! -S $sockdir/DoneLogger.ipc ]]; do

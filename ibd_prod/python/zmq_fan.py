@@ -7,25 +7,25 @@ invocation.
 """
 
 import argparse
-import time
 from multiprocessing import Process
 import zmq
 
-from prod_util import ParallelListReader, ParallelListWriter
+from prod_io import ListReaderBase, ListWriterBase, LockfileListReader, LockfileListWriter
+
+INPUTREADER_SOCK_NAME = 'InputReader'
+DONELOGGER_SOCK_NAME = 'DoneLogger'
 
 CHUNKSIZE = 600
 
-DONELOGGER_SOCK_NAME = 'DoneLogger'
-INPUTREADER_SOCK_NAME = 'InputReader'
+# ------------------------------ Client code ------------------------------
 
-class BufferedParallelListReader:
-    def __init__(self, sockdir):
+class ZmqListReader(ListReaderBase):
+    def __init__(self, sockdir, sockname=INPUTREADER_SOCK_NAME):
+        super().__init__()
+
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.REQ)
-        self.sock.connect('ipc://%s/%s.ipc' % (sockdir, INPUTREADER_SOCK_NAME))
-
-    def __iter__(self):
-        return self
+        self.sock.connect('ipc://%s/%s.ipc' % (sockdir, sockname))
 
     def __next__(self):
         self.sock.send_string('')
@@ -34,25 +34,18 @@ class BufferedParallelListReader:
             raise StopIteration
         return item
 
-class BufferedParallelListWriter:
-    def __init__(self, sockdir):
+class ZmqListWriter(ListWriterBase):
+    def __init__(self, sockdir, sockname=DONELOGGER_SOCK_NAME):
+        super().__init__()
+
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.PUSH)
-        self.sock.connect('ipc://%s/%s.ipc' % (sockdir, DONELOGGER_SOCK_NAME))
+        self.sock.connect('ipc://%s/%s.ipc' % (sockdir, sockname))
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, _exc_type, _exc_value, _traceback):
-        pass
-
-    def put(self, line):
+    def _do_put(self, line):
         self.sock.send_string(line)
 
-class BufferedDoneLogger(BufferedParallelListWriter):
-    def log(self, path):
-        tstamp = time.strftime('%Y-%m-%dT%H:%M:%S')
-        self.put(tstamp + ' ' + path)
+# ------------------------------ Server code ------------------------------
 
 class InputBuffer:
     def __init__(self, sockdir, infile, chunksize, timeout_secs=None):
@@ -60,7 +53,7 @@ class InputBuffer:
         self.sock = ctx.socket(zmq.REP)
         self.sock.bind('ipc://%s/%s.ipc' % (sockdir, INPUTREADER_SOCK_NAME))
 
-        self.plr = ParallelListReader(infile, chunksize=chunksize, timeout_secs=timeout_secs)
+        self.reader = LockfileListReader(infile, chunksize=chunksize, timeout_secs=timeout_secs)
         self.done = False       # to avoid grabbing the lock when we know it's all over
 
     def serve(self):
@@ -74,7 +67,7 @@ class InputBuffer:
 
             if not self.done:
                 try:
-                    item = next(self.plr)
+                    item = next(self.reader)
                 except StopIteration:  # timed out or drained input
                     self.done = True
 
@@ -86,18 +79,17 @@ class OutputBuffer:
         self.sock = ctx.socket(zmq.PULL)
         self.sock.bind('ipc://%s/%s.ipc' % (sockdir, DONELOGGER_SOCK_NAME))
 
-        self.plw = ParallelListWriter(outfile, chunksize=chunksize)
+        self.writer = LockfileListWriter(outfile, chunksize=chunksize)
 
     def serve(self):
-        while True:
-            item = self.sock.recv_string()
+        with self.writer:  # ensure cache is flushed
+            while True:
+                item = self.sock.recv_string()
 
-            if item == 'QUIT':
-                if self.plw._cache:
-                    self.plw._flush()
-                return
+                if item == 'QUIT':
+                    return
 
-            self.plw.put(item)
+                self.writer.put(item)
 
 def main():
     ap = argparse.ArgumentParser()
@@ -115,7 +107,7 @@ def main():
         ib.serve()
 
     def serve_outbuf():
-        donefile = args.infile[:-4] + '.done.txt'
+        donefile = args.infile + '.done'
         ob = OutputBuffer(args.sockdir, donefile, args.chunksize)
         ob.serve()
 

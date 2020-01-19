@@ -10,7 +10,7 @@ fi
 source bashlib/set_vars.inc.sh
 set_vars $tag
 
-rm $indir/input.ibd.done.txt
+rm $infile.done
 cp $infile.orig $infile
 
 rm -rf $outdir/EH1 $outdir/EH2 $outdir/EH3
