@@ -8,7 +8,7 @@ def process(path, outdir):
     runno, fileno, site = parse_path(path)
     subdir = runno // 100 * 100
     outpath = os.path.join(outdir, 'EH%d' % site, '%07d' % subdir, '%07d' % runno,
-                           'pre_ibd.%07d.%04d.root' % (runno, fileno))
+                           'stage1.fbf.eh%d.%07d.%04d.root' % (site, runno, fileno))
     os.system('mkdir -p %s' % os.path.dirname(outpath))
     os.system('time root -l -b -q "cling/run_stage1.C(\\"%s\\", \\"%s\\", %d, %d)"' %
               (path, outpath, site, stage_for(runno)))

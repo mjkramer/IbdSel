@@ -31,7 +31,7 @@ def process1(site, runno, fileno):
 def go(site, day):
     os.system('rm -f tests/out.test_day/*')
 
-    for runno, fileno in DRL.daily(day=day, site=site):
+    for runno, fileno in DRL.daily(site=site, day=day):
         print(runno, fileno)
         process1(site, runno, fileno)
 

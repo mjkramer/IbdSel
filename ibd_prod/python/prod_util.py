@@ -1,5 +1,6 @@
 import os, sys, time
 from itertools import islice
+from functools import wraps
 
 class ParallelListReader:
     def __init__(self, filename, chunksize=1, timeout_secs=None, retry_delay=5):
@@ -90,3 +91,38 @@ def stage_for(runno):
     if 67625 <= runno:
         return 3
     raise "Nonsensical run number"
+
+def dets_for(site, runno):
+    stage = stage_for(runno)
+    if site == 1:
+        return [2] if stage == 3 else [1, 2]
+    if site == 2:
+        return [1] if stage == 1 else [1, 2]
+    if site == 3:
+        return [1, 2, 3] if stage == 1 else [1, 2, 3, 4]
+
+def log_time(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        t1 = time.time()
+        res = fn(*args, **kwargs)
+        t2 = time.time()
+        print('ELAPSED %d seconds' % (t2 - t1))
+        return res
+    return wrapper
+
+def gen2thing(thing):
+    def wrap(gen):
+        @wraps(gen)
+        def fun(*args, **kwargs):
+            return thing(gen(*args, **kwargs))
+        return fun
+
+    return wrap
+
+gen2list = gen2thing(list)
+
+@gen2list
+def chunk_list(L, chunksize):
+    for i in range(0, len(L), chunksize):
+        yield L[i : i + chunksize]  # yes, kosher even if it points past end
