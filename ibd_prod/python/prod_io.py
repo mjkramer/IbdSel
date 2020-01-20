@@ -1,5 +1,4 @@
 import time, os
-from itertools import islice
 
 class ListReaderBase:
     def __iter__(self):
@@ -48,12 +47,29 @@ class LockfileListReader(ListReaderBase):
         if self._timeout:
             self._tstart = time.time()
 
+        self._lines = open(filename).readlines()
+
     def __next__(self):
         if not self._cache:
             self._load()
             if not self._cache:
                 raise StopIteration
         return self._cache.pop(0).strip()
+
+    def _lock_file(self):
+        return self._filename + '.lock'
+
+    def _offset_file(self):
+        return self._filename + '.offset'
+
+    def _read_offset(self):
+        try:
+            return int(open(self._offset_file()).read())
+        except FileNotFoundError:
+            return 0
+
+    def _write_offset(self, offset):
+        open(self._offset_file(), 'w').write(str(offset))
 
     def _load(self):
         if self._timeout:
@@ -63,12 +79,16 @@ class LockfileListReader(ListReaderBase):
                 raise StopIteration
 
         print('Grabbing input list lock')
-        os.system('time lockfile -%d %s.lock' % (self._retry_delay, self._filename))
-        with open(self._filename) as f:
-            self._cache = list(islice(f, self._chunksize))
-            rest = list(f)
-        open(self._filename, 'w').writelines(rest)
-        os.system('rm -f %s.lock' % self._filename)
+        os.system('time lockfile -%d %s' % (self._retry_delay, self._lock_file()))
+
+        offset = self._read_offset()
+
+        if offset < len(self._lines):
+            self._write_offset(offset + self._chunksize)
+
+        os.system('rm -f %s' % self._lock_file())
+
+        self._cache = self._lines[offset : offset + self._chunksize]
 
 class LockfileListWriter(ListWriterBase):
     def __init__(self, filename, chunksize=1, retry_delay=5):
