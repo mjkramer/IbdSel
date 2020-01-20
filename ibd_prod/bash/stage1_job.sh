@@ -3,10 +3,10 @@
 timeout=$1; shift
 tag=$1; shift
 
-source bashlib/set_vars.inc.sh
+source bash/set_vars.inc.sh
 set_vars $tag
 
-source bashlib/job_init.inc.sh
+source bash/job_init.inc.sh
 
 sockdir=$(mktemp -d)
 echo "Sockets in $sockdir"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Provides a buffer between this KNL node's workers and the
-lockfile-controlled resources (input/done list). See bashlib/stage1_job.sh for
+lockfile-controlled resources (input/done list). See bash/stage1_job.sh for
 invocation.
 
 """

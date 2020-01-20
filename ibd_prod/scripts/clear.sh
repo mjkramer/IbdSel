@@ -9,7 +9,7 @@ if [ -z $tag ]; then
     exit 1
 fi
 
-source bashlib/set_vars.inc.sh
+source bash/set_vars.inc.sh
 set_vars $tag
 
 echo rm -rf $trueOutdir $outdir $indir $logdir

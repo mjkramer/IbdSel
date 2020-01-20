@@ -5,4 +5,4 @@
 # Make sure stage1_main.cc has already been compiled, to avoid race conditions
 # Submit with scripts/submit_stage1.sh
 
-bashlib/stage1_job.sh $@
+bash/stage1_job.sh $@

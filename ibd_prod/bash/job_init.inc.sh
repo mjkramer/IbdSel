@@ -1,7 +1,7 @@
 # -*- sh-shell: bash -*-
 
-source bashlib/job_env.inc.sh
-source bashlib/maybe_srun.inc.sh
+source bash/job_env.inc.sh
+source bash/maybe_srun.inc.sh
 
 echo Running on $(hostname)
 

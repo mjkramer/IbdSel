@@ -3,7 +3,7 @@
 nfiles=500
 factors="48 68 136 272"
 
-source bashlib/set_vars.inc.sh
+source bash/set_vars.inc.sh
 
 firstFactor=$(printf "%03d" ${factors%% *})
 firstIndir=$(mktemp -d ../../data/prod_input/benchmark.$nfiles.XXX.$firstFactor)
