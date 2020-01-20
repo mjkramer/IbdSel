@@ -22,19 +22,18 @@ fi
 echo "Acquiring lock"
 lockfile -5 $infile.lock
 
-# XXX check this
-if [ -n "$pending" ]; then
-    # the range that we DON'T want because they're being processed
-    end=$(cat $infile.offset)
-    start=$((end - pending))
+awk '{print $2}' $infile.done > $infile.tmp.omit
 
-    head -n $start $infile > $infile.tmp
-    tail -n +$end $infile >> $infile.tmp
-else
-    mv $infile $infile.tmp
+if [ -n "$pending" ]; then
+    offset=$(cat $infile.offset)
+
+    # In 0-based indexing, take l = lines[ [o-p, o) ]. Count = p.
+    # sed uses 1-based indexing and inclusive ranges: l == lines'[ [o-p+1, o] ]
+    sed -n "$((offset - pending + 1)),$((offset))p;$((offset+1))q" \
+        $infile >> $infile.tmp.omit
 fi
 
-comm -23 <(sort $infile.tmp) <(awk '{print $2}' $infile.done | sort) > $infile
+comm -23 <(sort $infile.orig) <(sort $infile.tmp.omit) > $infile
 rm $infile.offset
 
-rm -f $infile.lock
+rm -f $infile.lock $infile.tmp.omit
