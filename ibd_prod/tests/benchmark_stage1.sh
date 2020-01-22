@@ -4,9 +4,12 @@ nfiles=500
 factors="48 68 136 272"
 
 source bash/stage1_vars.inc.sh
+# no tag specified -> end up with parent dirs
+# for getting $firstIndir
+stage1_vars
 
 firstFactor=$(printf "%03d" ${factors%% *})
-firstIndir=$(mktemp -d ../../data/prod_input/benchmark.$nfiles.XXX.$firstFactor)
+firstIndir=$(mktemp -d ${indir}benchmark.$nfiles.XXX.$firstFactor)
 uniqueId=$(basename $firstIndir | cut -d. -f3)
 
 for f in $factors; do

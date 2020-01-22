@@ -1,6 +1,6 @@
 #!/bin/bash
 
-listfile=../../data/prod_input/orig/paths.physics.good.p17b.v3.sync.txt
+LISTFILENAME=paths.physics.good.p17b.v3.sync.txt
 
 while getopts "f:" opt; do
     case $opt in
@@ -23,6 +23,8 @@ fi
 
 source bash/stage1_vars.inc.sh
 stage1_vars $tag
+
+listfile=$indir/../orig/$LISTFILENAME
 
 mkdir -p $trueOutdir
 mkdir -p $(dirname $outdir)
