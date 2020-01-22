@@ -37,17 +37,17 @@ Problem is in stage1: AdSaver needs to be able to know when the input file has c
 * Testing stage1
 ** Generating smaller input
 - First 10 files:
-scripts/prep_p17b.sh -f "head -n -10" some_tag
+scripts/prep_p17b.sh -f "head -n -10" $tag
 
 - Random 10 files:
-scripts/prep_p17b.sh -f "shuf -n 10" some_tag
+scripts/prep_p17b.sh -f "shuf -n 10" $tag
 
 ** Running interactively (one process)
 newenv
-bashlib/stage1_job.sh -1 some_tag
+bash/stage1_job.sh -1 $tag
 
 ** Cleaning up
-eval `scripts/clear.sh some_tag`
+eval `scripts/clear.sh stage1 $tag`
 
 * Submitting stage1
 Do everything from ibd_prod directory, within a fresh shell environment
@@ -57,12 +57,69 @@ Make sure stage1_main.cc.so is the newest file in selector/, and be sure that yo
 
 ** Prepare dirs
 #+begin_src bash
-scripts/prep_p17b.sh v1
+scripts/prep_p17b.sh $tag
 #+end_src
 
 ** Get sbatch command
 10 jobs:
 #+begin_src bash
-examples/submit_knl_short.sh v1 10
+examples/submit_stage1_short.sh $tag 10
 #+end_src
 Check, copy, and paste
+
+** Iterating to completion
+If no jobs are running:
+#+begin_src bash
+scripts/filter_done.sh stage1 $tag
+#+end_src
+
+If N jobs are running, calculate pending = N * chunksize, then
+#+begin_src bash
+scripts/filter_done.sh -p $pending stage1 $tag
+#+end_src
+This assumes that all running jobs are processing items drawn from the current version of input.stage1.txt. If that file was updated after a job was launched, and that job has yet to pull any items off the new list, then the above method won't work right. Some files will be omitted even though nobody is processing them, and some in-progress files will be include. If in doubt, just wait for jobs to finish.
+
+** End result
+560k stage1 files in ../../data/stage1_fbf/$tag/EH1/0021200/0021221 etc.
+
+* Merging stage1
+** Prepare input
+#+begin_src bash
+scripts/prep_daily.sh merge1 $tag
+#+end_src
+
+** Running the merge
+#+begin_src bash
+scripts/run_merge1.sh $tag
+#+end_src
+Spawn multiple processes as necessary.
+
+** Iterating
+#+begin_src bash
+scripts/filter_done.sh merge1 $tag
+#+end_src
+
+** Cleanup
+Delete the fbf files
+
+** Preservation
+Copy the dbd files to CFS
+
+** End result
+6k daily stage1 files in ../../data/stage1_dbd/$tag/EH1 etc.
+
+* Submitting stage2
+** Preparing
+#+begin_src bash
+scripts/prep_daily.py stage2 $tag
+#+end_src
+
+** Submitting
+#+begin_src bash
+examples/submit_stage2_knl_short.sh $tag.$cutname $cutfile 10
+#+end_src
+
+** Iterating
+
+** End result
+6k daily stage2 files 

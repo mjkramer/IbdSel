@@ -1,14 +1,19 @@
 #!/bin/bash
 
-tag=$1; shift
+step=$1; shift
+if [ -z $step ]; then
+    echo "Specify a step"
+    exit 1
+fi
 
+tag=$1; shift
 if [ -z $tag ]; then
     echo "Specify a tag"
     exit 1
 fi
 
-source bash/stage1_vars.inc.sh
-stage1_vars $tag
+source bash/${step}_vars.inc.sh
+${step}_vars $tag
 
 rm $infile.done
 cp $infile.orig $infile

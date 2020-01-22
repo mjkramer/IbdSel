@@ -1,12 +1,11 @@
-# -*- sh-shell: bash -*-
+source bash/common_vars.inc.sh
 
 stage1_vars() {
-    tag=$1; shift
+    local tag=$1; shift
 
     trueOutdir=$SCRATCH/p17b/stage1_fbf/$tag
-    outdir=../../data/stage1_fbf/$tag
-    indir=../../data/stage1_input/$tag
-    infile=$indir/input.stage1.txt
-    logdir=../../log/ibd_prod/$tag
-    logfmt=$logdir/slurm-%A_%a.out
+    outdir=$(data_dir_for stage1_fbf $tag)
+    indir=$(data_dir_for stage1_input $tag)
+    infile=$(input_file_for stage1 $tag)
+    logdir=$(log_dir_for stage1 $tag)
 }

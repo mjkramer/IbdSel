@@ -1,5 +1,3 @@
-# -*- sh-shell: bash -*-
-
 maybe_srun() {
     local arg srun_args cmd_str
 

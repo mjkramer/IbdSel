@@ -1,5 +1,6 @@
 import os, sys, time
 from functools import wraps
+from subprocess import check_output
 
 def parse_path(path):
     fields = os.path.basename(path).split('.')
@@ -58,3 +59,13 @@ gen2list = gen2thing(list)
 def chunk_list(L, chunksize):
     for i in range(0, len(L), chunksize):
         yield L[i : i + chunksize]  # yes, kosher even if it points past end
+
+def _call_bash(cmd):
+    fullcmd = f'source bash/common_vars.inc.sh && {cmd}'
+    return check_output(fullcmd, shell=True).strip().decode()
+
+def input_fname(step, tag):
+    return _call_bash(f'input_file_for {step} {tag}')
+
+def data_dir(name, tag):
+    return _call_bash(f'data_dir_for {name} {tag}')

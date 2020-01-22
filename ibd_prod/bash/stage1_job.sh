@@ -28,7 +28,7 @@ echo "Beginning at $(date +%s) = $(date)"
 
 # NB: Looks like 24 might be closer to the ideal -n, based on looking at "top"
 # output in the logs
-maybe_srun -n $ntasks --cpu-bind=cores -- python/stage1_worker.py -q $sockdir $infile $outdir
+maybe_srun -n $ntasks --cpu-bind=cores -- python/stage1_worker.py -q $sockdir $tag
 
 echo "Ending at $(date +%s) = $(date)"
 

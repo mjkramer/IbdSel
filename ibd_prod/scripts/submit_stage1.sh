@@ -52,4 +52,4 @@ if [ ! -f ../selector/stage1_main_cc.so ]; then
     exit 1
 fi
 
-echo sbatch -t $walltime --array=1-$njob -o $logdir/slurm-%A_%a.out $slurmfile $timeout $tag
+echo sbatch -t $walltime --array=1-$njob -o $logdir/$logfmt $slurmfile $timeout $tag

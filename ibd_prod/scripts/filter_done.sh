@@ -12,12 +12,20 @@ while getopts "p:" opt; do
 done
 shift $((OPTIND-1))
 
-infile=$1; shift
-
-if [ -z "$infile" ]; then
-    echo "Specify an input list file"
+step=$1; shift
+if [ -z "$step" ]; then
+    echo "Specify a step (e.g. stage1)"
     exit 1
 fi
+
+tag=$1; shift
+if [ -z "$tag" ]; then
+    echo "Specify a tag"
+    exit 1
+fi
+
+source bash/${step}_vars.sh
+${step}_vars $tag
 
 echo "Acquiring lock"
 lockfile -5 $infile.lock

@@ -5,7 +5,7 @@ import ROOT as R
 R.PyConfig.IgnoreCommandLineOptions = True
 
 from daily_runlist import DailyRunList
-from prod_util import sysload, gen2list, log_time, dets_for
+from prod_util import sysload, gen2list, log_time, dets_for, input_fname, data_dir
 from prod_io import LockfileListReader, LockfileListWriter
 from hadd import hadd_chunked
 
@@ -19,12 +19,12 @@ class Merger:
 
     def input_path(self, site, runno, fileno):
         subdir = runno // 100 * 100
-        return os.path.join(self.cmd_args.datadir, 'stage1_fbf', self.cmd_args.tag,
+        return os.path.join(data_dir('stage1_fbf', self.cmd_args.tag),
                             f'EH{site}', f'{subdir:07d}', f'{runno:07d}'
                             f'stage1.fbf.eh{site}.{runno:07d}.{fileno:04d}.root')
 
     def output_path(self, site, day):
-        return os.path.join(self.cmd_args.datadir, 'stage1_dbd', self.cmd_args.tag,
+        return os.path.join(data_dir('stage1_dbd', self.cmd_args.tag),
                             f'EH{site}',
                             f'stage1.dbd.eh{site}.{day:04d}.root')
 
@@ -61,11 +61,14 @@ class Merger:
         outpath = self.output_path(site, day)
         hadd_chunked(paths, outpath, HADD_CHUNKSIZE)
 
+    def input_fname(self):
+        return input_fname('merge1', self.cmd_args.tag)
+
     def loop(self):
-        reader = LockfileListReader(self.cmd_args.inputlist,
+        reader = LockfileListReader(self.input_fname(),
                                     chunksize=JOB_CHUNKSIZE,
                                     timeout_secs=self.cmd_args.timeout * 3600)
-        logger = LockfileListWriter(self.cmd_args.inputlist + '.done',
+        logger = LockfileListWriter(self.input_fname() + '.done',
                                     chunksize=JOB_CHUNKSIZE)
 
         with logger:
@@ -78,8 +81,6 @@ class Merger:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('inputlist', help='file format: site day')
-    ap.add_argument('datadir')
     ap.add_argument('tag')
     ap.add_argument('-t', '--timeout', type=float, default=18, help='hours')
     args = ap.parse_args()

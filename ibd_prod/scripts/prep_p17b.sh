@@ -1,6 +1,8 @@
 #!/bin/bash
 
-LISTFILENAME=paths.physics.good.p17b.v3.sync.txt
+source bash/stage1_vars.inc.sh
+
+LISTFILEPATH=../../misc/paths.physics.good.p17b.v3.sync.txt
 
 while getopts "f:" opt; do
     case $opt in
@@ -21,10 +23,9 @@ if [ -z $tag ]; then
     exit 1
 fi
 
-source bash/stage1_vars.inc.sh
 stage1_vars $tag
 
-listfile=$indir/../orig/$LISTFILENAME
+listfile=$LISTFILEPATH
 
 mkdir -p $trueOutdir
 mkdir -p $(dirname $outdir)

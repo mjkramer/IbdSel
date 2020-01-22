@@ -155,8 +155,8 @@ Beginning at 1579253085 = Fri Jan 17 01:24:45 PST 2020
 Ending at 1579253326 = Fri Jan 17 01:28:46 PST 2020
 
 ** Todo before we submit stage1
-*** TODO Plan njobs, walltime, timeout, chunksize, delay (in stage1_job or queue_buffer, prob QB)
-Let "node chunksize" denote the larger one (used by queue_buffer) and "task chunksize" denote the smaller one (used by stage1_worker)
+*** TODO Plan njobs, walltime, timeout, chunksize, delay (in stage1_job or zmq_fan, prob QB)
+Let "node chunksize" denote the larger one (used by zmq_fan) and "task chunksize" denote the smaller one (used by stage1_worker)
 
 #+begin_src ipython :session :exports both :results none
 %precision 3
@@ -197,8 +197,8 @@ def scale(k, l):
 **** Final decision (using submit_knl_short.sh):
 - [X] Walltime = 2 hrs
 - [X] Timeout = 1.5 hrs
-- [X] Delay = rand() % 2 minutes (in stage1_job before queue_buffer)
+- [X] Delay = rand() % 2 minutes (in stage1_job before zmq_fan)
 - [X] Node chunksize = 600
-- [X] Task chunksize = 8
+- +[X] Task chunksize = 8+ There's no chunking when reading from the buffer
 - [ ] Expect 75-200 jobs needed, 10k - 25k MPP hours
 

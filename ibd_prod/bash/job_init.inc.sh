@@ -1,5 +1,3 @@
-# -*- sh-shell: bash -*-
-
 source bash/job_env.inc.sh
 source bash/maybe_srun.inc.sh
 
