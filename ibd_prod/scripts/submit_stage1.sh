@@ -23,14 +23,13 @@ timeout=$1; shift
 tag=$1; shift
 njob=$1; shift
 
+source bash/stage1_vars.inc.sh
+stage1_vars $tag
+
 if [ ! -f $slurmfile ]; then
     echo "Slurm file does not exist. Bailing."
     exit 1
 fi
-
-infile=../../data/prod_input/$tag/input.ibd.txt
-outdir=../../data/ibd_fbf/$tag
-logdir=../../log/ibd_prod/$tag
 
 if [ ! -f $infile ]; then
     echo "$infile does not exist. Bailing."

@@ -21,8 +21,8 @@ if [ -z $tag ]; then
     exit 1
 fi
 
-source bash/set_vars.inc.sh
-set_vars $tag
+source bash/stage1_vars.inc.sh
+stage1_vars $tag
 
 mkdir -p $trueOutdir
 mkdir -p $(dirname $outdir)

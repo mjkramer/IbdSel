@@ -1,10 +1,10 @@
 # -*- sh-shell: bash -*-
 
-set_vars() {
+stage1_vars() {
     tag=$1; shift
 
-    trueOutdir=$SCRATCH/p17b/ibd_fbf/$tag
-    outdir=../../data/ibd_fbf/$tag
+    trueOutdir=$SCRATCH/p17b/stage1_fbf/$tag
+    outdir=../../data/stage1_fbf/$tag
     indir=../../data/prod_input/$tag
     infile=$indir/input.ibd.txt
     logdir=../../log/ibd_prod/$tag

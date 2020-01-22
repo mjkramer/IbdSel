@@ -3,8 +3,8 @@
 timeout=$1; shift
 tag=$1; shift
 
-source bash/set_vars.inc.sh
-set_vars $tag
+source bash/stage1_vars.inc.sh
+stage1_vars $tag
 
 source bash/job_init.inc.sh
 

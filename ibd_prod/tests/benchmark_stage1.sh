@@ -3,7 +3,7 @@
 nfiles=500
 factors="48 68 136 272"
 
-source bash/set_vars.inc.sh
+source bash/stage1_vars.inc.sh
 
 firstFactor=$(printf "%03d" ${factors%% *})
 firstIndir=$(mktemp -d ../../data/prod_input/benchmark.$nfiles.XXX.$firstFactor)
@@ -11,7 +11,7 @@ uniqueId=$(basename $firstIndir | cut -d. -f3)
 
 for f in $factors; do
     tag=benchmark.$nfiles.$uniqueId.$(printf "%03d" $f)
-    set_vars $tag
+    stage1_vars $tag
     scripts/prep_p17b.sh -f "shuf -n $nfiles" $tag
 
     expt="ALL,IBDSEL_NTASKS=$f"
