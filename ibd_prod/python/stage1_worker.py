@@ -2,7 +2,7 @@
 
 import os, argparse, random
 
-from prod_util import parse_path, sysload, stage_for
+from prod_util import parse_path, sysload, phase_for
 from prod_io import LockfileListReader, LockfileListWriter
 from zmq_fan import ZmqListReader, ZmqListWriter
 
@@ -13,7 +13,7 @@ def process(path, outdir):
                            'stage1.fbf.eh%d.%07d.%04d.root' % (site, runno, fileno))
     os.system('mkdir -p %s' % os.path.dirname(outpath))
     os.system('time root -l -b -q "cling/run_stage1.C(\\"%s\\", \\"%s\\", %d, %d)"' %
-              (path, outpath, site, stage_for(runno)))
+              (path, outpath, site, phase_for(runno)))
 
 def main():
     ap = argparse.ArgumentParser()

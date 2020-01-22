@@ -14,7 +14,7 @@ def sysload():
 def unbuf_stdout():
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 
-def stage_for(runno):
+def phase_for(runno):
     if 21221 <= runno <= 26694:
         return 1
     if 34523 <= runno <= 67012:
@@ -24,13 +24,13 @@ def stage_for(runno):
     raise "Nonsensical run number"
 
 def dets_for(site, runno):
-    stage = stage_for(runno)
+    phase = phase_for(runno)
     if site == 1:
-        return [2] if stage == 3 else [1, 2]
+        return [2] if phase == 3 else [1, 2]
     if site == 2:
-        return [1] if stage == 1 else [1, 2]
+        return [1] if phase == 1 else [1, 2]
     if site == 3:
-        return [1, 2, 3] if stage == 1 else [1, 2, 3, 4]
+        return [1, 2, 3] if phase == 1 else [1, 2, 3, 4]
     raise ValueError("Invalid site")
 
 def log_time(fn):

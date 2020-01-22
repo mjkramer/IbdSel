@@ -9,7 +9,7 @@
 #include "LivetimeSaver.cc"
 #include "Misc.cc"
 
-void stage1_main(const char* inFile, const char* outFile, Site site, Stage stage)
+void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase)
 {
   Pipeline p;
 
@@ -20,7 +20,7 @@ void stage1_main(const char* inFile, const char* outFile, Site site, Stage stage
   p.makeAlg<MuonSaver>();
   p.makeAlg<FlasherCut>();
 
-  for (Det detector : util::ADsFor(site, stage)) {
+  for (Det detector : util::ADsFor(site, phase)) {
     p.makeAlg<AdSaver>(detector);
   }
 

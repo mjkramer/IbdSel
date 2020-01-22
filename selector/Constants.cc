@@ -5,7 +5,7 @@
 // These used to be ": UChar_t", but PyROOT then chokes when dealing with
 // vectors of them, assuming they are the default size.
 
-enum class Stage { k6AD = 1, k8AD, k7AD };
+enum class Phase { k6AD = 1, k8AD, k7AD };
 
 enum class Site { EH1 = 1, EH2, EH3 };
 

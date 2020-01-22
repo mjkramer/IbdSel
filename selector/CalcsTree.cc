@@ -14,7 +14,7 @@ public:
   Float_t li9Daily, li9DailyErr;
 
   UInt_t seq;
-  Stage stage;
+  Phase phase;
   Site site;
   Det detector;
 
@@ -35,7 +35,7 @@ void CalcsTree::initBranches()
   BR(li9Daily); BR(li9DailyErr);
 
   BR(seq);
-  BR(stage);
+  BR(phase);
   BR(site);
   BR(detector);
 

@@ -16,8 +16,8 @@
 
 class Calculator {
 public:
-  Calculator(Pipeline& pipe, Stage stage, UInt_t seq, Site site) :
-    pipe(pipe), stage(stage), seq(seq), site(site) {}
+  Calculator(Pipeline& pipe, Phase phase, UInt_t seq, Site site) :
+    pipe(pipe), phase(phase), seq(seq), site(site) {}
 
   double livetime_s();
   double vetoEff(Det detector, MuonAlg::Purpose purp = MuonAlg::Purpose::ForIBDs);
@@ -47,7 +47,7 @@ private:
   double dmcEffSingles(Det detector);
 
   Pipeline& pipe;
-  Stage stage;
+  Phase phase;
   UInt_t seq;
   Site site;
 
@@ -243,13 +243,13 @@ void Calculator::writeValues()
   TreeWriter<CalcsTree> w("results");
   w.connect(pipe);
 
-  w.data.stage = stage;
+  w.data.phase = phase;
   w.data.seq = seq;
   w.data.site = site;
 
   w.data.livetime_s = livetime_s();
 
-  for (Det detector : util::ADsFor(site, stage)) {
+  for (Det detector : util::ADsFor(site, phase)) {
     w.data.detector = detector;
     w.data.vetoEff = vetoEff(detector);
     w.data.dmcEff = dmcEff(detector);

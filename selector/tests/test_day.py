@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, '../ibd_prod/python')
 from daily_runlist import DailyRunList
 
-from test_candidates import stage_for
+from prod_util import phase_for
 
 # For FileFinder
 # R.gSystem.Load("/usr/common/software/python/2.7-anaconda-2019.07/lib/libsqlite3.so")
@@ -18,7 +18,7 @@ for line in ['.x LoadBoost.C',
              ".L stage1_main.cc+"]:
     R.gROOT.ProcessLine(line)
 
-R.Stage, R.Site                 # preload
+R.Phase, R.Site                 # preload
 
 FF = R.FileFinder()
 DRL = DailyRunList()
@@ -26,7 +26,7 @@ DRL = DailyRunList()
 def process1(site, runno, fileno):
     outpath = "tests/out.test_day/stage1.%06d.%04d.root" % (runno, fileno)
     inpath = FF.find(int(runno), int(fileno))
-    R.stage1_main(inpath, outpath, site, stage_for(runno))
+    R.stage1_main(inpath, outpath, site, phase_for(runno))
 
 def go(site, day):
     os.system('rm -f tests/out.test_day/*')
@@ -37,7 +37,7 @@ def go(site, day):
 
     for cmd in [
             "hadd -f tests/out_stage1.root tests/out.test_day/stage1.*.root",
-            "root -b -q -l 'tests/test_stage2.C(%d, %d)'" % (site, stage_for(runno)),
+            "root -b -q -l 'tests/test_stage2.C(%d, %d)'" % (site, phase_for(runno)),
             "mv tests/out_stage2.root tests/out_stage2_%d_%04d.root" % (site, day)
     ]:
         os.system(cmd)

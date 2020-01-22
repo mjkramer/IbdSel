@@ -12,7 +12,7 @@
 #include <iostream>              // XXX
 
 void stage2_main(const char* confFile, const char* inFile, const char* outFile,
-                 Site site, Stage stage, UInt_t seq)
+                 Site site, Phase phase, UInt_t seq)
 {
   Pipeline p;
 
@@ -25,7 +25,7 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   p.makeAlg<MuonAlg>(MuonAlg::Purpose::ForSingles);
   p.makeAlg<PrefetchLooper<MuonReader>>(); // build up a lookahead buffer
 
-  std::vector<Det> allADs = util::ADsFor(site, stage);
+  std::vector<Det> allADs = util::ADsFor(site, phase);
   // std::reverse(allADs.begin(), allADs.end()); // XXX
 
   for (Det detector : allADs) {
@@ -48,6 +48,6 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
 
   p.process({inFile});
 
-  Calculator calc(p, stage, seq, site);
+  Calculator calc(p, phase, seq, site);
   calc.writeValues();
 }

@@ -9,7 +9,7 @@ import ROOT as R
 from root_pandas import read_root
 
 sys.path.insert(0, '../ibd_prod/python')
-from prod_util import stage_for
+from prod_util import phase_for
 
 R.gErrorIgnoreLevel = R.kError    # suppress warnings of empty trees
 
@@ -28,7 +28,7 @@ R.gROOT.ProcessLine(".L stage1_main.cc+" + ("g" if DEBUG_MODE else ""))
 # R.gROOT.ProcessLine(".L stage2_main.cc+" + ("g" if DEBUG_MODE else ""))
 
 # force pyroot to load R.k6AD etc.
-R.Stage
+R.Phase
 
 def site_for(filename):
     return int(filename.split('/')[-1].split('.')[4][2])
@@ -36,9 +36,9 @@ def site_for(filename):
 def candis_df(site):
     return pd.read_csv(os.path.join(CANDIDIR, "EH%d.txt" % site), sep=r'\s+')
 
-def read_stage2_output(site, stage):
+def read_stage2_output(site, phase):
     results = []
-    for det in R.util.ADsFor(site, stage):
+    for det in R.util.ADsFor(site, phase):
         try:
             df = read_root('tests/out_stage2.root', 'ibd_AD%d' % det)
         except OSError:         # root-numpy raises when tree is empty >_<
@@ -47,17 +47,17 @@ def read_stage2_output(site, stage):
             results.append((det, _.trigP, _.trigD))
     return results
 
-def run_stage1(runno, fileno, site, stage):
+def run_stage1(runno, fileno, site, phase):
     os.system("root -l -q 'tests/test_stage1.C(%d, %d, %d, %d)'" %
-              (runno, fileno, site, stage))
+              (runno, fileno, site, phase))
 
-def run_stage2(site, stage):
-    output = os.system("root -l -q 'tests/test_stage2.C(%d, %d)'" % (site, stage))
-    return read_stage2_output(site, stage)
+def run_stage2(site, phase):
+    output = os.system("root -l -q 'tests/test_stage2.C(%d, %d)'" % (site, phase))
+    return read_stage2_output(site, phase)
 
-def run_all(runno, fileno, site, stage):
-    run_stage1(runno, fileno, site, stage)
-    return run_stage2(site, stage)
+def run_all(runno, fileno, site, phase):
+    run_stage1(runno, fileno, site, phase)
+    return run_stage2(site, phase)
 
 class Runner(object):
     def __init__(self):
@@ -67,14 +67,14 @@ class Runner(object):
     def compare(self, runno, fileno):
         fname = self.ff.find(runno, fileno)
         site = site_for(fname)
-        stage = stage_for(runno)
+        phase = phase_for(runno)
 
         candis = self.candis[site]
         cond = (candis.RunNo == runno) & (candis.FileNo == fileno)
         expected = [(_.Detector, _.trigno_prompt, _.trigno_delayed)
                     for _ in candis.loc[cond].itertuples()]
 
-        actual = run_all(runno, fileno, site, stage)
+        actual = run_all(runno, fileno, site, phase)
 
         for c in actual:
             det, trigP, trigD = c

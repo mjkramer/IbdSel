@@ -8,30 +8,30 @@
 
 namespace util {
 
-std::vector<Det> ADsFor(Site site, Stage stage)
+std::vector<Det> ADsFor(Site site, Phase phase)
 {
   if (site == Site::EH1) {
-    if (stage == Stage::k7AD)
+    if (phase == Phase::k7AD)
       return { Det::AD2 };
     else
       return { Det::AD1, Det::AD2 };
   }
 
   if (site == Site::EH2) {
-    if (stage == Stage::k6AD)
+    if (phase == Phase::k6AD)
       return { Det::AD1 };
     else
       return { Det::AD1, Det::AD2 };
   }
 
   if (site == Site::EH3) {
-    if (stage == Stage::k6AD)
+    if (phase == Phase::k6AD)
       return { Det::AD1, Det::AD2, Det::AD3 };
     else
       return { Det::AD1, Det::AD2, Det::AD3, Det::AD4 };
   }
 
-  throw std::runtime_error("Invalid site/stage in ADsFor");
+  throw std::runtime_error("Invalid site/phase in ADsFor");
 }
 
 std::tuple<UInt_t, UShort_t> runAndFile(const std::string& path)
