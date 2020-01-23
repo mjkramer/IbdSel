@@ -1,7 +1,7 @@
 #!/bin/bash
 
 nfiles=500
-factors="48 68 136 272"
+factors="8 16 32 48 68"
 
 source bash/stage1_vars.inc.sh
 # no tag specified -> end up with parent dirs
@@ -18,5 +18,5 @@ for f in $factors; do
     scripts/prep_p17b.sh -f "shuf -n $nfiles" $tag
 
     expt="ALL,IBDSEL_NTASKS=$f"
-    echo sbatch -q debug --export=$expt -t 00:30:00 -o $logfmt slurm/stage1_knl.sl.sh 0.5 $tag
+    echo sbatch -q debug --export=$expt -t 00:30:00 -o $logdir/$logfmt slurm/stage1_knl.sl.sh 0.5 $tag
 done
