@@ -85,7 +85,7 @@ class LockfileListReader(ListReaderBase):
             return 0
 
     def _write_offset(self, offset):
-        open(self._offset_file(), 'w').write(str(offset))
+        open(self._offset_file(), 'w').write(f'{offset}\n')
 
     def _pull(self):
         if self._cfg.timeout_secs:
