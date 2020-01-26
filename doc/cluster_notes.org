@@ -202,3 +202,39 @@ def scale(k, l):
 - +[X] Task chunksize = 8+ There's no chunking when reading from the buffer
 - [ ] Expect 75-200 jobs needed, 10k - 25k MPP hours
 
+
+*** Reconsidering, with 2-5 node-sec per file
+
+*** TODO Make the workers takecare of the timeout on their owns
+* Back of the envelope:
+- KNL: 1 node-second per file, charge factor 80
+- Haswell: 0.3 node-second per file, charge factor 140
+- MPP ratio KNL / Haswell = 1 / 0.3 * 80 / 140 = 1.90
+- So KNL costs roughly twice as much
+* Lockfile stress testing
+- Test on $HOME, $SCRATCH, and $CFS
+** Old idea
+- Have N processes, each with a LockfileListReader/Writer
+- Each process sleeps for Floor(0, Norm(T0, sigma_T)) seconds
+- Then writes to the donefile and pulls from the input
+** New idea
+- Create a process pool
+- Maintain an LLR/W for each process
+- Repeatedly sample exp(-dt / tau_pull) to get dt to next pull
+- Tell an available process to do a _pull + _flush
+- Each process records the times
+- Parent process aggregates the stats
+** What lockfile rate do we expect?
+- Assume 1 node-sec per file (KNL)
+- 560k node-sec = 150 node-hours = 6.5 node-days
+- 150 node-hours / 1.5 hours/job = 100 jobs would finish in 2 hours
+- So assume absolute max parallelism of 100 jobs
+- Meanwhile, with a LFR timeout of 1.5 hrs, want a chunksize that runs in 10ish minutes, so say 500 files
+- 100 pulls / 500 seconds = 1 pull every 5 seconds. Our time constant is 5s.
+* New plan
+- chunksize = 100
+- ntasks = 54
+- walltime = 2:00
+- timeout = 1:45
+- expect ~100 jobs
+- [ ] update workers (see above todo)
