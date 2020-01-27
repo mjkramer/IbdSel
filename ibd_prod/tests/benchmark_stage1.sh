@@ -1,5 +1,11 @@
 #!/bin/bash
 
+export IBDSEL_CHUNKSIZE=250
+export IBDSEL_WALLTIME=00:30:00
+export IBDSEL_CHUNK_MARGIN_SECS=0
+export IBDSEL_FILE_MARGIN_SECS=0
+export IBDSEL_STARTUP_SLEEP_SECS=0
+
 nfiles=500
 
 while getopts "H" opt; do
@@ -37,6 +43,6 @@ for f in $factors; do
     stage1_vars $tag
     scripts/prep_p17b.sh -f "shuf -n $nfiles" $tag
 
-    expt="ALL,IBDSEL_NTASKS=$f"
-    echo sbatch -q debug --export=$expt -t 00:30:00 -o $logdir/$logfmt slurm/stage1_${sysname}.sl.sh 0.5 $tag
+    export IBDSEL_NTASKS=$f
+    sbatch -q debug -t 00:30:00 -o $logdir/$logfmt slurm/stage1_${sysname}.sl.sh 0.5 $tag
 done

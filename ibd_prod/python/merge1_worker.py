@@ -67,7 +67,7 @@ class Merger:
     def loop(self):
         reader = LockfileListReader(self.input_fname(),
                                     chunksize=JOB_CHUNKSIZE,
-                                    timeout_secs=self.cmd_args.timeout * 3600)
+                                    timeout_mins=self.cmd_args.timeout_mins)
         logger = LockfileListWriter(self.input_fname() + '.done',
                                     chunksize=JOB_CHUNKSIZE)
 
@@ -82,7 +82,7 @@ class Merger:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('tag')
-    ap.add_argument('-t', '--timeout', type=float, default=18, help='hours')
+    ap.add_argument('-t', '--timeout-mins', type=float, default=120)
     args = ap.parse_args()
 
     merger = Merger(args)

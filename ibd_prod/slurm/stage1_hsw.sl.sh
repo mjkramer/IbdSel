@@ -6,8 +6,7 @@
 # Submit with scripts/submit_stage1.sh
 
 if [ -z "$IBDSEL_NTASKS" ]; then
-   # The default in stage1_job.sh assumes we're running on KNL
-   export IBDSEL_NTASKS=16
+   export IBDSEL_NTASKS=32
 fi
 
 bash/stage1_job.sh $@

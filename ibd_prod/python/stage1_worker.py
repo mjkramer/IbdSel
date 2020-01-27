@@ -5,11 +5,12 @@
 
 import os, argparse, random
 
-from prod_util import parse_path, sysload, phase_for, input_fname, data_dir
-from prod_io import LockfileListReader, LockfileListWriter
+from prod_util import parse_path, sysload, phase_for, data_dir
+from prod_util import worker_timeout_mins
 from zmq_fan import ZmqListReader, ZmqListWriter
 
-def process(path, outdir):
+def process(path, tag):
+    outdir = data_dir('stage1_fbf', tag)
     runno, fileno, site = parse_path(path)
     subdir = runno // 100 * 100
     outpath = os.path.join(outdir, 'EH%d' % site, '%07d' % subdir, '%07d' % runno,
@@ -20,33 +21,18 @@ def process(path, outdir):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument('sockdir', help='Dir containing zmq_fan sockets')
     ap.add_argument('tag')
-    ap.add_argument('-q', '--sockdir',
-                    help='Socket dir if using zmq_fan.py to buffer the listfile')
-    ap.add_argument('-t', '--timeout', type=float, default=18,
-                    help='Timeout when reading directly from listfile (i.e. not using -q)')
-    ap.add_argument('-c', '--chunksize', type=int, default=50,
-                    help='Chunksize when reading directly from listfile (i.e. not using -q)')
     args = ap.parse_args()
 
-    if args.sockdir:
-        reader = ZmqListReader(args.sockdir)
-        logger = ZmqListWriter(args.sockdir)
-    else:
-        fname = input_fname('stage1', args.tag)
-        reader = LockfileListReader(fname,
-                                    chunksize=args.chunksize,
-                                    timeout_secs=args.timeout*3600)
-        logger = LockfileListWriter(fname + '.done',
-                                    chunksize=args.chunksize)
-
-    outdir = data_dir('stage1_fbf', args.tag)
+    reader = ZmqListReader(args.sockdir, timeout_mins=worker_timeout_mins())
+    logger = ZmqListWriter(args.sockdir)
 
     with logger:
         for path in reader:
             if random.random() < 0.01:
                 sysload()
-            process(path, outdir)
+            process(path, args.tag)
             logger.log(path)
 
 if __name__ == '__main__':

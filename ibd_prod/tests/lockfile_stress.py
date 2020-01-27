@@ -36,7 +36,7 @@ class Config:
 
 def init(cfg):
     reader = LockfileListReader(cfg.infile, chunksize=cfg.chunksize,
-                                timeout_secs=None)
+                                timeout_mins=None)
     writer = LockfileListWriter(cfg.outfile, chunksize=cfg.chunksize)
     return reader, writer
 

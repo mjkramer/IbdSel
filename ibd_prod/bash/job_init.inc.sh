@@ -9,3 +9,11 @@ echo Running on $(hostname)
 # single node, given that other bottlenecks make us plateau around 35 tasks.
 ulimit -Sn unlimited
 ulimit -Sl unlimited
+
+if [ ${IBDSEL_STARTUP_SLEEP_SECS:-0} -ne 0 ]; then
+    export IBDSEL_TRUE_SLEEP_SECS=$(( RANDOM % IBDSEL_STARTUP_SLEEP_SECS ))
+    echo "Sleeping for $IBDSEL_TRUE_SLEEP_SECS seconds"
+    sleep $IBDSEL_TRUE_SLEEP_SECS
+else
+    export IBDSEL_TRUE_SLEEP_SECS=0
+fi

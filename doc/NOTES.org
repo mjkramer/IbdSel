@@ -44,7 +44,11 @@ scripts/prep_p17b.sh -f "shuf -n 10" $tag
 
 ** Running interactively (one process)
 newenv
-bash/stage1_job.sh -1 $tag
+bash/stage1_job.sh $tag
+
+** Testing on KNL
+newenv
+tests/submit_stage1_debug.sh $tag
 
 ** Cleaning up
 eval `scripts/clear.sh stage1 $tag`
@@ -60,12 +64,11 @@ Make sure stage1_main.cc.so is the newest file in selector/, and be sure that yo
 scripts/prep_p17b.sh $tag
 #+end_src
 
-** Get sbatch command
+** Submit
 10 jobs:
 #+begin_src bash
-examples/submit_stage1_short.sh $tag 10
+scripts/submit_stage1.sh $tag 10
 #+end_src
-Check, copy, and paste
 
 ** Iterating to completion
 If no jobs are running:

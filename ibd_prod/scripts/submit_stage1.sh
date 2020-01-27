@@ -1,55 +1,21 @@
 #!/bin/bash
 
-# brittle hack
-if (env | grep LD_LIBRARY_PATH | grep mkramer >/dev/null 2>&1); then
-    echo "Your environment looks dirty. Bailing."
-    exit 1
-fi
+# Calculations assume best-case 1 node-sec per file and 60 seconds per process.
+# Using a safety factor of 5.
 
-# If we're invoked by something in examples/
-if [ $# -eq 3 ]; then
-    echo "Need two more args: tag and njob"
-    exit 1
-fi
+# Min. lockfile period here is 250 * 1sec / njobs
+# So 1Hz for 250 jobs at worst (and we probably need < 250 total 2hr jobs)
+# Testing shows $HOME/$CFS can handle at least 4Hz no problem
+export IBDSEL_CHUNKSIZE=250
 
-if [ $# -ne 5 ]; then
-    echo "Usage: submit.sh slurmfile walltime timeout tag njob"
-    exit 1
-fi
-
-slurmfile=$1; shift
-walltime=$1; shift
-timeout=$1; shift
+export IBDSEL_WALLTIME=02:00:00
+export IBDSEL_CHUNK_MARGIN_SECS=1250 # 250 * 1sec * 5
+export IBDSEL_FILE_MARGIN_SECS=300   # 60sec * 5
+export IBDSEL_STARTUP_SLEEP_SECS=120
+export IBDSEL_NTASKS=54
 
 tag=$1; shift
 njob=$1; shift
+slurm_args=$@
 
-source bash/stage1_vars.inc.sh
-stage1_vars $tag
-
-if [ ! -f $slurmfile ]; then
-    echo "Slurm file does not exist. Bailing."
-    exit 1
-fi
-
-if [ ! -f $infile ]; then
-    echo "$infile does not exist. Bailing."
-    exit 1
-fi
-
-if [ ! -d $outdir ]; then
-    echo "$outdir does not exist. Bailing."
-    exit 1
-fi
-
-if [ ! -d $logdir ]; then
-    echo "$logdir does not exist. Bailing."
-    exit 1
-fi
-
-if [ ! -f ../selector/stage1_main_cc.so ]; then
-    echo "Compile ../selector/stage1_main.cc (in ROOT 6) first"
-    exit 1
-fi
-
-echo sbatch -t $walltime --array=1-$njob -o $logdir/$logfmt $slurmfile $timeout $tag
+bash/do_submit_stage1.sh slurm/stage1_knl.sl.sh $tag $njob $slurm_args

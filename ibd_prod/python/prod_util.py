@@ -2,6 +2,8 @@ import os, sys, time
 from functools import wraps
 from subprocess import check_output
 
+DEFAULT_JOB_CHUNKSIZE = 500
+
 def parse_path(path):
     fields = os.path.basename(path).split('.')
     runno, fileno, site = int(fields[2]), int(fields[6][1:]), int(fields[4][2])
@@ -69,3 +71,25 @@ def input_fname(step, tag):
 
 def data_dir(name, tag):
     return _call_bash(f'data_dir_for {name} {tag}')
+
+def job_chunksize():
+    return int(os.getenv('IBDSEL_CHUNKSIZE', str(DEFAULT_JOB_CHUNKSIZE)))
+
+def _walltime_mins():
+    v = os.getenv('IBDSEL_WALLTIME', '00:00:00')
+    fields = [int(x) for x in v.split(':')]
+    return 60 * fields[0] + fields[1] + fields[2] / 60
+
+def _startup_sleep_mins():
+    return int(os.getenv('IBDSEL_TRUE_SLEEP_SECS', '0')) / 60
+
+def _timeout_mins(margin_var_secs):
+    margin_mins = int(os.getenv(margin_var_secs, '0')) / 60
+
+    return _walltime_mins() - _startup_sleep_mins() - margin_mins
+
+def buffer_timeout_mins():
+    return _timeout_mins('IBDSEL_CHUNK_MARGIN_SECS')
+
+def worker_timeout_mins():
+    return _timeout_mins('IBDSEL_FILE_MARGIN_SECS')

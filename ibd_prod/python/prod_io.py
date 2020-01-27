@@ -1,13 +1,24 @@
 import time, os
-from dataclasses import dataclass
-from typing import Optional
 
 class ListReaderBase:
+    def __init__(self, timeout_mins=None):
+        self._timeout_mins = timeout_mins
+
+        if self._timeout_mins:
+            self._tstart = time.time()
+
     def __iter__(self):
         return self
 
     def __next__(self):
         raise NotImplementedError
+
+    def _check_timeout(self):
+        if self._timeout_mins:
+            delta = (time.time() - self._tstart) / 60
+            if delta > self._timeout_mins:
+                print('Terminating due to specified timeout')
+                raise StopIteration
 
 class ListWriterBase:
     def __init__(self):
@@ -37,24 +48,16 @@ class ListWriterBase:
         self.put(f'{tstamp} {line}')
 
 class LockfileListReader(ListReaderBase):
-    @dataclass
-    class Config:
-        chunksize: int = 1
-        timeout_secs: Optional[int] = None
-        retry_delay: int = 5
-
-    def __init__(self, filename, **cfg_kwargs):
-        super().__init__()
+    def __init__(self, filename, chunksize=1, retry_delay=5, **kwargs):
+        super().__init__(**kwargs)
 
         self._filename = filename
-        self._cfg = LockfileListReader.Config(**cfg_kwargs)
+        self._chunksize = chunksize
+        self._retry_delay = retry_delay
 
         self._all = []
         self._working = []
         self._lastmtime = 0
-
-        if self._cfg.timeout_secs:
-            self._tstart = time.time()
 
         self._load()
 
@@ -88,14 +91,10 @@ class LockfileListReader(ListReaderBase):
         open(self._offset_file(), 'w').write(f'{offset}\n')
 
     def _pull(self):
-        if self._cfg.timeout_secs:
-            delta = time.time() - self._tstart
-            if delta > self._cfg.timeout_secs:
-                print('Terminating due to specified timeout')
-                raise StopIteration
+        self._check_timeout()
 
         print('Grabbing input list lock')
-        os.system('time lockfile -%d %s' % (self._cfg.retry_delay, self._lock_file()))
+        os.system('time lockfile -%d %s' % (self._retry_delay, self._lock_file()))
 
         if self._modified():
             self._load()
@@ -103,29 +102,25 @@ class LockfileListReader(ListReaderBase):
         offset = self._read_offset()
 
         if offset < len(self._all):
-            self._write_offset(offset + self._cfg.chunksize)
+            self._write_offset(offset + self._chunksize)
 
         os.system('rm -f %s' % self._lock_file())
 
-        self._working = self._all[offset : offset + self._cfg.chunksize]
+        self._working = self._all[offset : offset + self._chunksize]
 
 class LockfileListWriter(ListWriterBase):
-    @dataclass
-    class Config:
-        chunksize: int = 1
-        retry_delay: int = 5
-
-    def __init__(self, filename, **cfg_kwargs):
-        super().__init__()
+    def __init__(self, filename, chunksize=1, retry_delay=5, **kwargs):
+        super().__init__(**kwargs)
 
         self._filename = filename
-        self._cfg = LockfileListWriter.Config(**cfg_kwargs)
+        self._chunksize = chunksize
+        self._retry_delay = retry_delay
 
         self._buf = []
 
     def _do_put(self, line):
         self._buf.append(line)
-        if len(self._buf) == self._cfg.chunksize:
+        if len(self._buf) == self._chunksize:
             self._flush()
 
     def close(self):
@@ -134,7 +129,7 @@ class LockfileListWriter(ListWriterBase):
 
     def _flush(self):
         chunk = '\n'.join(self._buf) + '\n'
-        os.system('time lockfile -%d %s.lock' % (self._cfg.retry_delay, self._filename))
+        os.system('time lockfile -%d %s.lock' % (self._retry_delay, self._filename))
         with open(self._filename, 'a') as f:
             f.write(chunk)
         os.system('rm -f %s.lock' % self._filename)

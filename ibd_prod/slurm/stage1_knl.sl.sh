@@ -5,4 +5,8 @@
 # Make sure stage1_main.cc has already been compiled, to avoid race conditions
 # Submit with scripts/submit_stage1.sh
 
+if [ -z "$IBDSEL_NTASKS" ]; then
+    export IBDSEL_NTASKS=54
+fi
+
 bash/stage1_job.sh $@

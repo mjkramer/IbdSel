@@ -11,23 +11,23 @@ from multiprocessing import Process
 import zmq
 
 from prod_io import ListReaderBase, ListWriterBase, LockfileListReader, LockfileListWriter
+from prod_util import job_chunksize, buffer_timeout_mins
 
 INPUTREADER_SOCK_NAME = 'InputReader'
 DONELOGGER_SOCK_NAME = 'DoneLogger'
 
-CHUNKSIZE = 600
-
 # ------------------------------ Client code ------------------------------
 
 class ZmqListReader(ListReaderBase):
-    def __init__(self, sockdir, sockname=INPUTREADER_SOCK_NAME):
-        super().__init__()
+    def __init__(self, sockdir, sockname=INPUTREADER_SOCK_NAME, **kwargs):
+        super().__init__(**kwargs)
 
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.REQ)
         self.sock.connect('ipc://%s/%s.ipc' % (sockdir, sockname))
 
     def __next__(self):
+        self._check_timeout()
         self.sock.send_string('')
         item = self.sock.recv_string()
         if item == '':
@@ -35,8 +35,8 @@ class ZmqListReader(ListReaderBase):
         return item
 
 class ZmqListWriter(ListWriterBase):
-    def __init__(self, sockdir, sockname=DONELOGGER_SOCK_NAME):
-        super().__init__()
+    def __init__(self, sockdir, sockname=DONELOGGER_SOCK_NAME, **kwargs):
+        super().__init__(**kwargs)
 
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.PUSH)
@@ -48,12 +48,12 @@ class ZmqListWriter(ListWriterBase):
 # ------------------------------ Server code ------------------------------
 
 class InputBuffer:
-    def __init__(self, sockdir, infile, chunksize, timeout_secs=None):
+    def __init__(self, sockdir, infile, chunksize, timeout_mins=None):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.REP)
         self.sock.bind('ipc://%s/%s.ipc' % (sockdir, INPUTREADER_SOCK_NAME))
 
-        self.reader = LockfileListReader(infile, chunksize=chunksize, timeout_secs=timeout_secs)
+        self.reader = LockfileListReader(infile, chunksize=chunksize, timeout_mins=timeout_mins)
         self.done = False       # to avoid grabbing the lock when we know it's all over
 
     def serve(self):
@@ -95,20 +95,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('sockdir')
     ap.add_argument('infile')
-    ap.add_argument('-c', '--chunksize', type=int, default=CHUNKSIZE,
-                    help='How many items to pop off or log at once')
-    ap.add_argument('-t', '--timeout', type=float, default=18, help='hours')
     args = ap.parse_args()
 
     def serve_inbuf():
-        timeout_secs = None if args.timeout == -1 else 3600 * args.timeout
-        ib = InputBuffer(args.sockdir, args.infile, args.chunksize,
-                         timeout_secs=timeout_secs)
+        ib = InputBuffer(args.sockdir, args.infile, job_chunksize(),
+                         timeout_mins=buffer_timeout_mins())
         ib.serve()
 
     def serve_outbuf():
         donefile = args.infile + '.done'
-        ob = OutputBuffer(args.sockdir, donefile, args.chunksize)
+        ob = OutputBuffer(args.sockdir, donefile, job_chunksize())
         ob.serve()
 
     Process(target=serve_inbuf).start()

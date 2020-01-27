@@ -19,7 +19,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('inputlist')
     ap.add_argument('outputdir')
-    ap.add_argument('-t', '--timeout', type=float, default=18, help='hours')
+    ap.add_argument('-t', '--timeout-mins', type=float, default=90)
     ap.add_argument('-c', '--chunksize', type=int, default=CHUNKSIZE)
     args = ap.parse_args()
 
@@ -27,7 +27,7 @@ def main():
 
     with DoneLogger(donelist, chunksize=args.chunksize) as logger:
         for path in LockfileListReader(args.inputlist, chunksize=args.chunksize,
-                                       timeout_secs = args.timeout * 3600):
+                                       timeout_mins = args.timeout_mins):
             # sysload()
             process(path, args.outputdir)
             logger.log(path)
