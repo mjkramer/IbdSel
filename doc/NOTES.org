@@ -34,6 +34,13 @@ With current janky environment, do not compile C++ from within PyROOT! The "wron
 * Multiple input files?
 Problem is in stage1: AdSaver needs to be able to know when the input file has changed so that it can update the run/file in the output tree. SyncReader needs to be able to notify downstream algs when the input file changes to the next one in the chain. Stage2 is fine as-is.
 
+* Environment setup
+Start with a fresh login. Then
+#+begin_src bash
+source bash/job_env.inc.sh
+#+end_src
+Now you are in the same environment that jobs will run in. Includes Python 3.7, ROOT 6.18, Pandas. It's OK to submit jobs from a different environment, as we whitelist the env vars that get exported to the job.
+
 * Testing stage1
 ** Generating smaller input
 #+begin_src bash
@@ -96,7 +103,7 @@ This assumes that all running jobs are processing items drawn from the current v
 * Merging stage1
 ** Prepare input
 #+begin_src bash
-scripts/prep_daily.sh merge1 $tag
+scripts/prep_merge1.sh $tag
 #+end_src
 
 ** Running the merge
