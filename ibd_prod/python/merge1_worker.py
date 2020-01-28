@@ -20,7 +20,7 @@ class Merger:
     def input_path(self, site, runno, fileno):
         subdir = runno // 100 * 100
         return os.path.join(data_dir('stage1_fbf', self.cmd_args.tag),
-                            f'EH{site}', f'{subdir:07d}', f'{runno:07d}'
+                            f'EH{site}', f'{subdir:07d}', f'{runno:07d}',
                             f'stage1.fbf.eh{site}.{runno:07d}.{fileno:04d}.root')
 
     def output_path(self, site, day):
