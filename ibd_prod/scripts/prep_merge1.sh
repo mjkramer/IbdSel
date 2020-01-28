@@ -23,7 +23,9 @@ fi
 
 merge1_vars $tag
 
-mkdir -p $indir $outdir $logdir
+mkdir -p $indir $logdir $trueOutdir
+mkdir -p $(dirname $outdir)
+ln -s $trueOutdir $outdir
 
 python/prep_daily.py merge1 $tag
 
