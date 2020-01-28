@@ -36,19 +36,28 @@ Problem is in stage1: AdSaver needs to be able to know when the input file has c
 
 * Testing stage1
 ** Generating smaller input
-- First 10 files:
+#+begin_src bash
+# First 10 files:
 scripts/prep_p17b.sh -f "head -n -10" $tag
 
-- Random 10 files:
+# Random 10 files:
 scripts/prep_p17b.sh -f "shuf -n 10" $tag
+#+end_src
 
 ** Running interactively (one process)
+#+begin_src bash
 newenv
 bash/stage1_job.sh $tag
+#+end_src
 
-** Testing on KNL
-newenv
-tests/submit_stage1_debug.sh $tag
+** Checking sbatch command
+Set IBDSEL_DRYRUN=1 when running submit_stage1_foo.sh
+
+** Testing on batch
+#+begin_src bash
+# $sys is either knl or hsw
+tests/submit_stage1_debug_$sys.sh $tag
+#+end_src
 
 ** Cleaning up
 eval `scripts/clear.sh stage1 $tag`
@@ -65,9 +74,8 @@ scripts/prep_p17b.sh $tag
 #+end_src
 
 ** Submit
-10 jobs:
 #+begin_src bash
-scripts/submit_stage1.sh $tag 10
+scripts/submit_stage1_$sys.sh $tag $njob
 #+end_src
 
 ** Iterating to completion

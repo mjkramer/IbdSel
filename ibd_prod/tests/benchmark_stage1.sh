@@ -28,9 +28,11 @@ else
     sysname=knl
 fi
 
+export IBDSEL_SLURMFILE=slurm/stage1_${sysname}.sl.sh
+
+# HACK: Call stage1_vars with no tag arg, end up with parent dirs in $indir etc
+# (including trailing slash). We need these parent dirs to compute $firstIndir.
 source bash/stage1_vars.inc.sh
-# no tag specified -> end up with parent dirs (including trailing slash)
-# for getting $firstIndir
 stage1_vars
 
 tagbase=benchmark_$sysname.$nfiles
@@ -44,5 +46,5 @@ for f in $factors; do
     scripts/prep_p17b.sh -f "shuf -n $nfiles" $tag
 
     export IBDSEL_NTASKS=$f
-    sbatch -q debug -t 00:30:00 -o $logdir/$logfmt slurm/stage1_${sysname}.sl.sh 0.5 $tag
+    source bash/do_submit_stage1.inc.sh $tag 1 -q debug
 done

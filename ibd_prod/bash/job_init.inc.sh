@@ -1,6 +1,12 @@
 source bash/job_env.inc.sh
 source bash/maybe_srun.inc.sh
 
+# This prevents srun from using the same --export option as sbatch. In the case
+# of sbatch, we only propagate the IBDSEL_* variables, to avoid any potential
+# contamination from the submission environment. Inside the job, however, we
+# want our job steps to inherit the job's environment.
+export SLURM_EXPORT_ENV=ALL
+
 echo Running on $(hostname)
 
 # Try to prevent "error forking child", "resource temporarily unavailable", etc.

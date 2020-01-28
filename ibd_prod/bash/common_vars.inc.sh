@@ -2,7 +2,7 @@
 data_base=../../data
 log_base=../../log
 
-logfmt=slurm-%A_%a.out
+logfmt=slurm${IBDSEL_LOGFMT_EXTRA}-%A_%a.out
 
 data_dir_for() {
     local name=$1; shift
