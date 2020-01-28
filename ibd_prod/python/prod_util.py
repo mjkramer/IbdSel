@@ -1,4 +1,4 @@
-import os, sys, time
+import os, sys, time, io
 from functools import wraps
 from subprocess import check_output
 
@@ -15,7 +15,8 @@ def sysload():
     print('END-SYSLOAD')
 
 def unbuf_stdout():
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stdout = io.TextIOWrapper(open(sys.stdout.fileno(), 'wb', 0),
+                                  write_through=True)
 
 def phase_for(runno):
     if 21221 <= runno <= 26694:

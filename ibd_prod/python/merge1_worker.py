@@ -5,7 +5,8 @@ import ROOT as R
 R.PyConfig.IgnoreCommandLineOptions = True
 
 from daily_runlist import DailyRunList
-from prod_util import sysload, gen2list, log_time, dets_for, input_fname, data_dir
+from prod_util import gen2list, log_time, dets_for, input_fname, data_dir
+from prod_util import unbuf_stdout, sysload
 from prod_io import LockfileListReader, LockfileListWriter
 from hadd import hadd_chunked
 
@@ -82,11 +83,12 @@ class Merger:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('tag')
-    ap.add_argument('-t', '--timeout-mins', type=float, default=120)
+    ap.add_argument('-t', '--timeout-mins', type=float, default=0)
     args = ap.parse_args()
 
     merger = Merger(args)
     merger.loop()
 
 if __name__ == '__main__':
+    unbuf_stdout()
     main()

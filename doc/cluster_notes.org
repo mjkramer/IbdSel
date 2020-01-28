@@ -238,3 +238,8 @@ def scale(k, l):
 - timeout = 1:45
 - expect ~100 jobs
 - [ ] update workers (see above todo)
+
+* merge1 speed
+- 20 proc-secs per hall-day on Haswell (interactive)
+- 5676 hall-days * 20 = 113520 seconds = 31.5 hours
+- So to make it an overnighter, launch 6 processes in a screen

@@ -17,10 +17,13 @@ In fit_prep? c.f.
 CLOSED: [2020-01-16 Thu 12:17]
 Already have the singles histograms, dur.
 ** TODO Run checks of daily everything vs LBNL
-** TODO Update job script for stage1
-** TODO Update stage1 merge job?
+** DONE Update job script for stage1
+CLOSED: [2020-01-28 Tue 17:03]
+** DONE Update stage1 merge job?
+CLOSED: [2020-01-28 Tue 17:03]
 ** TODO Write/test job script to do stage2 + merge + fit
-** TODO Run stage1 (+ merge?) on P17B
+** DONE Run stage1 (+ merge?) on P17B
+CLOSED: [2020-01-28 Tue 17:03]
 ** TODO Do one fit, to test
 ** TODO Do another N fits
 
@@ -39,7 +42,7 @@ Start with a fresh login. Then
 #+begin_src bash
 source bash/job_env.inc.sh
 #+end_src
-Now you are in the same environment that jobs will run in. Includes Python 3.7, ROOT 6.18, Pandas. It's OK to submit jobs from a different environment, as we whitelist the env vars that get exported to the job.
+Now you are in the same environment that jobs will run in. Includes Python 3.7, ROOT 6.18, Pandas. It's OK to submit jobs from a different environment, as we whitelist the env vars that get exported to the job. However, for doing things interactively, it's a good idea to use the job environment.
 
 * Testing stage1
 ** Generating smaller input
@@ -85,7 +88,7 @@ scripts/prep_p17b.sh $tag
 scripts/submit_stage1_$sys.sh $tag $njob
 #+end_src
 
-** Iterating to completion
+** Iterating to completion (not tested)
 If no jobs are running:
 #+begin_src bash
 scripts/filter_done.sh stage1 $tag
@@ -108,14 +111,17 @@ scripts/prep_merge1.sh $tag
 
 ** Running the merge
 #+begin_src bash
-scripts/run_merge1.sh $tag
+scripts/run_merge1.sh $tag $nproc
 #+end_src
-Spawn multiple processes as necessary.
+It's fine to add processes to a running merge. With 8 processes spread between two Cori login nodes, P17B took 4 hours.
 
-** Iterating
+** Iterating (not tested)
 #+begin_src bash
 scripts/filter_done.sh merge1 $tag
 #+end_src
+
+** Checking
+Grep the logs for CRAPPY. Try to redo stage1 for those files. Those that cannot be resolved should be tagged as bad. (P17B good run list v3 should be 100% viable.)
 
 ** Cleanup
 Delete the fbf files

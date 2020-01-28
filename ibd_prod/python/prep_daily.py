@@ -15,8 +15,8 @@ def main():
     args = ap.parse_args()
 
     drl = DailyRunList()
-    vals = drl.df[['site', 'day']].drop_duplicates().values
-
+    vals = drl.df[['site', 'day']].sort_values(by=['day','site'])\
+                                  .drop_duplicates().values
     np.savetxt(input_fname(args.step, args.tag), vals, fmt='%d %d')
 
 if __name__ == '__main__':
