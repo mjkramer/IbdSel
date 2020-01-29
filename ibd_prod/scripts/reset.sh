@@ -12,13 +12,5 @@ if [ -z $tag ]; then
     exit 1
 fi
 
-source bash/${step}_vars.inc.sh
-${step}_vars $tag
-
-rm $infile.done
-cp $infile.orig $infile
-
-rm -rf $outdir/EH1 $outdir/EH2 $outdir/EH3
-
-rm $logdir/*
-
+eval $(scripts/clear.sh $step $tag)
+scripts/prep_${step}.sh $tag

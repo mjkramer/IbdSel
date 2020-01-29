@@ -43,7 +43,7 @@ uniqueId=$(basename $firstIndir | cut -d. -f3)
 for f in $factors; do
     tag=$tagbase.$uniqueId.$(printf "%03d" $f)
     stage1_vars $tag
-    scripts/prep_p17b.sh -f "shuf -n $nfiles" $tag
+    scripts/prep_stage1.sh -f "shuf -n $nfiles" $tag
 
     export IBDSEL_NTASKS=$f
     source bash/do_submit_stage1.inc.sh $tag 1 -q debug

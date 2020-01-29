@@ -2,7 +2,7 @@
 
 source bash/stage1_vars.inc.sh
 
-LISTFILEPATH=../../misc/paths.physics.good.p17b.v3.sync.txt
+LISTFILEPATH=../static/filelist/paths.physics.good.p17b.v3.sync.txt.gz
 
 while getopts "f:" opt; do
     case $opt in
@@ -25,22 +25,11 @@ fi
 
 stage1_vars $tag
 
-listfile=$LISTFILEPATH
-
-mkdir -p $trueOutdir
+mkdir -p $indir $logdir $trueOutdir
 mkdir -p $(dirname $outdir)
 ln -s $trueOutdir $outdir
 
-mkdir -p $logdir
+filter_cmd=${filter_cmd:-cat}
 
-
-mkdir -p $indir
-
-if [ -n "$filter_cmd" ]; then
-    eval $filter_cmd $listfile > $infile.orig
-else
-    ln -rs $listfile $infile.orig
-fi
-
+gunzip -c $LISTFILEPATH | $filter_cmd > $infile.orig
 cp $infile.orig $infile
-chmod +w $infile

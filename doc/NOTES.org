@@ -48,10 +48,10 @@ Now you are in the same environment that jobs will run in. Includes Python 3.7, 
 ** Generating smaller input
 #+begin_src bash
 # First 10 files:
-scripts/prep_p17b.sh -f "head -n -10" $tag
+scripts/prep_stage1.sh -f "head -n -10" $tag
 
 # Random 10 files:
-scripts/prep_p17b.sh -f "shuf -n 10" $tag
+scripts/prep_stage1.sh -f "shuf -n 10" $tag
 #+end_src
 
 ** Running interactively (one process)
@@ -80,7 +80,7 @@ Make sure stage1_main.cc.so is the newest file in selector/, and be sure that yo
 
 ** Prepare dirs
 #+begin_src bash
-scripts/prep_p17b.sh $tag
+scripts/prep_stage1.sh $tag
 #+end_src
 
 ** Submit

@@ -27,9 +27,6 @@ mkdir -p $indir $logdir $trueOutdir
 mkdir -p $(dirname $outdir)
 ln -s $trueOutdir $outdir
 
-python/prep_daily.py merge1 $tag
+filter_cmd=${filter_cmd:-cat}
 
-if [ -n "$filter_cmd" ]; then
-    eval $filter_cmd $infile > $infile.tmp
-    mv $infile.tmp $infile
-fi
+python/prep_daily.py merge1 $tag | $filter_cmd > $infile
