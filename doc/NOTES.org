@@ -132,6 +132,21 @@ Copy the dbd files to CFS
 ** End result
 6k daily stage1 files in ../../data/stage1_dbd/$tag/EH1 etc.
 
+* Stage2 testing
+** DONE Run stage2_job.sh interactively, no IBDSEL_CONFIGDIR
+CLOSED: [2020-01-31 Fri 21:44]
+** DONE Run stage2_job.sh interactively, set IBDSEL_CONFIGDIR to ../misc/configs and use a "config.altered.txt" in there
+CLOSED: [2020-01-31 Fri 23:17]
+** DONE Test in debug QOS
+CLOSED: [2020-02-01 Sat 01:41]
+** TODO Using performance numbers, draft submit_stage2_${sys}_debug.sh
+** TODO Run some benchmarks to determine ideal performance params
+** TODO Update submit_XXX performance params
+** TODO Investigate "MuonAlg is behind!" etc.
+** TODO Investigate discrepancy in number of days between halls
+** TODO Add any needed branches to the IBD trees
+** TODO Submit one full job
+
 * Submitting stage2
 ** Preparing
 #+begin_src bash
