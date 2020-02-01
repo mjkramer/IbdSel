@@ -2,6 +2,10 @@ source bash/common_vars.inc.sh
 
 stage1_vars() {
     local tag=$1; shift
+    if [ -z "$tag" ]; then
+        echo "Specify a tag!"
+        exit 1
+    fi
 
     trueOutdir=$SCRATCH/p17b/stage1_fbf/$tag
 

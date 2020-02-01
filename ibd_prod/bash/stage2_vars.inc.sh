@@ -2,7 +2,16 @@ source bash/common_vars.inc.sh
 
 stage2_vars() {
     local tag=$1; shift
+    if [ -z "$tag" ]; then
+        echo "Specify a tag!"
+        exit 1
+    fi
+
     local configname=$1; shift
+    if [ -z "$configname" ]; then
+        echo "Specify a config!"
+        exit 1
+    fi
 
     export IBDSEL_CONFIGDIR=${IBDSEL_CONFIGDIR:-../static/configs}
 

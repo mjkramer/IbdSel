@@ -30,14 +30,13 @@ fi
 
 export IBDSEL_SLURMFILE=slurm/run_${sysname}.sl.sh
 
-# HACK: Call stage1_vars with no tag arg, end up with parent dirs in $indir etc
-# (including trailing slash). We need these parent dirs to compute $firstIndir.
 source bash/stage1_vars.inc.sh
-stage1_vars
+stage1_vars DUMMY
+inroot=$(dirname $indir)
 
 tagbase=benchmark_$sysname.$nfiles
 firstFactor=$(printf "%03d" ${factors%% *})
-firstIndir=$(mktemp -d ${indir}${tagbase}.XXX.$firstFactor)
+firstIndir=$(mktemp -d ${inroot}/${tagbase}.XXX.$firstFactor)
 uniqueId=$(basename $firstIndir | cut -d. -f3)
 
 for f in $factors; do
