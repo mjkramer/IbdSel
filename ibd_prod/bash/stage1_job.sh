@@ -1,8 +1,9 @@
 #!/bin/bash
 
+source bash/stage1_vars.inc.sh
+
 tag=$1; shift
 
-source bash/stage1_vars.inc.sh
 stage1_vars $tag
 
 source bash/job_init.inc.sh

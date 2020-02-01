@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-# This code expects the environment variables exported in
-# bash/stage1_vars.inc.sh. See bash/stage1_job.sh
+# This code expects IBDSEL_SOCKDIR to be set.
+# See bash/stage1_job.sh
 
 import os, argparse, random
 
