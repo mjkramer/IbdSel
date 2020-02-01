@@ -103,3 +103,14 @@ def buffer_timeout_mins():
 
 def worker_timeout_mins():
     return _timeout_mins('IBDSEL_FILE_MARGIN_SECS')
+
+def stage1_fbf_path(site, runno, fileno, tag):
+    subdir = runno // 100 * 100
+    return os.path.join(data_dir('stage1_fbf', tag),
+                        f'EH{site}', f'{subdir:07d}', f'{runno:07d}',
+                        f'stage1.fbf.eh{site}.{runno:07d}.{fileno:04d}.root')
+
+def stage1_dbd_path(site, day, tag):
+    return os.path.join(data_dir('stage1_dbd', tag),
+                        f'EH{site}',
+                        f'stage1.dbd.eh{site}.{day:04d}.root')

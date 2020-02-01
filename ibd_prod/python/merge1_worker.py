@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import os, argparse, random
+import argparse, random
 import ROOT as R
 R.PyConfig.IgnoreCommandLineOptions = True
 
 from daily_runlist import DailyRunList
-from prod_util import gen2list, log_time, dets_for, input_fname, data_dir
+from prod_util import gen2list, log_time, dets_for, input_fname
+from prod_util import stage1_fbf_path, stage1_dbd_path
 from prod_util import unbuf_stdout, sysload
 from prod_io import LockfileListReader, LockfileListWriter
 from hadd import hadd_chunked
@@ -17,17 +18,6 @@ class Merger:
     def __init__(self, cmd_args):
         self.cmd_args = cmd_args
         self.runlist = DailyRunList()
-
-    def input_path(self, site, runno, fileno):
-        subdir = runno // 100 * 100
-        return os.path.join(data_dir('stage1_fbf', self.cmd_args.tag),
-                            f'EH{site}', f'{subdir:07d}', f'{runno:07d}',
-                            f'stage1.fbf.eh{site}.{runno:07d}.{fileno:04d}.root')
-
-    def output_path(self, site, day):
-        return os.path.join(data_dir('stage1_dbd', self.cmd_args.tag),
-                            f'EH{site}',
-                            f'stage1.dbd.eh{site}.{day:04d}.root')
 
     @staticmethod
     def things2check(site, runno):
@@ -48,7 +38,7 @@ class Merger:
     @gen2list
     def readable_files(self, site, day):
         for runno, fileno in self.runlist.daily(site=site, day=day):
-            path = self.input_path(site, runno, fileno)
+            path = stage1_fbf_path(site, runno, fileno, self.cmd_args.tag)
             if self.is_readable(path, site, runno):
                 yield path
             else:
@@ -59,17 +49,15 @@ class Merger:
         print(f'MERGING {site} {day}')
 
         paths = self.readable_files(site, day)
-        outpath = self.output_path(site, day)
+        outpath = stage1_dbd_path(site, day, self.cmd_args.tag)
         hadd_chunked(paths, outpath, HADD_CHUNKSIZE)
 
-    def input_fname(self):
-        return input_fname('merge1', self.cmd_args.tag)
-
     def loop(self):
-        reader = LockfileListReader(self.input_fname(),
+        listfile = input_fname('merge1', self.cmd_args.tag)
+        reader = LockfileListReader(listfile,
                                     chunksize=JOB_CHUNKSIZE,
                                     timeout_mins=self.cmd_args.timeout_mins)
-        logger = LockfileListWriter(self.input_fname() + '.done',
+        logger = LockfileListWriter(listfile + '.done',
                                     chunksize=JOB_CHUNKSIZE)
 
         with logger:
