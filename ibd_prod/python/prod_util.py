@@ -18,7 +18,7 @@ def unbuf_stdout():
     sys.stdout = io.TextIOWrapper(open(sys.stdout.fileno(), 'wb', 0),
                                   write_through=True)
 
-def phase_for(runno):
+def phase_for_run(runno):
     if 21221 <= runno <= 26694:
         return 1
     if 34523 <= runno <= 67012:
@@ -27,8 +27,17 @@ def phase_for(runno):
         return 3
     raise "Nonsensical run number"
 
+def phase_for_day(day):
+    if 0 <= day <= 217:
+        return 1
+    if 300 <= day <= 1824:
+        return 2
+    if 1860 <= day <= 2076:
+        return 3
+    raise ValueError(f'Day {day} is not part of P17B')
+
 def dets_for(site, runno):
-    phase = phase_for(runno)
+    phase = phase_for_run(runno)
     if site == 1:
         return [2] if phase == 3 else [1, 2]
     if site == 2:

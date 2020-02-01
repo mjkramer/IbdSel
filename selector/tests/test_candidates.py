@@ -9,7 +9,7 @@ import ROOT as R
 from root_pandas import read_root
 
 sys.path.insert(0, '../ibd_prod/python')
-from prod_util import phase_for
+from prod_util import phase_for_run
 
 R.gErrorIgnoreLevel = R.kError    # suppress warnings of empty trees
 
@@ -67,7 +67,7 @@ class Runner(object):
     def compare(self, runno, fileno):
         fname = self.ff.find(runno, fileno)
         site = site_for(fname)
-        phase = phase_for(runno)
+        phase = phase_for_run(runno)
 
         candis = self.candis[site]
         cond = (candis.RunNo == runno) & (candis.FileNo == fileno)
