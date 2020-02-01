@@ -14,9 +14,10 @@ def process(site, day, tag, config):
     outpath = stage2_dbd_path(site, day, tag, config)
     configpath = configfile_path(tag, config)
     os.system('mkdir -p %s' % os.path.dirname(outpath))
-    os.system(('time root -l -b -q "cling/run_stage2.C(\\"%s\\", \\"%s\\", \\"%s\\", ' +
-               '%d, %d, %d)"') %
-              (configpath, inpath, outpath, site, phase_for_day(day), day))
+
+    phase = phase_for_day(day)
+    call = f'cling/run_stage2.C(\\"{configpath}\\", \\"{inpath}\\", \\"{outpath}\\", {site}, {phase}, {day})'
+    os.system(f'time root -l -b -q "{call}"')
 
 def main():
     ap = argparse.ArgumentParser()

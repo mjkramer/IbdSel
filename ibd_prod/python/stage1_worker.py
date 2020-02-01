@@ -13,8 +13,10 @@ def process(path, tag):
     runno, fileno, site = parse_path(path)
     outpath = stage1_fbf_path(site, runno, fileno, tag)
     os.system('mkdir -p %s' % os.path.dirname(outpath))
-    os.system('time root -l -b -q "cling/run_stage1.C(\\"%s\\", \\"%s\\", %d, %d)"' %
-              (path, outpath, site, phase_for_run(runno)))
+
+    phase = phase_for_run(runno)
+    call = f'cling/run_stage1.C(\\"{path}\\", \\"{outpath}\\", {site}, {phase})'
+    os.system(f'time root -l -b -q "{call}"')
 
 def main():
     ap = argparse.ArgumentParser()

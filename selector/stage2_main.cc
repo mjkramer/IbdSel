@@ -9,8 +9,6 @@
 #include "SelectorFramework/core/Kernel.cc"
 #include "SelectorFramework/core/ConfigTool.cc"
 
-#include <iostream>              // XXX
-
 void stage2_main(const char* confFile, const char* inFile, const char* outFile,
                  Site site, Phase phase, UInt_t seq)
 {

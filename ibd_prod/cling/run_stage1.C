@@ -1,10 +1,10 @@
 void run_stage1(const char* inFile, const char* outFile, int site, int phase)
 {
   gErrorIgnoreLevel = kError;  // suppress warnings of missing NuWa dictionaries
+
   gROOT->ProcessLine(".L ../selector/stage1_main.cc+");
 
-  // We have to jump through these hoops in order to pass the Site/Stage enums
-  // to stage1_main... sigh
-  auto line = Form(".x cling/run_stage1_impl.C(\"%s\", \"%s\", %d, %d)", inFile, outFile, site, phase);
+  auto form = "stage1_main(\"%s\", \"%s\", Site(%d), Phase(%d))";
+  auto line = Form(form, inFile, outFile, site, phase);
   gROOT->ProcessLine(line);
 }
