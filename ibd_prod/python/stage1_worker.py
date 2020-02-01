@@ -18,12 +18,11 @@ def process(path, tag):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('sockdir', help='Dir containing zmq_fan sockets')
     ap.add_argument('tag')
     args = ap.parse_args()
 
-    reader = ZmqListReader(args.sockdir, timeout_mins=worker_timeout_mins())
-    logger = ZmqListWriter(args.sockdir)
+    reader = ZmqListReader(timeout_mins=worker_timeout_mins())
+    logger = ZmqListWriter()
 
     with logger:
         for path in reader:

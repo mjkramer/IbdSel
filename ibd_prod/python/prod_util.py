@@ -104,6 +104,9 @@ def buffer_timeout_mins():
 def worker_timeout_mins():
     return _timeout_mins('IBDSEL_FILE_MARGIN_SECS')
 
+def sockdir():
+    return os.getenv('IBDSEL_SOCKDIR')
+
 def stage1_fbf_path(site, runno, fileno, tag):
     subdir = runno // 100 * 100
     return os.path.join(data_dir('stage1_fbf', tag),
