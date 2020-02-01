@@ -29,4 +29,4 @@ ln -s $trueOutdir $outdir
 
 filter_cmd=${filter_cmd:-cat}
 
-python/prep_daily.py merge1 $tag | $filter_cmd > $infile
+python/dump_days.py | $filter_cmd > $infile
