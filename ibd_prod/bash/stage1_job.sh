@@ -25,7 +25,7 @@ maybe_srun -n $IBDSEL_NTASKS --cpu-bind=cores -- python/stage1_worker.py $sockdi
 
 echo "Ending at $(date +%s) = $(date)"
 
-python/stage1_shutdown.py $sockdir
+python/zmq_shutdown.py $sockdir
 
 while [ -d /proc/$qbPid ]; do
     sleep 5
