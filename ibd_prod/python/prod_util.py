@@ -117,3 +117,12 @@ def stage1_dbd_path(site, day, tag):
     return os.path.join(data_dir('stage1_dbd', tag),
                         f'EH{site}',
                         f'stage1.dbd.eh{site}.{day:04d}.root')
+
+def stage2_dbd_path(site, day, tag, config):
+    return os.path.join(data_dir('stage2_dbd', f'{tag}@{config}'),
+                        f'EH{site}',
+                        f'stage2.dbd.eh{site}.{day:04d}.root')
+
+def configfile_path(tag, config):
+    return os.path.join(data_dir('stage2_input', f'{tag}@{config}'),
+                        f'config.{config}.txt')

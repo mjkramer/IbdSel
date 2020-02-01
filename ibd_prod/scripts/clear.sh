@@ -8,13 +8,7 @@ if [ -z $step ]; then
     exit 1
 fi
 
-tag=$1; shift
-if [ -z $tag ]; then
-    echo "Specify a tag!"
-    exit 1
-fi
-
 source bash/${step}_vars.inc.sh
-${step}_vars $tag
+${step}_vars $@
 
 echo rm -rf $trueOutdir $outdir $indir $logdir

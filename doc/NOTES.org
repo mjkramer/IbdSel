@@ -135,12 +135,26 @@ Copy the dbd files to CFS
 * Submitting stage2
 ** Preparing
 #+begin_src bash
-scripts/prep_daily.py stage2 $tag
+# if unset, uses ../static/configs (which just has nominal cuts)
+export IBDSEL_CONFIGDIR=some_dir
+# use -f to produce a short list for testing purposes, like prep_stage1
+scripts/prep_stage2.sh $tag $configname
+#+end_src
+
+** Clearing
+#+begin_src bash
+eval $(scripts/clear.sh stage2 $tag $configname)
+#+end_src
+See also reset.sh
+
+** Testing interactively
+#+begin_src bash
+bash/stage2_job.sh $tag $configname
 #+end_src
 
 ** Submitting
 #+begin_src bash
-examples/submit_stage2_knl_short.sh $tag.$cutname $cutfile 10
+scripts/submit_stage2_knl.sh $tag $configname 10
 #+end_src
 
 ** Iterating
