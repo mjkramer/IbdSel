@@ -9,7 +9,7 @@ export IBDSEL_CHUNK_MARGIN_SECS=240
 export IBDSEL_FILE_MARGIN_SECS=120
 export IBDSEL_STARTUP_SLEEP_SECS=10
 export IBDSEL_NTASKS=54
-export IBDSEL_SLURMFILE=slurm/stage1_knl.sl.sh
+export IBDSEL_SLURMFILE=slurm/run_knl.sl.sh
 export IBDSEL_LOGFMT_EXTRA=_knl_dbg
 
 njob=1

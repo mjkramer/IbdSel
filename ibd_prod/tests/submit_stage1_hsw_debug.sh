@@ -9,7 +9,7 @@ export IBDSEL_CHUNK_MARGIN_SECS=60
 export IBDSEL_FILE_MARGIN_SECS=30
 export IBDSEL_STARTUP_SLEEP_SECS=10
 export IBDSEL_NTASKS=40
-export IBDSEL_SLURMFILE=slurm/stage1_hsw.sl.sh
+export IBDSEL_SLURMFILE=slurm/run_hsw.sl.sh
 export IBDSEL_LOGFMT_EXTRA=_hsw_dbg
 
 njob=1

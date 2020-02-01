@@ -28,7 +28,7 @@ else
     sysname=knl
 fi
 
-export IBDSEL_SLURMFILE=slurm/stage1_${sysname}.sl.sh
+export IBDSEL_SLURMFILE=slurm/run_${sysname}.sl.sh
 
 # HACK: Call stage1_vars with no tag arg, end up with parent dirs in $indir etc
 # (including trailing slash). We need these parent dirs to compute $firstIndir.
