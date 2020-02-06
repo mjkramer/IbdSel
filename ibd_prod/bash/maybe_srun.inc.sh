@@ -15,7 +15,8 @@ maybe_srun() {
     done
 
     if [ -n "$SLURM_JOB_ID" ]; then
-        srun $srun_args $cmd_str
+        # -l prepends task ID to lines of stdout/err
+        srun -l $srun_args $cmd_str
     else
         $cmd_str
     fi
