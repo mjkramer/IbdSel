@@ -122,51 +122,9 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
   return Status::Continue;
 }
 
-struct maybe_cout {
-  maybe_cout(bool on, Det detector) : on_(on), det_(int(detector))  {}
-
-  template <class T>
-  maybe_cout& operator<<(const T& t)
-  {
-    if (newline_) {
-      newline_ = false;
-      if (on_) std::cout << "AD" << det_ << " ";
-    }
-    if (on_) std::cout << t;
-    return *this;
-  }
-
-  // for endl: https://stackoverflow.com/questions/1134388/stdendl-is-of-unknown-type-when-overloading-operator
-
-  using endl_t = decltype(std::endl<char, std::char_traits<char>>);
-
-  maybe_cout& operator<<(endl_t endl)
-  {
-    operator<< <endl_t> (*endl);
-    newline_ = true;
-    return *this;
-  }
-
-  bool on_;
-  int det_;
-  bool newline_ = true;
-};
-
-// template <class T>
-// maybe_cout& operator<<(maybe_cout& mc, const T& t)
-// {
-//   if (mc.on_)
-//     std::cout << t;
-//   return mc;
-// }
-
 bool MuonAlg::isVetoed(Time t, Det detector) const
 {
   bool xfirst = true;
-  // size_t xx = 0;
-  // maybe_cout xcout(getenv("DIAG_IBDS") ? (purpose == Purpose::ForIBDs)
-  //                  : (purpose == Purpose::ForSingles),
-  //                  detector);
   const char* xpurp = (purpose == Purpose::ForIBDs) ? "IBDs" : "singles";
   const char* xheader = Form("AD%d %s: ", int(detector), xpurp);
 
@@ -185,17 +143,14 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
     const float dt_us = t.diff_us(muon.time());
 
     if (xfirst) {
-    //   xcout << "first dt " << dt_us << std::endl;
       xfirst = false;
       if (dt_us > -muPreVeto_us) {
         std::cout << xheader << Form("MuonAlg is behind! %.3f", dt_us) << std::endl;
       }
     }
 
-    // ++xx;
 
     if (showerMuPostVeto_us < dt_us) {  // no more muons worth checking
-      // xcout << "end at muon " << xx << std::endl;
       return false;
     }
 
@@ -206,19 +161,15 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
       continue;                 // Ignore muons in other ADs
 
     if (-muPreVeto_us < dt_us && dt_us < 0) { // pre-muon veto
-      // xcout << "veto before muon " << xx << std::endl;
       lastBufDepth[idet] = i;
       return true;
     }
 
     if (dt_us < nomPostVeto_us(muon)) {
-      // xcout << "veto after muon " << xx << std::endl;
       lastBufDepth[idet] = i;
       return true;
     }
   }
-
-  // xcout << "exhausted after muon " << xx << std::endl;
 
   if (muonBuf.full()) {
     std::cout << xheader << "MuonAlg is exhausted!" << std::endl;
