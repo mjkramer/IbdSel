@@ -27,6 +27,23 @@ void MuonAlg::initCuts(const Config* config)
   END_CONFIG();
 }
 
+void MuonAlg::log(const MuonTree& muon, Time t, Det det, const char* msg)
+{
+  const bool forIBDs = purpose == Purpose::ForIBDs;
+  const char* selName = forIBDs ? "IBDs" : "singles";
+
+  const auto sel = forIBDs
+    ? static_cast<SelectorBase*>(pipe().getAlg<IbdSel>(det))
+    : static_cast<SelectorBase*>(pipe().getAlg<SingleSel>(det));
+
+  const AdTree& delayed = sel->getCurrent();
+
+  std::cerr << Form("MuonAlg (%s) %d %d, T_mu %d.%d, AD%d trig %d: %s\n",
+                    selName, delayed.runNo, delayed.fileNo,
+                    muon.time().s, muon.time().ns,
+                    det, delayed.trigNo, msg);
+}
+
 void MuonAlg::connect(Pipeline& p)
 {
   if (purpose == Purpose::ForIBDs) {

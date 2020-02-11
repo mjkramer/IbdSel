@@ -24,6 +24,8 @@ public:
   bool isVetoed(Time t, Det detector) const;
   double vetoTime_s(Det detector) const;
 
+  void log(const MuonTree& muon, Time t, Det det, const char* msg);
+
 private:
   void initCuts(const Config* config);
   Time endOfLastVeto(size_t idet) const;
