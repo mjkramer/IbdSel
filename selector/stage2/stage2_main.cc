@@ -1,13 +1,15 @@
 #include "AdBuffer.cc"
+#include "CalcsTree.cc"
+#include "Calculator.cc"
+#include "Li9Calc.cc"
 #include "MultCut.cc"
 #include "MuonAlg.cc"
 #include "Readers.cc"
 #include "Selectors.cc"
-#include "Calculator.cc"
 
-#include "../common/Misc.cc"
+#include "../common/common_deps.cc"
 
-#include "../SelectorFramework/core/ConfigTool.cc"
+#include "../external/FukushimaLambertW.cc"
 
 void stage2_main(const char* confFile, const char* inFile, const char* outFile,
                  Site site, Phase phase, UInt_t seq)

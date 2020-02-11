@@ -5,7 +5,7 @@
 #include "MuonSaver.cc"
 #include "TrigTypeCut.cc"
 
-#include "../common/Misc.cc"
+#include "../common/common_deps.cc"
 
 #include <string>
 #include <vector>

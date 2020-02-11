@@ -1,10 +1,9 @@
-#pragma once
+#include "EventReader.hh"
 
-#include "EventReader.cc"
+#include "../common/Constants.hh"
 
-#include "../common/Constants.cc"
-
-#include "../SelectorFramework/core/Kernel.cc"
+#include "../SelectorFramework/core/Kernel.hh"
+#include "../SelectorFramework/core/SimpleAlg.hh"
 
 #include <TH1F.h>
 

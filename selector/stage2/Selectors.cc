@@ -1,36 +1,13 @@
-#pragma once
-
-#include "AdBuffer.cc"
-#include "IbdTree.cc"
-#include "MuonAlg.cc"
-#include "MultCut.cc"
-
-#include "../common/Constants.cc"
-
-#include "../SelectorFramework/core/TreeWriter.cc"
+#include "Selectors.hh"
+#include "MultCut.hh"
+#include "MuonAlg.hh"
 
 #include <TH1F.h>
 
-class SelectorBase : public BufferedSimpleAlg<AdBuffer, Det> {
-public:
-  using Iter = AdBuffer::Iter;
-
-  SelectorBase(Det det, MuonAlg::Purpose purpose) :
-    BufferedSimpleAlg<AdBuffer, Det>(det),
-    det(det),
-    purpose(purpose) {}
-
-  void connect(Pipeline& p) override;
-
-  const Det det;
-
-protected:
-  const MuonAlg* muonAlg;
-  const MultCutTool* multCut;
-
-private:
-  const MuonAlg::Purpose purpose;
-};
+SelectorBase::SelectorBase(Det det, MuonAlg::Purpose purpose) :
+  BufferedSimpleAlg<AdBuffer, Det>(det),
+  det(det),
+  purpose(purpose) {}
 
 void SelectorBase::connect(Pipeline &p)
 {
@@ -42,19 +19,21 @@ void SelectorBase::connect(Pipeline &p)
   multCut = p.getTool<MultCutTool>();
 }
 
+inline
+Algorithm::Status SelectorBase::consume_iter(Iter it)
+{
+  current = it;
+  select(it);
+  return Status::Continue;
+}
+
+inline
+const AdTree& SelectorBase::getCurrent() const
+{
+  return *current;
+}
+
 // ----------------------------------------------------------------------
-
-class SingleSel : public SelectorBase {
-public:
-  static constexpr float EMIN = 0.7;
-  static constexpr float EMAX = 12;
-
-  SingleSel(Det det);
-  Algorithm::Status consume_iter(Iter it) override;
-  void finalize(Pipeline& p) override;
-
-  TH1F* hist;
-};
 
 SingleSel::SingleSel(Det det) :
   SelectorBase(det, MuonAlg::Purpose::ForSingles)
@@ -68,7 +47,7 @@ void SingleSel::finalize(Pipeline& _p)
   hist->Write();
 }
 
-Algorithm::Status SingleSel::consume_iter(Iter it)
+void SingleSel::select(Iter it)
 {
   if (EMIN < it->energy && it->energy < EMAX &&
       not muonAlg->isVetoed(it->time(), det) &&
@@ -76,33 +55,9 @@ Algorithm::Status SingleSel::consume_iter(Iter it)
 
     hist->Fill(it->energy);
   }
-
-  return Status::Continue;
 }
 
 // ----------------------------------------------------------------------
-
-class IbdSel : public SelectorBase {
-public:
-  static constexpr float PROMPT_MIN = 0.7;
-  static constexpr float PROMPT_MAX = 12;
-  static constexpr float DELAYED_MIN = 6;
-  static constexpr float DELAYED_MAX = 12;
-  static constexpr unsigned DT_MIN_US = 1;
-  static constexpr unsigned DT_MAX_US = 200;
-
-  IbdSel(Det detector);
-  void connect(Pipeline& p) override;
-  Algorithm::Status consume_iter(Iter it) override;
-  void finalize(Pipeline& p) override;
-
-  TH1F* hist;
-
-private:
-  void save(Iter prompt, Iter delayed);
-
-  TreeWriter<IbdTree> ibdTree;
-};
 
 IbdSel::IbdSel(Det detector) :
   SelectorBase(detector, MuonAlg::Purpose::ForIBDs),
@@ -133,7 +88,7 @@ void IbdSel::save(Iter prompt, Iter delayed)
   ibdTree.fill();
 }
 
-Algorithm::Status IbdSel::consume_iter(Iter it)
+void IbdSel::select(Iter it)
 {
   auto dt_us = [&](Iter other) { return it->time().diff_us(other->time()); };
 
@@ -154,6 +109,4 @@ Algorithm::Status IbdSel::consume_iter(Iter it)
       }
     }
   }
-
-  return Status::Continue;
 }

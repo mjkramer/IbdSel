@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../common/Constants.cc"
+#include "Constants.hh"
 
-#include "../SelectorFramework/core/BaseIO.cc"
+#include "../SelectorFramework/core/BaseIO.hh"
 
 class MuonTree : public TreeBase {
 public:

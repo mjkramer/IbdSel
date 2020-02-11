@@ -1,6 +1,6 @@
-#pragma once
+#include "EventReader.hh"
 
-#include "EventReader.cc"
+#include "../SelectorFramework/core/SimpleAlg.hh"
 
 Algorithm::Status trigTypeCut(const EventReader::Data& e)
 {

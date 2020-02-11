@@ -1,13 +1,12 @@
-#pragma once
+#include "EventReader.hh"
+#include "MuonSaver.hh"
 
-#include "EventReader.cc"
-#include "MuonSaver.cc"
+#include "../common/AdTree.hh"
+#include "../common/Constants.hh"
+#include "../common/Misc.hh"
 
-#include "../common/AdTree.cc"
-#include "../common/Constants.cc"
-#include "../common/Misc.cc"
-
-#include "../SelectorFramework/core/TreeWriter.cc"
+#include "../SelectorFramework/core/SimpleAlg.hh"
+#include "../SelectorFramework/core/TreeWriter.hh"
 
 class AdSaver : public SimpleAlg<EventReader> {
 public:

@@ -1,17 +1,17 @@
-#pragma once
+#include "CalcsTree.hh"
+#include "Li9Calc.hh"
+#include "MultCut.hh"
+#include "MuonAlg.hh"
+#include "Selectors.hh"
 
-#include "CalcsTree.cc"
-#include "Li9Calc.cc"
-#include "MultCut.cc"
-#include "MuonAlg.cc"
-#include "Selectors.cc"
+#include "../common/Constants.hh"
+#include "../common/Misc.hh"
 
-#include "../common/Constants.cc"
-#include "../common/Misc.cc"
+#include "../external/FukushimaLambertW.h"
 
-#include "../external/FukushimaLambertW.cc"
+#include "../SelectorFramework/core/Kernel.hh"
 
-#include "../SelectorFramework/core/Kernel.cc"
+#include <TH1F.h>
 
 #include <cmath>
 
