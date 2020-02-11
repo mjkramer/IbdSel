@@ -1,13 +1,13 @@
-#include "Readers.cc"
-#include "MuonAlg.cc"
-#include "Selectors.cc"
-#include "MultCut.cc"
-#include "Calculator.cc"
 #include "AdBuffer.cc"
-#include "Misc.cc"
+#include "MultCut.cc"
+#include "MuonAlg.cc"
+#include "Readers.cc"
+#include "Selectors.cc"
+#include "Calculator.cc"
 
-#include "SelectorFramework/core/Kernel.cc"
-#include "SelectorFramework/core/ConfigTool.cc"
+#include "../common/Misc.cc"
+
+#include "../SelectorFramework/core/ConfigTool.cc"
 
 void stage2_main(const char* confFile, const char* inFile, const char* outFile,
                  Site site, Phase phase, UInt_t seq)

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <vector>
-#include <stdexcept>
+#include "Constants.cc"
+
 #include <boost/algorithm/string.hpp>
 
-#include "Constants.cc"
+#include <stdexcept>
+#include <vector>
 
 namespace util {
 

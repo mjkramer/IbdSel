@@ -2,11 +2,12 @@
 
 #include "EventReader.cc"
 #include "MuonSaver.cc"
-#include "AdTree.cc"
-#include "Constants.cc"
-#include "Misc.cc"
 
-#include "SelectorFramework/core/TreeWriter.cc"
+#include "../common/AdTree.cc"
+#include "../common/Constants.cc"
+#include "../common/Misc.cc"
+
+#include "../SelectorFramework/core/TreeWriter.cc"
 
 class AdSaver : public SimpleAlg<EventReader> {
 public:

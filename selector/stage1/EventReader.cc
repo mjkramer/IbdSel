@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Constants.cc"
+#include "../common/Constants.cc"
 
-#include "SelectorFramework/core/SyncReader.cc"
-#include "SelectorFramework/core/Util.cc"
+#include "../SelectorFramework/core/SyncReader.cc"
+#include "../SelectorFramework/core/Util.cc"
 
 class EventTree : public TreeBase {
 public:

@@ -1,11 +1,12 @@
 #pragma once
 
-#include <TH1F.h>
-
-#include "SelectorFramework/core/Kernel.cc"
-
 #include "EventReader.cc"
-#include "Constants.cc"
+
+#include "../common/Constants.cc"
+
+#include "../SelectorFramework/core/Kernel.cc"
+
+#include <TH1F.h>
 
 using Status = Algorithm::Status;
 

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "SelectorFramework/core/TreeWriter.cc"
-
 #include "EventReader.cc"
-#include "MuonTree.cc"
+
+#include "../common/MuonTree.cc"
+
+#include "../SelectorFramework/core/TreeWriter.cc"
 
 using Status = Algorithm::Status;
 

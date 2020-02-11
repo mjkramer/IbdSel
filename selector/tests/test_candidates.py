@@ -24,7 +24,7 @@ R.gSystem.Load("/usr/common/software/python/2.7-anaconda-2019.07/lib/libsqlite3.
 R.gROOT.ProcessLine(".L tests/FileFinder.cc+")
 
 # Load just so we have access to enums/constants, util::ADsFor, etc.
-R.gROOT.ProcessLine(".L stage1_main.cc+" + ("g" if DEBUG_MODE else ""))
+R.gROOT.ProcessLine(".L stage1/stage1_main.cc+" + ("g" if DEBUG_MODE else ""))
 # R.gROOT.ProcessLine(".L stage2_main.cc+" + ("g" if DEBUG_MODE else ""))
 
 # force pyroot to load R.k6AD etc.

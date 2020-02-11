@@ -1,6 +1,6 @@
 void test_stage2_impl(int site, int phase)
 {
-  auto f_conf = "tests/test.cfg";
+  auto f_conf = "../static/configs/config.nominal.txt";
   auto f_in = "tests/out_stage1.root";
   auto f_out = "tests/out_stage2.root";
   auto seq = 0u;

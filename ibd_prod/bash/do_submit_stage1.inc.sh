@@ -14,6 +14,6 @@ sbatch_extra=$@
 
 stage1_vars $tag
 check_paths
-check_compiled ../selector/stage1_main.cc
+check_compiled ../selector/stage1/stage1_main.cc
 
 $(sbatch_cmd $njob $sbatch_extra) bash/stage1_job.sh $tag

@@ -1,13 +1,14 @@
+#include "AdSaver.cc"
+#include "EventReader.cc"
+#include "FlasherCut.cc"
+#include "LivetimeSaver.cc"
+#include "MuonSaver.cc"
+#include "TrigTypeCut.cc"
+
+#include "../common/Misc.cc"
+
 #include <string>
 #include <vector>
-
-#include "EventReader.cc"
-#include "TrigTypeCut.cc"
-#include "MuonSaver.cc"
-#include "FlasherCut.cc"
-#include "AdSaver.cc"
-#include "LivetimeSaver.cc"
-#include "Misc.cc"
 
 void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase)
 {

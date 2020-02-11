@@ -6,17 +6,14 @@ import sys
 
 sys.path.insert(0, '../ibd_prod/python')
 from daily_runlist import DailyRunList
-
 from prod_util import phase_for_run
 
 # For FileFinder
 # R.gSystem.Load("/usr/common/software/python/2.7-anaconda-2019.07/lib/libsqlite3.so")
 # No need to do that when using PyROOT since Python is linked to libsqlite3
 
-for line in ['.x LoadBoost.C',
-             '.L tests/FileFinder.cc+',
-             ".L stage1_main.cc+"]:
-    R.gROOT.ProcessLine(line)
+R.gROOT.ProcessLine('.x cling/Build.C("stage1/stage1_main.cc")')
+R.gROOT.ProcessLine('.L tests/FileFinder.cc+')
 
 R.Phase, R.Site                 # preload
 

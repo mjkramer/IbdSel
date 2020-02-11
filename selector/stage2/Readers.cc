@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SelectorFramework/core/TimeSyncReader.cc"
+#include "../common/AdTree.cc"
+#include "../common/Constants.cc"
+#include "../common/MuonTree.cc"
 
-#include "Constants.cc"
-#include "MuonTree.cc"
-#include "AdTree.cc"
+#include "../SelectorFramework/core/TimeSyncReader.cc"
 
 class MuonReader : public TimeSyncReader<MuonTree> {
 public:

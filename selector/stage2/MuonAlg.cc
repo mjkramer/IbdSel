@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Readers.cc"
-#include "Constants.cc"
 
-#include "SelectorFramework/core/ConfigTool.cc"
-#include "SelectorFramework/core/RingBuf.cc"
-#include "SelectorFramework/core/Util.cc"
+#include "../common/Constants.cc"
+
+#include "../SelectorFramework/core/ConfigTool.cc"
+#include "../SelectorFramework/core/RingBuf.cc"
+#include "../SelectorFramework/core/Util.cc"
 
 #include <algorithm>
 
