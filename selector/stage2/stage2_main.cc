@@ -1,3 +1,7 @@
+// Force assertion checks, even in non-debug builds
+#undef NDEBUG
+#include <cassert>
+
 #include "AdBuffer.cc"
 #include "CalcsTree.cc"
 #include "Calculator.cc"

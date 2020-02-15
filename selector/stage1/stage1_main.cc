@@ -1,3 +1,7 @@
+// Force assertion checks, even in non-debug builds
+#undef NDEBUG
+#include <cassert>
+
 #include "AdSaver.cc"
 #include "EventReader.cc"
 #include "FlasherCut.cc"
