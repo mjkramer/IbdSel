@@ -1,0 +1,134 @@
+#+PROPERTY: header-args:jupyter-python+ :async t
+#+PROPERTY: header-args:jupyter-python+ :session /global/u2/m/mkramer/.local/share/jupyter/runtime/kernel-39333.json
+
+* Session setup
+Use a python from any environment that has the jupyter_client package:
+
+#+begin_src emacs-lisp :results silent
+(setq python-shell-interpreter "/global/homes/m/mkramer/.conda/envs/ibdsel1/bin/python")
+#+end_src
+
+Launch a jupyter console. Get the connection file:
+
+#+begin_src python
+import ipykernel
+ipykernel.get_connection_file()
+#+end_src
+
+Paste that as the :session at the top of the file. Hit ~C-c C-c~ on the first line.
+
+** Troubleshooting
+Use ~jupyter kernelspec list~ to see list of kernels, select one using ~jupyter console --kernel=<kernel>~. If the kernel isn't working right (e.g., not using the sys.executable/path for the virtualenv), try ~python3 -m ipykernel install [--user]~.
+
+* HACK HACK HACK
+When we import ROOT, it imports JupyROOT, which somehow borks tab-completion in the jupyter console (we get spammed with 'variable "blah" not defined'). We don't need JupyROOT (since we're not in a notebook), so let's just override it with a dummy module:
+
+#+begin_src jupyter-python :results silent
+import os, atexit, sys
+from tempfile import mkdtemp
+
+tmpdir = mkdtemp()
+open(os.path.join(tmpdir, 'JupyROOT.py'), 'w').write('\n')
+sys.path.insert(0, tmpdir)
+atexit.register(lambda: os.system(f'rm -rf {tmpdir}'))
+
+# prevent ROOT from doing "%gui ROOT", which won't work w/o JupyROOT
+import ROOT
+ROOT.PyConfig.StartGuiThread = False
+#+end_src
+
+* Imports
+#+begin_src jupyter-python :results silent
+import os
+import pandas as pd
+from root_pandas import read_root
+# from rootpy.io import root_open
+
+# import logging
+# logging.getLogger('parso.python.diff').disabled = True
+#+end_src
+
+* pandas integer formatting with commas
+#+begin_src jupyter-python :results silent
+import pandas.io.formats.format as pf
+
+class IntArrayFormatter(pf.GenericArrayFormatter):
+    def _format_strings(self):
+        formatter = self.formatter or '{:,d}'.format
+        fmt_values = [formatter(x) for x in self.values]
+        return fmt_values
+pf.IntArrayFormatter = IntArrayFormatter
+
+pd.set_option('display.max_rows', 75)
+pd.set_option('display.max_columns', 160)
+pd.set_option('display.expand_frame_repr', False)
+#+end_src
+
+* Paging
+#+begin_src jupyter-python :results silent
+def pg():
+    i = pg.i
+    pg.i += 70
+    return df.iloc[i:(i+70)]
+pg.i = 0
+#+end_src
+
+* Input helpers
+#+begin_src jupyter-python :results silent
+DATA_ROOT = '/global/homes/m/mkramer/mywork/ThesisAnalysis/IbdSel/data'
+DEFAULT_TAG = '2020_01_26'
+
+def fbf1_path(site, runno, fileno, tag=DEFAULT_TAG):
+    subdir = runno // 100 * 100
+    return os.path.join(DATA_ROOT, 'stage1_fbf', tag,
+                        f'EH{site}', f'{subdir:07d}', f'{runno:07d}',
+                        f'stage1.fbf.eh{site}.{runno:07d}.{fileno:04d}.root')
+
+def dbd1_path(site, day, tag=DEFAULT_TAG):
+    return os.path.join(DATA_ROOT, 'stage1_dbd', tag,
+                        f'EH{site}',
+                        f'stage1.dbd.eh{site}.{day:04d}.root')
+
+def fbf1_data(site, runno, fileno, dets, tag=DEFAULT_TAG):
+    path = fbf1_path(site, runno, fileno, tag)
+    return read_data(path, site, dets)
+
+def dbd1_data(site, day, dets, tag=DEFAULT_TAG):
+    path = dbd1_path(site, day, tag)
+    return read_data(path, site, dets)
+
+def read_data(path, site, dets):
+    dets = [dets] if type(dets) is int else dets
+    df_mu = read_root(path, 'muons')
+    df_phys = [read_root(path, f'physics_AD{det}').assign(detector=det)
+               for det in dets]
+
+    col_order = ['runNo', 'fileNo', 'trigSec', 'trigNanoSec', 'detector', 'strength', 'trigNo', 'energy']
+    sort_order = ['trigSec', 'trigNanoSec']
+
+    return pd.concat([df_mu, *df_phys], sort=True)[col_order] \
+             .sort_values(sort_order) \
+             .reset_index(drop=True)
+#+end_src
+
+* Analysis helpers
+#+begin_src jupyter-python :results silent
+def find_muon(t_mu: str):
+    tS, tNS = map(int, t_mu.split('.'))
+    return df.query(f'trigSec == {tS} and trigNanoSec == {tNS}')
+
+def scan_muon(t_mu: str, n_before = 30, n_after = 40):
+    idx = find_muon(t_mu).index[0]
+    print(idx)
+    return df.loc[(idx - n_before) : (idx + n_after)]
+#+end_src
+
+* Muon dt distribution
+#+begin_src jupyter-python
+muons = df.query('strength == strength')  # hack: removes NaN
+diffs = muons[['trigSec', 'trigNanoSec']].diff().dropna()
+diffs_us = diffs.trigSec * 1e6 + diffs.trigNanoSec * 1e-3
+#+end_src
+
+#+RESULTS:
+: # Out[75]:
