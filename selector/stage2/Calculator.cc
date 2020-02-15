@@ -180,9 +180,9 @@ double Calculator::accDaily(Det detector)
   const double postDelayedEmptyWindow = 1e-6 * MultCutTool::IBD_USEC_AFTER;
 
   // sanity checks, assuming standard DMC
-  assert(promptWindow == 200e-6);
-  assert(prePromptWindowEmptyWindow == 200e-6);
-  assert(postDelayedEmptyWindow == 200e-6);
+  assert(fabs(promptWindow - 200e-6) < 1e-15);
+  assert(fabs(prePromptWindowEmptyWindow - 200e-6) < 1e-15);
+  assert(fabs(postDelayedEmptyWindow - 200e-6) < 1e-15);
 
   const double probOnePro = (Rpro * promptWindow) * exp(-Rpro * promptWindow);
   const double probZeroPreMu = exp(-RpreMu * promptWindow);
