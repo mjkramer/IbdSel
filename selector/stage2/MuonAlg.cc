@@ -27,7 +27,7 @@ void MuonAlg::initCuts(const Config* config)
   END_CONFIG();
 }
 
-void MuonAlg::log(const MuonTree& muon, Time t, Det det, const char* msg)
+void MuonAlg::log(const char* msg, Det det, Time t, const MuonTree* muon) const
 {
   const bool forIBDs = purpose == Purpose::ForIBDs;
   const char* selName = forIBDs ? "IBDs" : "singles";
@@ -38,10 +38,13 @@ void MuonAlg::log(const MuonTree& muon, Time t, Det det, const char* msg)
 
   const AdTree& delayed = sel->getCurrent();
 
-  std::cerr << Form("MuonAlg (%s) %d %d, T_mu %d.%d, AD%d trig %d: %s\n",
+  const char* maybeMuonTime =
+    muon ? Form(", T_mu %d.%d", muon->time().s, muon->time().ns)
+         : "";
+
+  std::cerr << Form("MuonAlg (%s) %d %d, AD%d trig %d%s: %s\n",
                     selName, delayed.runNo, delayed.fileNo,
-                    muon.time().s, muon.time().ns,
-                    det, delayed.trigNo, msg);
+                    det, delayed.trigNo, maybeMuonTime, msg);
 }
 
 void MuonAlg::connect(Pipeline& p)
@@ -141,9 +144,7 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
 
 bool MuonAlg::isVetoed(Time t, Det detector) const
 {
-  bool xfirst = true;
-  const char* xpurp = (purpose == Purpose::ForIBDs) ? "IBDs" : "singles";
-  const char* xheader = Form("AD%d %s: ", int(detector), xpurp);
+  bool first = true;
 
   const size_t idet = size_t(detector) - size_t(Det::AD1);
   size_t i = lastBufDepth[idet];
@@ -159,17 +160,16 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
     const auto& muon = muonBuf.at(i);
     const float dt_us = t.diff_us(muon.time());
 
-    if (xfirst) {
-      xfirst = false;
-      if (dt_us > -muPreVeto_us) {
-        std::cout << xheader << Form("MuonAlg is behind! %.3f", dt_us) << std::endl;
-      }
+    if (first) {
+      first = false;
+      if (dt_us > -muPreVeto_us)
+        log(Form("MuonAlg is behind! %.3f", dt_us),
+            detector, t, &muon);
     }
 
 
-    if (showerMuPostVeto_us < dt_us) {  // no more muons worth checking
+    if (showerMuPostVeto_us < dt_us)  // no more muons worth checking
       return false;
-    }
 
     if (dt_us < -muPreVeto_us)  // way-after-event muon
       continue;
@@ -188,9 +188,8 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
     }
   }
 
-  if (muonBuf.full()) {
-    std::cout << xheader << "MuonAlg is exhausted!" << std::endl;
-  }
+  if (muonBuf.full())
+    log("MuonAlg is exhausted!", detector, t);
 
   return false;
 }
