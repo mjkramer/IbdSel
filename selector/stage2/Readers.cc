@@ -1,16 +1,15 @@
 #include "Readers.hh"
 
 MuonReader::MuonReader() :
-  TimeSyncReader({"muons"})
+  TimeSyncReader({"muons"}, ClockMode::ClockReader)
 {
-  setClockMode(ClockMode::ClockReader);
-  setLeadtime_us(4'500'000);
+  leadtime_us = 4'500'000;
 }
 
 // -----------------------------------------------------------------------------
 
-AdReader::AdReader(Det det, bool clockWriter) :
+AdReader::AdReader(Det det, ClockMode clockMode) :
   TimeSyncReader({Form("physics_AD%d", int(det))},
-                 clockWriter),
+                 clockMode),
   det(det) {}
 

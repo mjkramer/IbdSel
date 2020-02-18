@@ -15,6 +15,8 @@
 
 #include "../external/FukushimaLambertW.cc"
 
+using CM = ClockMode;
+
 void stage2_main(const char* confFile, const char* inFile, const char* outFile,
                  Site site, Phase phase, UInt_t seq)
 {
@@ -35,7 +37,7 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   for (Det detector : allADs) {
     bool lastAD = detector == allADs.back();
 
-    p.makeAlg<AdReader>(detector, lastAD); // ClockWriter if lastAD
+    p.makeAlg<AdReader>(detector, lastAD ? CM::ClockWriter : CM::ClockReader);
     p.makeAlg<AdBuffer>(detector);
 
     p.makeAlg<SingleSel>(detector);

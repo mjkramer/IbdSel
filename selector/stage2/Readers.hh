@@ -15,7 +15,7 @@ public:
 
 class AdReader : public TimeSyncReader<AdTree> {
 public:
-  AdReader(Det det, bool clockWriter = false);
+  AdReader(Det det, ClockMode clockMode);
 
   int rawTag() const override;
   Time timeInTree() override;
