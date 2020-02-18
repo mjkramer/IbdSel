@@ -4,8 +4,7 @@ MuonReader::MuonReader() :
   TimeSyncReader({"muons"})
 {
   setClockMode(ClockMode::ClockReader);
-  setEpsilon_us(3'000'000);
-  setPrefetch_us(4'500'000);
+  setLeadtime_us(4'500'000);
 }
 
 // -----------------------------------------------------------------------------
