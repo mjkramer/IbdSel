@@ -37,7 +37,7 @@ private:
   float nomPostVeto_us(const MuonTree& e) const;
   float effVeto_us(const MuonTree& e, size_t idet) const;
 
-  Purpose purpose;
+  const Purpose purpose;
 
   double muPreVeto_us = 2;
 
@@ -49,6 +49,8 @@ private:
 
   double showerMuChgCut = 300'000 ;
   double showerMuPostVeto_us = 400'400;
+
+  bool vetoAroundGaps = false;
 
   Time lastWpTime;
   Time lastAdTime[4];

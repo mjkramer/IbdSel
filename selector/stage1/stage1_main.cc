@@ -2,17 +2,19 @@
 #undef NDEBUG
 #include <cassert>
 
-#include "AdSaver.cc"
-#include "EventReader.cc"
-#include "FlasherCut.cc"
-#include "LivetimeSaver.cc"
-#include "MuonSaver.cc"
-#include "TrigTypeCut.cc"
+#include "stage1_main.hh"
 
-#include "../common/common_deps.cc"
+#include "AdSaver.hh"
+#include "EventReader.hh"
+#include "FlasherCut.hh"
+#include "LivetimeSaver.hh"
+#include "MuonSaver.hh"
+#include "TrigTypeCut.hh"
 
 #include <string>
 #include <vector>
+
+#include "../common/Misc.hh"
 
 void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase)
 {

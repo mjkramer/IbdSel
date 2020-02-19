@@ -6,3 +6,4 @@ dbg/
 *.root
 yasu/
 .ccls-cache/
+_build/

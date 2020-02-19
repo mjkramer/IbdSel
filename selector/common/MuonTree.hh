@@ -3,6 +3,7 @@
 #include "Constants.hh"
 
 #include "../SelectorFramework/core/BaseIO.hh"
+#include "../SelectorFramework/core/Util.hh"
 
 class MuonTree : public TreeBase {
 public:
@@ -17,11 +18,3 @@ public:
 
   void initBranches() override;
 };
-
-void MuonTree::initBranches()
-{
-  BR(detector);
-  BR(trigSec);
-  BR(trigNanoSec);
-  BR(strength);
-}

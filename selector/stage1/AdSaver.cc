@@ -1,3 +1,5 @@
+#include "AdSaver.hh"
+
 #include "EventReader.hh"
 #include "MuonSaver.hh"
 
@@ -7,23 +9,6 @@
 
 #include "../SelectorFramework/core/SimpleAlg.hh"
 #include "../SelectorFramework/core/TreeWriter.hh"
-
-class AdSaver : public SimpleAlg<EventReader> {
-public:
-  AdSaver(Det det);
-  void connect(Pipeline& pipeline) override;
-  Algorithm::Status consume(const algdata_t<EventReader>& e) override;
-
-  const Det det;
-
-private:
-  void save(const algdata_t<EventReader>& e);
-  std::tuple<UInt_t, UShort_t> runAndFile() const;
-
-  TreeWriter<AdTree> tree;
-
-  const MuonSaver* muonSaver;
-};
 
 AdSaver::AdSaver(Det det) :
   det(det),

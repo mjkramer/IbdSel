@@ -17,14 +17,3 @@ public:
 
   void initBranches() override;
 };
-
-void AdTree::initBranches()
-{
-  BR(trigSec);
-  BR(trigNanoSec);
-  BR(energy);
-
-  BR(trigNo);
-  BR(runNo);
-  BR(fileNo);
-}

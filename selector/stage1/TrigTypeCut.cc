@@ -1,6 +1,4 @@
-#include "EventReader.hh"
-
-#include "../SelectorFramework/core/SimpleAlg.hh"
+#include "TrigTypeCut.hh"
 
 Algorithm::Status trigTypeCut(const EventReader::Data& e)
 {
@@ -20,5 +18,3 @@ Algorithm::Status trigTypeCut(const EventReader::Data& e)
 
   return Algorithm::Status::Continue;
 }
-
-using TrigTypeCut = PureAlg<EventReader, trigTypeCut>;

@@ -11,11 +11,3 @@ public:
 
   void initBranches() override;
 };
-
-void IbdTree::initBranches()
-{
-  BR(runNo);
-  BR(fileNo);
-  BR(trigP);
-  BR(trigD);
-}

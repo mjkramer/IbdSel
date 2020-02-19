@@ -2,18 +2,18 @@
 #undef NDEBUG
 #include <cassert>
 
-#include "AdBuffer.cc"
-#include "CalcsTree.cc"
-#include "Calculator.cc"
-#include "Li9Calc.cc"
-#include "MultCut.cc"
-#include "MuonAlg.cc"
-#include "Readers.cc"
-#include "Selectors.cc"
+#include "stage2_main.hh"
 
-#include "../common/common_deps.cc"
+#include "AdBuffer.hh"
+#include "CalcsTree.hh"
+#include "Calculator.hh"
+#include "Li9Calc.hh"
+#include "MultCut.hh"
+#include "MuonAlg.hh"
+#include "Readers.hh"
+#include "Selectors.hh"
 
-#include "../external/FukushimaLambertW.cc"
+#include "../common/Misc.hh"
 
 using CM = ClockMode;
 

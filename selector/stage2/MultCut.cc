@@ -44,17 +44,3 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
 
   return true;
 }
-
-inline bool MultCutTool::ibdDmcOk(Iter itP, Iter itD, Det det) const
-{
-  Cuts cuts {IBD_USEC_BEFORE, IBD_USEC_AFTER, PROMPT_MIN, DELAYED_MIN,
-    DELAYED_MAX};
-  return dmcOk(itP, itD, det, cuts, muonAlgIBDs);
-}
-
-inline bool MultCutTool::singleDmcOk(Iter it, Det det) const
-{
-  Cuts cuts {SINGLE_USEC_BEFORE, SINGLE_USEC_AFTER, PROMPT_MIN, PROMPT_MIN,
-    std::numeric_limits<float>::max()};
-  return dmcOk(std::nullopt, it, det, cuts, muonAlgSingles);
-}

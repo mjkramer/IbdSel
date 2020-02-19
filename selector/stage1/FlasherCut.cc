@@ -1,6 +1,4 @@
-#include "EventReader.hh"
-
-#include "../SelectorFramework/core/SimpleAlg.hh"
+#include "FlasherCut.hh"
 
 Algorithm::Status flasherCut(const EventReader::Data& e)
 {
@@ -13,4 +11,3 @@ Algorithm::Status flasherCut(const EventReader::Data& e)
 #undef SQ
 }
 
-using FlasherCut = PureAlg<EventReader, flasherCut>;
