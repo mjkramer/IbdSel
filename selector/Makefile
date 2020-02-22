@@ -62,11 +62,17 @@ all_cache_of = $($(1)_OBJS) $($(1)_DEPS) $($(1)_DICTS)
 all_cache_dirs := $(foreach p,$(ALL_PRODUCTS),$(dir $(call all_cache_of,$(p))))
 $(shell mkdir -p $(sort $(all_cache_dirs)))
 
+# We produce/rename .dep.tmp instead of directly producing .dep so that we don't
+# end up having Make read in a truncated .dep from an interrupted build
+.PRECIOUS: $(OBJS_DIR)/%.o
 $(OBJS_DIR)/%.o: %.cc $(DEPS_DIR)/%.dep
 	$(CC) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
 	mv -f $(DEPS_DIR)/$*.dep.tmp $(DEPS_DIR)/$*.dep
+	@# ensure .o is newer than .dep:
+	touch $@
 
 # It seems that dicts don't work unless they follow this exact filename scheme.
+.PRECIOUS: $(DICTS_DIR)/%_hh_ACLiC_dict.o
 $(DICTS_DIR)/%_hh_ACLiC_dict.o: %.hh $(DICTS_DIR)/%_LinkDef.h
 	rootcling -f $(DICTS_DIR)/$*_hh_ACLiC_dict.cxx -multiDict -s $(LIBNAME) $(EXTRA_INC) $^
 	$(CC) $(CFLAGS) -c -I. $(DICTS_DIR)/$*_hh_ACLiC_dict.cxx -o $@
@@ -75,14 +81,8 @@ $(DICTS_DIR)/%_hh_ACLiC_dict.o: %.hh $(DICTS_DIR)/%_LinkDef.h
 $(DICTS_DIR)/%_LinkDef.h:
 	$(shell sed 's!PLACEHOLDER!$*.hh!' cling/LinkDef.h > $@)
 
-$(BUILD_DIR)/common.so: $(common_OBJS) $(common_DICTS)
-$(BUILD_DIR)/stage1.so: $(stage1_OBJS) $(stage1_DICTS)
-$(BUILD_DIR)/stage2.so: $(stage2_OBJS) $(stage2_DICTS)
-
-# $(BUILD_DIR)/%.so: $(call objs_of,%) $(call dicts_of,%)
-# 	$(LD) $(LDFLAGS) $^ -o $@
-
-%.so:
+.SECONDEXPANSION:
+$(BUILD_DIR)/%.so: $$($$*_OBJS) $$($$*_DICTS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 .PHONY: clean
