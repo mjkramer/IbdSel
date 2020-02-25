@@ -27,13 +27,32 @@ CLOSED: [2020-01-28 Tue 17:03]
 ** TODO Do one fit, to test
 ** TODO Do another N fits
 
-* Usage with PyROOT
+* ROOT stuff
+** Usage with PyROOT
 ...(for, e.g., using test_candidates.py)
 With current janky environment, do not compile C++ from within PyROOT! The "wrong" dynamic libs get linked in. Compile code from "plain" ROOT, then load the .so from PyROOT. This applies to things like test/FileFinder.cc too.
 
-* PyROOT bugs
-- [[https://sft.its.cern.ch/jira/browse/ROOT-7240][Scoped enums]]
+** PyROOT bugs
+- [[https://sft.its.cern.ch/jira/browse/ROOT-7240][Scoped enums]] (also [[https://root-forum.cern.ch/t/enumerator-classes-available-in-root-using-linkdef/30728][roottalk]])
 
+** Compiling, linking, dictionaries
+*** Magic environment variables
+- CPLUS_INCLUDE_PATH
+- ROOT_INCLUDE_PATH
+*** Magic macros
+- R__LOAD_LIBRARY
+- R__ADD_INCLUDE_PATH
+- R__ADD_LIBRARY_PATH
+*** References
+- [[https://root-forum.cern.ch/t/shared-libraries-in-root-6-06-04/22270]]
+- https://root-forum.cern.ch/t/gsystem-load-vs-r-load-library-with-aclic/29685
+- https://root-forum.cern.ch/t/makefile-with-gsl-libraries/32024
+- https://root-forum.cern.ch/t/symbol-gsl-sf-bessel-j0-unresolved-while-linking-cling-interface-function/31577
+- https://root-forum.cern.ch/t/undefined-symbols-for-architecture-x86-64/33922
+- https://root-forum.cern.ch/t/weird-error-output-from-cling/19410
+- https://root-forum.cern.ch/t/rootmap-generation-with-rootcling-v6-00-00/17758
+- https://root-forum.cern.ch/t/how-to-load-an-shared-object-that-also-depends-on-clang-llvm-in-cling/38054
+- https://sft.its.cern.ch/jira/browse/ROOT-6325
 * Multiple input files?
 Problem is in stage1: AdSaver needs to be able to know when the input file has changed so that it can update the run/file in the output tree. SyncReader needs to be able to notify downstream algs when the input file changes to the next one in the chain. Stage2 is fine as-is.
 
