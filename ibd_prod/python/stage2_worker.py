@@ -10,14 +10,16 @@ from prod_util import stage1_dbd_path, stage2_dbd_path, configfile_path
 from zmq_fan import ZmqListReader, ZmqListWriter
 
 def process(site, day, tag, config):
+    configpath = configfile_path(tag, config)
     inpath = stage1_dbd_path(site, day, tag)
     outpath = stage2_dbd_path(site, day, tag, config)
-    configpath = configfile_path(tag, config)
+    phase = phase_for_day(day)
+
     os.system('mkdir -p %s' % os.path.dirname(outpath))
 
-    phase = phase_for_day(day)
-    call = f'cling/run_stage2.C(\\"{configpath}\\", \\"{inpath}\\", \\"{outpath}\\", {site}, {phase}, {day})'
-    os.system(f'time root -l -b -q "{call}"')
+    exe = os.getenv('IBDSEL_HOME') + '/selector/_build/stage2.exe'
+    cmd = f'{exe} {configpath} {inpath} {outpath} {site} {phase} {day}'
+    os.system(f'time {cmd}')
 
 def main():
     ap = argparse.ArgumentParser()

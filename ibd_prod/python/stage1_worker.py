@@ -11,12 +11,14 @@ from zmq_fan import ZmqListReader, ZmqListWriter
 
 def process(path, tag):
     runno, fileno, site = parse_path(path)
+    phase = phase_for_run(runno)
     outpath = stage1_fbf_path(site, runno, fileno, tag)
+
     os.system('mkdir -p %s' % os.path.dirname(outpath))
 
-    phase = phase_for_run(runno)
-    call = f'cling/run_stage1.C(\\"{path}\\", \\"{outpath}\\", {site}, {phase})'
-    os.system(f'time root -l -b -q "{call}"')
+    exe = os.getenv('IBDSEL_HOME') + '/selector/_build/stage1.exe'
+    cmd = f'{exe} {path} {outpath} {site} {phase}'
+    os.system(f'time {cmd}')
 
 def main():
     ap = argparse.ArgumentParser()

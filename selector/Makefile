@@ -16,11 +16,11 @@ common: $(BUILD_DIR)/common.so
 common: LIBNAME = common
 
 .PHONY: stage1
-stage1: $(BUILD_DIR)/stage1.so common
+stage1: $(BUILD_DIR)/stage1.exe $(BUILD_DIR)/stage1.so
 stage1: LIBNAME = stage1
 
 .PHONY: stage2
-stage2: $(BUILD_DIR)/stage2.so common
+stage2: $(BUILD_DIR)/stage2.exe $(BUILD_DIR)/stage2.so
 stage2: LIBNAME = stage2
 
 CC := g++
@@ -35,7 +35,7 @@ endif
 BOOST_HOME ?= /global/homes/m/mkramer/dunescratch/opt-cori/include
 EXTRA_INC  := -I$(shell root-config --incdir) -I$(BOOST_HOME)
 CFLAGS     += $(shell root-config --cflags) $(EXTRA_INC) -fPIC -fsigned-char -pipe
-LDFLAGS    += $(shell root-config --ldflags --libs) -shared
+LDFLAGS    += $(shell root-config --ldflags --libs)
 
 CACHE_DIR := $(BUILD_DIR)/_cache
 OBJS_DIR  := $(CACHE_DIR)/objs
@@ -82,8 +82,12 @@ $(DICTS_DIR)/%_LinkDef.h:
 	$(shell sed 's!PLACEHOLDER!$*.hh!' cling/LinkDef.h > $@)
 
 .SECONDEXPANSION:
+
 $(BUILD_DIR)/%.so: $$($$*_OBJS) $$($$*_DICTS)
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $(LDFLAGS) $^ -shared -o $@
+
+$(BUILD_DIR)/%.exe: $$*/$$*_exe.cpp $(BUILD_DIR)/$$*.so $(BUILD_DIR)/common.so
+	$(CC) $(CFLAGS) $(LDFLAGS) -L$(BUILD_DIR) -l:$*.so -l:common.so $< -o $@
 
 .PHONY: clean
 clean:

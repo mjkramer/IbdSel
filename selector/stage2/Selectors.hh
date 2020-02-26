@@ -18,7 +18,11 @@ public:
 
   void connect(Pipeline& p) override;
   Algorithm::Status consume_iter(Iter it) final;
-  const AdTree& getCurrent() const; // for logging purposes
+  const AdTree& getCurrent() const // for logging purposes
+  {
+    return *current;
+  }
+
 
   virtual void select(Iter it) = 0;
 

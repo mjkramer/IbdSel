@@ -27,12 +27,6 @@ Algorithm::Status SelectorBase::consume_iter(Iter it)
   return Status::Continue;
 }
 
-inline
-const AdTree& SelectorBase::getCurrent() const
-{
-  return *current;
-}
-
 // ----------------------------------------------------------------------
 
 SingleSel::SingleSel(Det det) :
