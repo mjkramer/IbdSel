@@ -2,6 +2,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <algorithm>
 #include <stdexcept>
 
 namespace util {
@@ -30,6 +31,15 @@ std::vector<Det> ADsFor(Site site, Phase phase)
   }
 
   throw std::runtime_error("Invalid site/phase in ADsFor");
+}
+
+std::vector<size_t> iADsFor(Site site, Phase phase)
+{
+  const auto ADs = ADsFor(site, phase);
+  std::vector<size_t> result;
+  std::transform(ADs.begin(), ADs.end(), result.begin(),
+                 [](Det d) { return size_t(d) - 1;});
+  return result;
 }
 
 std::tuple<UInt_t, UShort_t> runAndFile(const std::string& path)
