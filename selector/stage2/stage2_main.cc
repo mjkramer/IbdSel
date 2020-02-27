@@ -1,7 +1,3 @@
-// Force assertion checks, even in non-debug builds
-#undef NDEBUG
-#include <cassert>
-
 #include "stage2_main.hh"
 
 #include "AdBuffer.hh"
@@ -32,10 +28,9 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   p.makeAlg<PrefetchLooper<MuonReader>>(); // build up a lookahead buffer
 
   std::vector<Det> allADs = util::ADsFor(site, phase);
-  // std::reverse(allADs.begin(), allADs.end()); // XXX
 
-  for (Det detector : allADs) {
-    bool lastAD = detector == allADs.back();
+  for (const Det detector : allADs) {
+    const bool lastAD = detector == allADs.back();
 
     p.makeAlg<AdReader>(detector, lastAD ? CM::ClockWriter : CM::ClockReader);
     p.makeAlg<AdBuffer>(detector);

@@ -1,7 +1,3 @@
-// Force assertion checks, even in non-debug builds
-#undef NDEBUG
-#include <cassert>
-
 #include "stage1_main.hh"
 
 #include "AdSaver.hh"
