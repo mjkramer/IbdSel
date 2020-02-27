@@ -243,3 +243,23 @@ def scale(k, l):
 - 20 proc-secs per hall-day on Haswell (interactive)
 - 5676 hall-days * 20 = 113520 seconds = 31.5 hours
 - So to make it an overnighter, launch 6 processes in a screen
+* Interactive node performance (for regression testing)
+Note: Make sure cache is warm, run repeatedly till times converge
+** Commands
+- stage1, 21221 / 1:
+#+begin_src bash
+time tests/test_stage1.sh 21221 1 1 1
+#+end_src
+- stage2, 21221 / 1:
+#+begin_src bash
+time tests/test_stage1.sh 1 1
+#+end_src
+- stage1, day 1 EH1 (151 files):
+#+begin_src bash
+time _build/stage2.exe ../static/configs/config.nominal.txt ../../data/stage1_dbd/2020_01_26/EH1/stage1.dbd.eh1.0001.root out_day1.root 1 1 1
+#+end_src
+** Results
+*** 55e547e7
+- stage1, 21221 / 1:    2.5 - 2.9 sec
+- stage2, 21221 / 1:    0.8 sec
+- stage1, day 1 EH1:    28 sec = 0.185 sec/file
