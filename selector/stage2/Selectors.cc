@@ -2,6 +2,8 @@
 #include "MultCut.hh"
 #include "MuonAlg.hh"
 
+#include "../SelectorFramework/core/Assert.hh"
+
 #include <TH1F.h>
 
 SelectorBase::SelectorBase(Det det, MuonAlg::Purpose purpose) :
@@ -14,7 +16,7 @@ void SelectorBase::connect(Pipeline &p)
   BufferedSimpleAlg<AdBuffer, Det>::connect(p);
 
   muonAlg = p.getAlg<MuonAlg>(purpose);
-  assert(muonAlg->rawTag() == int(purpose));
+  ASSERT(muonAlg->rawTag() == int(purpose));
 
   multCut = p.getTool<MultCutTool>();
 }

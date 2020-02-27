@@ -1,14 +1,15 @@
 #include "MultCut.hh"
 
-#include <cassert>
+#include "../SelectorFramework/core/Assert.hh"
+
 #include <limits>
 
 void MultCutTool::connect(Pipeline& pipeline)
 {
   muonAlgIBDs = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForIBDs);
-  assert(muonAlgIBDs->rawTag() == int(MuonAlg::Purpose::ForIBDs));
+  ASSERT(muonAlgIBDs->rawTag() == int(MuonAlg::Purpose::ForIBDs));
   muonAlgSingles = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForSingles);
-  assert(muonAlgSingles->rawTag() == int(MuonAlg::Purpose::ForSingles));
+  ASSERT(muonAlgSingles->rawTag() == int(MuonAlg::Purpose::ForSingles));
 }
 
 bool MultCutTool::dmcOk(std::optional<Iter> optItP,

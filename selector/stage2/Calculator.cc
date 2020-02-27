@@ -9,6 +9,7 @@
 
 #include "external/FukushimaLambertW.hh"
 
+#include "../SelectorFramework/core/Assert.hh"
 #include "../SelectorFramework/core/Kernel.hh"
 
 #include <TH1F.h>
@@ -140,9 +141,9 @@ double Calculator::accDaily(Det detector)
   const double postDelayedEmptyWindow = 1e-6 * MultCutTool::IBD_USEC_AFTER;
 
   // sanity checks, assuming standard DMC
-  assert(fabs(promptWindow - 200e-6) < 1e-15);
-  assert(fabs(prePromptWindowEmptyWindow - 200e-6) < 1e-15);
-  assert(fabs(postDelayedEmptyWindow - 200e-6) < 1e-15);
+  ASSERT(fabs(promptWindow - 200e-6) < 1e-15);
+  ASSERT(fabs(prePromptWindowEmptyWindow - 200e-6) < 1e-15);
+  ASSERT(fabs(postDelayedEmptyWindow - 200e-6) < 1e-15);
 
   const double probOnePro = (Rpro * promptWindow) * exp(-Rpro * promptWindow);
   const double probZeroPreMu = exp(-RpreMu * promptWindow);
