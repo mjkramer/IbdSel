@@ -13,9 +13,14 @@
 
 using CM = ClockMode;
 
+namespace stage2 { Site site; Phase phase; }
+
 void stage2_main(const char* confFile, const char* inFile, const char* outFile,
                  Site site, Phase phase, UInt_t seq)
 {
+  stage2::site = site;
+  stage2::phase = phase;
+
   Pipeline p;
 
   p.makeOutFile(outFile);
