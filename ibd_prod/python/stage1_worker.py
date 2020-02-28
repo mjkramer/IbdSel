@@ -5,7 +5,7 @@
 
 import os, argparse, random
 
-from prod_util import parse_path, sysload, phase_for_run
+from prod_util import parse_path, sysload, phase_for_run, unbuf_stdout
 from prod_util import stage1_fbf_path, worker_timeout_mins
 from zmq_fan import ZmqListReader, ZmqListWriter
 
@@ -18,6 +18,7 @@ def process(path, tag):
 
     exe = os.getenv('IBDSEL_HOME') + '/selector/_build/stage1.exe'
     cmd = f'{exe} {path} {outpath} {site} {phase}'
+    print(cmd)
     os.system(f'time {cmd}')
 
 def main():
@@ -36,4 +37,5 @@ def main():
             logger.log(path)
 
 if __name__ == '__main__':
+    unbuf_stdout()
     main()
