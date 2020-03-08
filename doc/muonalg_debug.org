@@ -6,6 +6,7 @@ Use a python from any environment that has the jupyter_client package:
 
 #+begin_src emacs-lisp :results silent
 (setq python-shell-interpreter "/global/homes/m/mkramer/.conda/envs/ibdsel1/bin/python")
+(setq ob-ipython-command "/global/homes/m/mkramer/.conda/envs/ibdsel1/bin/jupyter")
 #+end_src
 
 Launch a jupyter console. Get the connection file:
