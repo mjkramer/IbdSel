@@ -123,6 +123,11 @@ def stage2_dbd_path(site, day, tag, config):
                         f'EH{site}',
                         f'stage2.dbd.eh{site}.{day:04d}.root')
 
+def stage2_pbp_path(site, phase, tag, config):
+    phasename = ['6AD', '8AD', '7AD'][phase-1]
+    return os.path.join(data_dir('stage2_pbp', f'{tag}@{config}'),
+                        f'stage2.pbp.eh{site}.{phasename}.root')
+
 def configfile_path(tag, config):
     return os.path.join(data_dir('stage2_input', f'{tag}@{config}'),
                         f'config.{config}.txt')
