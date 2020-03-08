@@ -1,0 +1,10 @@
+* Knowns
+- EH1-AD1 events occur every few dozen ms on average
+:COMMENT:
+This implies that, with an AdReader leadtime of 2 ms, different AdReaders will typically be within O(1) triggers of each other.
+:END:
+
+* Current parameters
+- AdBuffer size: 2 ms
+- AdReader leadtime: 2 ms
+- MuonReader leadtime: 4.5 sec
