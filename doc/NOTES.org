@@ -27,6 +27,8 @@ CLOSED: [2020-01-28 Tue 17:03]
 ** TODO Do one fit, to test
 ** TODO Do another N fits
 
+** Refactorings?
+- Add a <TagT> parameter to Node?
 * ROOT stuff
 ** Usage with PyROOT
 ...(for, e.g., using test_candidates.py)
@@ -53,18 +55,46 @@ With current janky environment, do not compile C++ from within PyROOT! The "wron
 - https://root-forum.cern.ch/t/rootmap-generation-with-rootcling-v6-00-00/17758
 - https://root-forum.cern.ch/t/how-to-load-an-shared-object-that-also-depends-on-clang-llvm-in-cling/38054
 - https://sft.its.cern.ch/jira/browse/ROOT-6325
+** jupyter console
+In ROOT.py, the inputhook-based event loop won't work, so use the old threading-based approach instead. Also, JupyROOT messes up tab-completion so don't import it. Patch ROOT.py like:
+#+begin_src diff
+--- ROOT.py.bak	2019-06-25 01:52:11.000000000 -0700
++++ ROOT.py	2020-03-07 20:48:29.853977716 -0800
+@@ -767,7 +767,9 @@
+     # use either the input hook or thread to send events to GUIs
+       if self.PyConfig.StartGuiThread and \
+             not ( self.keeppolling or _root.gROOT.IsBatch() ):
+-         if _is_ipython and 'IPython' in sys.modules and sys.modules['IPython'].version_info[0] >= 5 :
++         if (not os.getenv('NO_JUPYROOT') and
++             _is_ipython and 'IPython' in sys.modules and sys.modules['IPython'].version_info[0] >= 5):
++
+             from IPython.terminal import pt_inputhooks
+             import time
+             def _inputhook(context):
+@@ -830,7 +832,7 @@
+ if _is_ipython:
+    from IPython import get_ipython
+    ip = get_ipython()
+-   if hasattr(ip,"kernel"):
++   if hasattr(ip,"kernel") and not os.getenv('NO_JUPYROOT'):
+       import JupyROOT
+       import JsMVA
+
+#+end_src
+and set the NO_JUPYROOT env var when launching console/kernel.
 * Multiple input files?
 Problem is in stage1: AdSaver needs to be able to know when the input file has changed so that it can update the run/file in the output tree. SyncReader needs to be able to notify downstream algs when the input file changes to the next one in the chain. Stage2 is fine as-is.
 
-* Environment setup
+* Running the chain
+** Environment setup
 Start with a fresh login. Then
 #+begin_src bash
 source bash/job_env.inc.sh
 #+end_src
 Now you are in the same environment that jobs will run in. Includes Python 3.7, ROOT 6.18, Pandas. It's OK to submit jobs from a different environment, as we whitelist the env vars that get exported to the job. However, for doing things interactively, it's a good idea to use the job environment.
 
-* Testing stage1
-** Generating smaller input
+** Testing stage1
+*** Generating smaller input
 #+begin_src bash
 # First 10 files:
 scripts/prep_stage1.sh -f "head -n -10" $tag
@@ -73,41 +103,41 @@ scripts/prep_stage1.sh -f "head -n -10" $tag
 scripts/prep_stage1.sh -f "shuf -n 10" $tag
 #+end_src
 
-** Running interactively (one process)
+*** Running interactively (one process)
 #+begin_src bash
 newenv
 bash/stage1_job.sh $tag
 #+end_src
 
-** Checking sbatch command
+*** Checking sbatch command
 Set IBDSEL_DRYRUN=1 when running submit_stage1_foo.sh
 
-** Testing on batch
+*** Testing on batch
 #+begin_src bash
 # $sys is either knl or hsw
 tests/submit_stage1_debug_$sys.sh $tag
 #+end_src
 
-** Cleaning up
+*** Cleaning up
 eval `scripts/clear.sh stage1 $tag`
 
-* Submitting stage1
+** Submitting stage1
 Do everything from ibd_prod directory, within a fresh shell environment
 
-** Safety check
+*** Safety check
 Make sure stage1_main.cc.so is the newest file in selector/, and be sure that you didn't compile it from PyROOT
 
-** Prepare dirs
+*** Prepare dirs
 #+begin_src bash
 scripts/prep_stage1.sh $tag
 #+end_src
 
-** Submit
+*** Submit
 #+begin_src bash
 scripts/submit_stage1_$sys.sh $tag $njob
 #+end_src
 
-** Iterating to completion (not tested)
+*** Iterating to completion (not tested)
 If no jobs are running:
 #+begin_src bash
 scripts/filter_done.sh stage1 $tag
@@ -119,55 +149,64 @@ scripts/filter_done.sh -p $pending stage1 $tag
 #+end_src
 This assumes that all running jobs are processing items drawn from the current version of input.stage1.txt. If that file was updated after a job was launched, and that job has yet to pull any items off the new list, then the above method won't work right. Some files will be omitted even though nobody is processing them, and some in-progress files will be include. If in doubt, just wait for jobs to finish.
 
-** End result
+*** End result
 560k stage1 files in ../../data/stage1_fbf/$tag/EH1/0021200/0021221 etc.
 
-* Merging stage1
-** Prepare input
+** Merging stage1
+*** Prepare input
 #+begin_src bash
 scripts/prep_merge1.sh $tag
 #+end_src
 
-** Running the merge
+*** Running the merge
 #+begin_src bash
 scripts/run_merge1.sh $tag $nproc
 #+end_src
 It's fine to add processes to a running merge. With 8 processes spread between two Cori login nodes, P17B took 4 hours.
 
-** Iterating (not tested)
+*** Iterating (not tested)
 #+begin_src bash
 scripts/filter_done.sh merge1 $tag
 #+end_src
 
-** Checking
+*** Checking
 Grep the logs for CRAPPY. Try to redo stage1 for those files. Those that cannot be resolved should be tagged as bad. (P17B good run list v3 should be 100% viable.)
 
-** Cleanup
+*** Cleanup
 Delete the fbf files
 
-** Preservation
+*** Preservation
 Copy the dbd files to CFS
 
-** End result
+*** End result
 6k daily stage1 files in ../../data/stage1_dbd/$tag/EH1 etc.
 
-* Stage2 testing
-** DONE Run stage2_job.sh interactively, no IBDSEL_CONFIGDIR
+** Stage2 testing
+*** DONE Run stage2_job.sh interactively, no IBDSEL_CONFIGDIR
 CLOSED: [2020-01-31 Fri 21:44]
-** DONE Run stage2_job.sh interactively, set IBDSEL_CONFIGDIR to ../misc/configs and use a "config.altered.txt" in there
+*** DONE Run stage2_job.sh interactively, set IBDSEL_CONFIGDIR to ../misc/configs and use a "config.altered.txt" in there
 CLOSED: [2020-01-31 Fri 23:17]
-** DONE Test in debug QOS
+*** DONE Test in debug QOS
 CLOSED: [2020-02-01 Sat 01:41]
-** TODO Using performance numbers, draft submit_stage2_${sys}_debug.sh
-** TODO Run some benchmarks to determine ideal performance params
-** TODO Update submit_XXX performance params
-** TODO Investigate "MuonAlg is behind!" etc.
-** TODO Investigate discrepancy in number of days between halls
-** TODO Add any needed branches to the IBD trees
-** TODO Submit one full job
+*** DONE Using performance numbers, draft submit_stage2_${sys}_debug.sh
+CLOSED: [2020-03-07 Sat 21:16]
+*** DONE Run some benchmarks to determine ideal performance params
+CLOSED: [2020-03-07 Sat 21:16]
+*** DONE Update submit_XXX performance params
+CLOSED: [2020-03-07 Sat 21:16]
+*** TODO Investigate "MuonAlg is behind!" etc. [1/2]
+- [X] Find culprit
+:notes:
+Seems to be when the next file is missing.
+Or end of a run.
+:END:
+- [ ] Add (optional) shower muon veto before/after gaps?
+*** TODO Investigate discrepancy in number of days between halls
+*** DONE Submit one full job
+CLOSED: [2020-03-07 Sat 21:18]
 
-* Submitting stage2
-** Preparing
+** Submitting stage2
+*** Preparing
 #+begin_src bash
 # if unset, uses ../static/configs (which just has nominal cuts)
 export IBDSEL_CONFIGDIR=some_dir
@@ -175,23 +214,32 @@ export IBDSEL_CONFIGDIR=some_dir
 scripts/prep_stage2.sh $tag $configname
 #+end_src
 
-** Clearing
+If, for testing purposes, you'd like to use the nominal config under a different name, pass the -c option to prep_stage2.sh. E.g., for a quick test:
+#+begin_src bash
+scripts/prep_stage2.sh -f 'shuf -n 10' -c $tag test10
+#+end_src
+
+*** Clearing
 #+begin_src bash
 eval $(scripts/clear.sh stage2 $tag $configname)
 #+end_src
 See also reset.sh
 
-** Testing interactively
+*** Testing interactively
 #+begin_src bash
 bash/stage2_job.sh $tag $configname
 #+end_src
 
-** Submitting
+*** Submitting
 #+begin_src bash
 scripts/submit_stage2_knl.sh $tag $configname 10
 #+end_src
 
-** Iterating
+*** Iterating
 
-** End result
+*** End result
 6k daily stage2 files 
+** Merging stage2
+#+begin_src bash
+python/merge2_worker.py $tag $configname
+#+end_src
