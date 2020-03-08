@@ -1,0 +1,73 @@
+#+PROPERTY: header-args:jupyter-python+ :async t
+#+PROPERTY: header-args:jupyter-python+ :session /global/u2/m/mkramer/.local/share/jupyter/runtime/kernel-42636.json
+
+* Things to do
+** TODO Investigate last remaining MuonAlg messages
+
+* TODO Session setup
+Use a python from any environment that has the jupyter_client package:
+
+#+begin_src emacs-lisp :results silent
+(setq python-shell-interpreter "/global/homes/m/mkramer/.conda/envs/ibdsel1/bin/python")
+(setq ob-ipython-command "/global/homes/m/mkramer/.conda/envs/ibdsel1/bin/jupyter")
+#+end_src
+
+Launch a jupyter console after a newenv; load-my-root6-py37; export NO_JUPYROOT=1 (see ROOT.py patch in NOTES.org). Get the connection file:
+
+#+begin_src python
+import ipykernel
+ipykernel.get_connection_file()
+#+end_src
+
+Paste that as the :session at the top of the file. Hit ~C-c C-c~ on the first line.
+
+* Old P17B (Yasu) results:
+#+begin_src jupyter-python :results silent
+old_counts = [1787550, 1661624, 495730]
+#+end_src
+
+#+begin_src jupyter-python :results raw drawer
+old_counts
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[7]:
+: [1787550, 1661624, 495730]
+:end:
+
+* Analysis
+#+begin_src jupyter-python :results silent
+import ROOT as R
+import os
+stage2_dir = '/global/u2/m/mkramer/mywork/ThesisAnalysis/IbdSel/data/stage2_pbp/2020_01_26@yolo'
+#+end_src
+
+#+begin_src jupyter-python :results raw drawer
+new_counts = []
+
+for site in [1, 2, 3]:
+    dets = [1, 2, 3, 4] if site == 3 else [1, 2]
+    path = os.path.join(stage2_dir, f'merged/stage2.pbp.eh{site}.root')
+    f = R.TFile(path)
+    ents = sum(f.Get(f'ibd_AD{det}').GetEntries() for det in dets)
+    new_counts.append(ents)
+
+new_counts
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[12]:
+: [1787239, 1661380, 495684]
+:end:
+
+#+begin_src jupyter-python :results raw drawer
+[100 * (n-o)/o for n, o in zip(new_counts, old_counts)]
+#+end_src
+
+#+RESULTS:
+:results:
+# Out[15]:
+: [-0.017398114738049284, -0.014684429209014796, -0.009279244750166421]
+:end:
