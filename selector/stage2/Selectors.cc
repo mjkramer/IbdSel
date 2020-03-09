@@ -34,8 +34,8 @@ Algorithm::Status SelectorBase::consume_iter(Iter it)
 SingleSel::SingleSel(Det det) :
   SelectorBase(det, MuonAlg::Purpose::ForSingles)
 {
-  auto hname = Form("h_single_d%d", int(det));
-  hist = new TH1F(hname, hname, 113, 0.7, 12);
+  auto hname = Form("h_single_AD%d", int(det));
+  hist = new TH1F(hname, hname, 240, 0, 12);
 }
 
 void SingleSel::finalize(Pipeline& _p)
@@ -59,8 +59,8 @@ IbdSel::IbdSel(Det detector) :
   SelectorBase(detector, MuonAlg::Purpose::ForIBDs),
   ibdTree(Form("ibd_AD%d", int(detector)))
 {
-  auto hname = Form("h_ibd_d%d", detector);
-  hist = new TH1F(hname, hname, 113, 0.7, 12);
+  auto hname = Form("h_ibd_AD%d", detector);
+  hist = new TH1F(hname, hname, 240, 0, 12);
 }
 
 void IbdSel::connect(Pipeline& p)
