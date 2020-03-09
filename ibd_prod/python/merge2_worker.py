@@ -34,6 +34,12 @@ def merge(tag, config):
 
             hadd_chunked(files, outfile, chunksize=HADD_CHUNKSIZE)
 
+def copy_config(tag, config):
+    src = os.path.join(data_dir('stage2_dbd'), f'{tag}@{config}',
+                       f'config.{config.txt}')
+    dest = os.path.join(data_dir('stage2_pbp'), f'{tag}@{config}')
+    os.system(f'cp {src} {dest}')
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('tag')
@@ -41,6 +47,7 @@ def main():
     args = ap.parse_args()
 
     merge(args.tag, args.config)
+    copy_config(args.tag, args.config)
 
 if __name__ == '__main__':
     unbuf_stdout()

@@ -38,16 +38,23 @@ mkdir -p $indir $logdir $trueOutdir
 mkdir -p $(dirname $outdir)
 ln -s $trueOutdir $outdir
 
-if [ -n "$create_config" ]; then
-    cp $IBDSEL_CONFIGDIR/config.nominal.txt $indir/config.$configname.txt
-else
-    cp $IBDSEL_CONFIGDIR/config.$configname.txt $indir
-fi
+conffile=$indir/config.$configname.txt
 
 if [ -n "$based_on" ]; then
-    src_infile=$indir/../$tag@$based_on/$(basename $infile)
+    srcdir=$indir/../$tag@$based_on
+    src_infile=$srcdir/$(basename $infile)
+    src_conffile=$srcdir/config.${based_on}.txt
     cp $src_infile $infile
+    cp $src_conffile $conffile
 else
+    if [ -n "$create_config" ]; then
+        cp $IBDSEL_CONFIGDIR/config.nominal.txt $conffile
+    else
+        cp $IBDSEL_CONFIGDIR/config.$configname.txt $indir
+    fi
+
     filter_cmd=${filter_cmd:-cat}
     python/dump_days.py | $filter_cmd > $infile
 fi
+
+cp $conffile $outdir
