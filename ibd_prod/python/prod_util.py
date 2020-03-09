@@ -36,8 +36,7 @@ def phase_for_day(day):
         return 3
     raise ValueError(f'Day {day} is not part of P17B')
 
-def dets_for(site, runno):
-    phase = phase_for_run(runno)
+def dets_for_phase(site, phase):
     if site == 1:
         return [2] if phase == 3 else [1, 2]
     if site == 2:
@@ -45,6 +44,17 @@ def dets_for(site, runno):
     if site == 3:
         return [1, 2, 3] if phase == 1 else [1, 2, 3, 4]
     raise ValueError("Invalid site")
+
+def dets_for(site, runno):
+    phase = phase_for_run(runno)
+    return dets_for_phase(site, phase)
+
+def _idet(self, site, det):
+    return 2*(site-1) + (det-1)
+
+def sitedets():
+    return [(1, 1), (1, 2), (2, 1), (2, 2),
+            (3, 1), (3, 2), (3, 3), (3, 4)]
 
 def log_time(fn):
     @wraps(fn)
