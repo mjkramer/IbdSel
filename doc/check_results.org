@@ -4,7 +4,7 @@
 * Things to do
 ** TODO Investigate last remaining MuonAlg messages
 
-* TODO Session setup
+* Session setup
 Use a python from any environment that has the jupyter_client package:
 
 #+begin_src emacs-lisp :results silent
@@ -20,6 +20,10 @@ ipykernel.get_connection_file()
 #+end_src
 
 Paste that as the :session at the top of the file. Hit ~C-c C-c~ on the first line.
+
+** Troubleshooting
+Use ~jupyter kernelspec list~ to see list of kernels, select one using ~jupyter console --kernel=<kernel>~. If the kernel isn't working right (e.g., not using the sys.executable/path for the virtualenv), try ~python3 -m ipykernel install [--user]~.
+
 
 * Old P17B (Yasu) results:
 #+begin_src jupyter-python :results silent

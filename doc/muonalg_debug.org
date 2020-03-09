@@ -2,41 +2,7 @@
 #+PROPERTY: header-args:jupyter-python+ :session /global/u2/m/mkramer/.local/share/jupyter/runtime/kernel-39333.json
 
 * Session setup
-Use a python from any environment that has the jupyter_client package:
-
-#+begin_src emacs-lisp :results silent
-(setq python-shell-interpreter "/global/homes/m/mkramer/.conda/envs/ibdsel1/bin/python")
-(setq ob-ipython-command "/global/homes/m/mkramer/.conda/envs/ibdsel1/bin/jupyter")
-#+end_src
-
-Launch a jupyter console. Get the connection file:
-
-#+begin_src python
-import ipykernel
-ipykernel.get_connection_file()
-#+end_src
-
-Paste that as the :session at the top of the file. Hit ~C-c C-c~ on the first line.
-
-** Troubleshooting
-Use ~jupyter kernelspec list~ to see list of kernels, select one using ~jupyter console --kernel=<kernel>~. If the kernel isn't working right (e.g., not using the sys.executable/path for the virtualenv), try ~python3 -m ipykernel install [--user]~.
-
-* HACK HACK HACK
-When we import ROOT, it imports JupyROOT, which somehow borks tab-completion in the jupyter console (we get spammed with 'variable "blah" not defined'). We don't need JupyROOT (since we're not in a notebook), so let's just override it with a dummy module:
-
-#+begin_src jupyter-python :results silent
-import os, atexit, sys
-from tempfile import mkdtemp
-
-tmpdir = mkdtemp()
-open(os.path.join(tmpdir, 'JupyROOT.py'), 'w').write('\n')
-sys.path.insert(0, tmpdir)
-atexit.register(lambda: os.system(f'rm -rf {tmpdir}'))
-
-# prevent ROOT from doing "%gui ROOT", which won't work w/o JupyROOT
-import ROOT
-ROOT.PyConfig.StartGuiThread = False
-#+end_src
+See [[file:check_results.org::*Session setup][check_results.org]]
 
 * Imports
 #+begin_src jupyter-python :results silent
