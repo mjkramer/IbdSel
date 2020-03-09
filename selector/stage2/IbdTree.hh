@@ -8,6 +8,8 @@ public:
   UInt_t fileNo;
   UInt_t trigP;
   UInt_t trigD;
+  Float_t eP;
+  Float_t eD;
 
   void initBranches() override;
 };

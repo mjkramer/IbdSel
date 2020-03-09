@@ -80,6 +80,8 @@ void IbdSel::save(Iter prompt, Iter delayed)
   ibdTree.data.fileNo = delayed->fileNo;
   ibdTree.data.trigP = prompt->trigNo;
   ibdTree.data.trigD = delayed->trigNo;
+  ibdTree.data.eP = prompt->energy;
+  ibdTree.data.eD = delayed->energy;
 
   ibdTree.fill();
 }

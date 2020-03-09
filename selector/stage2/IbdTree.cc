@@ -6,4 +6,6 @@ void IbdTree::initBranches()
   BR(fileNo);
   BR(trigP);
   BR(trigD);
+  BR(eP);
+  BR(eD);
 }
