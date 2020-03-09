@@ -46,9 +46,8 @@ void Li9Calc::initLivetimes()
 
 std::string Li9Calc::dataPath(const char* filename)
 {
-  std::string srcCodePath = __FILE__;
-  std::string dir = srcCodePath.substr(0, srcCodePath.rfind('/'));
-  return dir + "/../data/" + filename;
+  std::string base = IBDSEL_BASE;
+  return base + "/" + DATA_DIR + "/" + filename;
 }
 
 double Li9Calc::extrapolate(unsigned shower_pe,

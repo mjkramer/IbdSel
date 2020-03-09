@@ -24,6 +24,7 @@ private:
   static constexpr double LI9_SEL_SHOWER_VETO_MS = 400;
   static constexpr double LI9_LIVETIME_MS = 257;
   static constexpr double NTAG_EFF = 0.45;
+  static constexpr const char* DATA_DIR = "static/li9_data";
   static constexpr const char* LI9_FILENAME = "matt_Li9_rates.txt";
   static constexpr const char* LIVETIME_FILENAME = "p17b_livetimes.txt";
 

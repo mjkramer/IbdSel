@@ -32,6 +32,9 @@ else
 	CFLAGS += -O3
 endif
 
+# so that code can find data files
+CFLAGS += -DIBDSEL_BASE=\"$(realpath $(dir $(firstword $(MAKEFILE_LIST)))..)\"
+
 BOOST_HOME ?= /global/homes/m/mkramer/dunescratch/opt-cori/include
 EXTRA_INC  := -I$(shell root-config --incdir) -I$(BOOST_HOME)
 CFLAGS     += $(shell root-config --cflags) $(EXTRA_INC) -fPIC -fsigned-char -pipe
