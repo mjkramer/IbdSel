@@ -1,3 +1,10 @@
+* Action items
+** TODO Add HistGen
+** TODO Write CLI driver for TextGen/HistGen
+** TODO Test/debug
+** TODO Figure out why li9calc is off
+** TODO Produce and check yolo inputs
+** TODO Run fitter chain
 * Things to do
 ** DONE Fix accidentals/DMC calc and compare 1+ daily value to LBNL [3/4]
 CLOSED: [2020-01-15 Wed 23:30]
