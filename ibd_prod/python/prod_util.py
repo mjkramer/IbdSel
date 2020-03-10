@@ -124,8 +124,13 @@ def stage1_fbf_path(site, runno, fileno, tag):
                         f'stage1.fbf.eh{site}.{runno:07d}.{fileno:04d}.root')
 
 def stage1_dbd_path(site, day, tag):
-    return os.path.join(data_dir('stage1_dbd', tag),
-                        f'EH{site}',
+    if os.getenv('IBDSEL_USE_BURSTBUF'):
+        base = os.path.join(os.getenv('DW_PERSISTENT_STRIPED_dyb_ibdsel'),
+                            'stage1_dbd', tag)
+    else:
+        base = data_dir('stage1_dbd', tag)
+
+    return os.path.join(base, f'EH{site}',
                         f'stage1.dbd.eh{site}.{day:04d}.root')
 
 def stage2_dbd_path(site, day, tag, config):

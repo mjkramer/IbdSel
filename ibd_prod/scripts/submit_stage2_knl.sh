@@ -15,5 +15,6 @@ export IBDSEL_STARTUP_SLEEP_SECS=120
 export IBDSEL_NTASKS=68
 export IBDSEL_SLURMFILE=slurm/run_knl.sl.sh
 export IBDSEL_LOGFMT_EXTRA=_knl
+export IBDSEL_USE_BURSTBUF=1
 
 source bash/do_submit_stage2.inc.sh

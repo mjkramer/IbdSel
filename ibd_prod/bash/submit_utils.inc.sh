@@ -32,7 +32,11 @@ function sbatch_cmd() {
     local exports="--export="$(echo ${!IBDSEL_*} | tr ' ' ,)
     local logdest="-o $logdir/$logfmt"
 
-    echo "do_sbatch $extra $array $walltime $exports $logdest $IBDSEL_SLURMFILE"
+    if [ -n "$IBDSEL_USE_BURSTBUF" ]; then
+        local bbf="--bbf=slurm/bbf.conf"
+    fi
+
+    echo "do_sbatch $extra $array $walltime $exports $logdest $bbf $IBDSEL_SLURMFILE"
 }
 
 function do_sbatch() {

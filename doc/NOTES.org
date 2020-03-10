@@ -218,7 +218,19 @@ Or end of a run.
 *** TODO Investigate discrepancy in number of days between halls
 *** DONE Submit one full job
 CLOSED: [2020-03-07 Sat 21:18]
-
+** Creating the burst buffer (for bulk stage2)
+Use https://my.nersc.gov/queuewaittimes.php to choose between Haswell and KNL (debug queue).
+#+begin_src bash
+sbatch -C knl slurm/create_BB.sl.sh
+#+end_src
+** Filling the burst buffer
+Apparently half an hour ain't enough. With a cold cache, half an hour copied all of EH1 and most of EH2. Subsequent full copy took 25 minutes.
+#+begin_src bash
+# salloc -q debug -C knl -t 00:30:00 --bbf=slurm/bbf.conf
+salloc -q interactive -C haswell -t 02:00:00 --bbf=slurm/bbf.conf
+mkdir -p $DW_PERSISTENT_STRIPED_dyb_ibdsel/stage1_dbd
+time cp -RL ../../data/stage1_dbd/2020_01_26 $DW_PERSISTENT_STRIPED_dyb_ibdsel/stage1_dbd
+#+end_src
 ** Submitting stage2
 *** Preparing
 #+begin_src bash
@@ -256,4 +268,9 @@ scripts/submit_stage2_knl.sh $tag $configname 10
 ** Merging stage2
 #+begin_src bash
 python/merge2_worker.py $tag $configname
+#+end_src
+** Deleting the burst buffer
+If we won't be running stage2 for a while.
+#+begin_src bash
+sbatch -C knl slurm/destroy_BB.sl.sh
 #+end_src
