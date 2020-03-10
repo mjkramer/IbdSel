@@ -1,16 +1,16 @@
 #!/bin/bash
 
-export IBDSEL_CHUNKSIZE=25
-export IBDSEL_WALLTIME=00:30:00
-export IBDSEL_CHUNK_MARGIN_SECS=0
-export IBDSEL_FILE_MARGIN_SECS=0
-export IBDSEL_STARTUP_SLEEP_SECS=0
-export IBDSEL_USE_BURSTBUF=1
+nfiles=500
+walltime=00:60:00
 
-nfiles=100
-
-while getopts "H" opt; do
+while getopts "n:w:H" opt; do
     case $opt in
+        n)
+            nfiles=$OPTARG
+            ;;
+        w)
+            walltime=$OPTARG
+            ;;
         H)
             use_haswell=1
             ;;
@@ -31,10 +31,17 @@ if [ -n "$use_haswell" ]; then
     factors="8 16 24 32 48"
     sysname=hsw
 else
-    factors="16 32 48 58 68 78 88"
+    factors="32 48 58 68 78 88"
     sysname=knl
 fi
 
+export IBDSEL_CHUNKSIZE=$nfiles
+export IBDSEL_WALLTIME=$walltime
+
+export IBDSEL_CHUNK_MARGIN_SECS=0
+export IBDSEL_FILE_MARGIN_SECS=0
+export IBDSEL_STARTUP_SLEEP_SECS=0
+export IBDSEL_USE_BURSTBUF=1
 export IBDSEL_SLURMFILE=slurm/run_${sysname}.sl.sh
 
 source bash/stage2_vars.inc.sh
