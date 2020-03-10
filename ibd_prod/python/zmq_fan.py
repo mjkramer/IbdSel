@@ -11,7 +11,7 @@ from multiprocessing import Process
 import zmq
 
 from prod_io import ListReaderBase, ListWriterBase, LockfileListReader, LockfileListWriter
-from prod_util import job_chunksize, buffer_timeout_mins, sockdir
+from prod_util import job_chunksize, buffer_timeout_mins, sockdir, unbuf_stdout
 
 INPUTREADER_SOCK_NAME = 'InputReader'
 DONELOGGER_SOCK_NAME = 'DoneLogger'
@@ -110,4 +110,5 @@ def main():
     Process(target=serve_outbuf).start()
 
 if __name__ == '__main__':
+    unbuf_stdout()
     main()
