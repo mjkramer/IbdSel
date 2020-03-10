@@ -31,7 +31,7 @@ if [ -n "$use_haswell" ]; then
     factors="8 16 24 32 48"
     sysname=hsw
 else
-    factors="8 16 32 48 68"
+    factors="16 32 48 58 68 78 88"
     sysname=knl
 fi
 
@@ -58,5 +58,5 @@ for f in $factors; do
     scripts/prep_stage2.sh -f "shuf -n $nfiles" $tag $configname
 
     export IBDSEL_NTASKS=$f
-    source bash/do_submit_stage2.inc.sh $tag $configname 1 -q debug
+    source bash/do_submit_stage2.inc.sh $tag $configname 1 -q regular
 done
