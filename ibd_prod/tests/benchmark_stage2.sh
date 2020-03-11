@@ -12,7 +12,7 @@ while getopts "n:w:f:H" opt; do
             walltime=$OPTARG
             ;;
         f)
-            factors=$OPTARG
+            factors=$(echo $OPTARG | sed 's/,/ /g')
             ;;
         H)
             use_haswell=1
