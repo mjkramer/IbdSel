@@ -3,13 +3,16 @@
 nfiles=500
 walltime=00:60:00
 
-while getopts "n:w:H" opt; do
+while getopts "n:w:f:H" opt; do
     case $opt in
         n)
             nfiles=$OPTARG
             ;;
         w)
             walltime=$OPTARG
+            ;;
+        f)
+            factors=$OPTARG
             ;;
         H)
             use_haswell=1
@@ -28,10 +31,10 @@ if [ -z "$tag" ]; then
 fi
 
 if [ -n "$use_haswell" ]; then
-    factors="8 16 24 32 48"
+    factors=${factors:-"8 16 24 32 48"}
     sysname=hsw
 else
-    factors="32 48 58 68 78 88"
+    factors=${factors:-"32 48 58 68 78 88"}
     sysname=knl
 fi
 
