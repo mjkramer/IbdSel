@@ -49,7 +49,7 @@ def dets_for(site, runno):
     phase = phase_for_run(runno)
     return dets_for_phase(site, phase)
 
-def _idet(self, site, det):
+def idet(site, det):
     return 2*(site-1) + (det-1)
 
 def sitedets():
@@ -138,11 +138,31 @@ def stage2_dbd_path(site, day, tag, config):
                         f'EH{site}',
                         f'stage2.dbd.eh{site}.{day:04d}.root')
 
+def phasename(phase):
+    return ['6ad', '8ad', '7ad'][phase-1]
+
 def stage2_pbp_path(site, phase, tag, config):
-    phasename = ['6AD', '8AD', '7AD'][phase-1]
+    phname = phasename(phase)
     return os.path.join(data_dir('stage2_pbp', f'{tag}@{config}'),
-                        f'stage2.pbp.eh{site}.{phasename}.root')
+                        f'stage2.pbp.eh{site}.{phname}.root')
 
 def configfile_path(tag, config):
     return os.path.join(data_dir('stage2_input', f'{tag}@{config}'),
                         f'config.{config}.txt')
+
+def fit_hist_ibd_path(phase, tag, config):
+    # fitter convention is lowercase "ad"
+    phname = phasename(phase)
+    return os.path.join(data_dir('fit_input', f'{tag}@{config}'),
+                        f'ibd_eprompt_shapes_{phname}.root')
+
+def fit_hist_acc_path(phase, tag, config):
+    # fitter convention is lowercase "ad"
+    phname = phasename(phase)
+    return os.path.join(data_dir('fit_input', f'{tag}@{config}'),
+                        f'accidental_eprompt_shapes_{phname}.root')
+
+def fit_text_input_path(phase, tag, config):
+    phname = phasename(phase)
+    return os.path.join(data_dir('fit_input', f'{tag}@{config}'),
+                        f'Theta13-inputs_P17B_inclusive_{phname}.txt')

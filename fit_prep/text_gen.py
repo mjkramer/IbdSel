@@ -3,6 +3,7 @@
 from calc import Calc
 
 from prod_util import sitedets, dets_for_phase
+from prod_util import data_dir, fit_text_input_path, configfile_path
 
 from datetime import datetime as DT
 
@@ -11,7 +12,7 @@ def today():
     return DT.now().strftime('%b. %-m, %Y')
 
 
-def gen_text(out_fname, phase, stage2_dir, config_path):
+def gen_text_(out_fname, phase, stage2_dir, config_path):
     calc = Calc(phase, stage2_dir, config_path)
 
     outf = open(out_fname, 'w')
@@ -37,7 +38,7 @@ def gen_text(out_fname, phase, stage2_dir, config_path):
     w('# For P17B analysis')
     w('#')
     w('# Stage')
-    w('{phase}')
+    w(f'{phase}')
     w('# DataFlag 1=Data, 0=MC')
     w('1')
     w('# Delta M^2_{32} and error (eV^2) (not used in our analysis)')
@@ -76,7 +77,7 @@ def gen_text(out_fname, phase, stage2_dir, config_path):
     dump(7, calc.totEffErr, '%.1f')
     w('#')
     w('# Row 8 ==>  Total target mass for AD1 to AD8 (kg)')
-    dump(8, calc.targetMass, '%.1g')
+    dump(8, calc.targetMass, '%.6g')
     w('#')
     w('#### Note: The background estimates are *not* corrected for efficiencies anymore')
     w('#')
@@ -111,3 +112,12 @@ def gen_text(out_fname, phase, stage2_dir, config_path):
     dump(20, calc.alphanBkgErr, '%.3g')
 
     outf.close()
+
+
+def gen_text(tag, config):
+    for phase in [1, 2, 3]:
+        out_fname = fit_text_input_path(phase, tag, config)
+        stage2_dir = data_dir('stage2_pbp', f'{tag}@{config}')
+        config_path = configfile_path(tag, config)
+
+        gen_text_(out_fname, phase, stage2_dir, config_path)
