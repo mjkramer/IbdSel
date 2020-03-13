@@ -5,7 +5,6 @@
 Li9Calc::Li9Calc()
 {
   initTable();
-  initLivetimes();
 }
 
 void Li9Calc::initTable()
@@ -25,23 +24,6 @@ void Li9Calc::initTable()
     Data& d = table[Site(site)][bin];
     ifs >> d.nomRate >> d.statUnc >> d.rateNoB12 >> d.rate15pctHe8 >> d.rateNoHe8;
   }
-}
-
-void Li9Calc::initLivetimes()
-{
-  std::ifstream ifs(dataPath(LIVETIME_FILENAME));
-
-  auto fill = [&](Site site, size_t ndet) {
-    double tmp;
-    for (size_t i = 0; i < ndet; ++i) {
-      ifs >> tmp;
-      adLivedays[site] += tmp;
-    }
-  };
-
-  fill(Site::EH1, 2);
-  fill(Site::EH2, 2);
-  fill(Site::EH3, 4);
 }
 
 std::string Li9Calc::dataPath(const char* filename)
@@ -85,19 +67,29 @@ double Li9Calc::measHighRange(Site site, unsigned shower_pe)
   return extrapolate(shower_pe, getter);
 }
 
-double Li9Calc::li9daily(Site site, unsigned shower_pe, double showerVeto_ms)
+double Li9Calc::li9daily(Site site, double shower_pe, double showerVeto_ms)
 {
   const double totLow = measLowRange(site);
   const double totMid = measMidRange(site, shower_pe);
   const double totHigh = measHighRange(site, shower_pe);
 
-  const double li9SelSurvProb = exp(-LI9_SEL_SHOWER_VETO_MS / LI9_LIVETIME_MS);
-  const double ibdSelSurvProb = exp(-showerVeto_ms / LI9_LIVETIME_MS);
+  const double ibdSelSurvProb = exp(-showerVeto_ms / LI9_LIFETIME_MS);
+  const double survRatio = ibdSelSurvProb / LI9_SEL_SURV_PROB;
+
+  const size_t isite = int(site) - 1;
+  const double denom = LIVEDAYS[isite] * NDET_WEIGHTED[isite] *
+    VETO_EFFS[isite] * MULT_EFF * DT_EFF;
+  const double lowPePromptEff =
+    site == Site::EH3 ? FAR_LOW_PE_PROMPT_EFF : NEAR_LOW_PE_PROMPT_EFF;
+
+  // XXX
+  const double highPeFudgeFactor =
+    site == Site::EH3 ? LI9_SEL_SURV_PROB : 1;
 
   const double predCount =
-    1./NTAG_EFF * totLow +
-    totMid +
-    ibdSelSurvProb / li9SelSurvProb * totHigh;
+    totLow / lowPePromptEff +
+    totMid / lowPePromptEff +
+    totHigh / HIGH_PE_PROMPT_EFF * survRatio * highPeFudgeFactor;
 
-  return predCount / adLivedays[site];
+  return predCount / denom;
 }
