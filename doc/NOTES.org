@@ -1,10 +1,14 @@
 * Action items
+BB: screen on cori06
+** TODO Benchmark 500 files around n=68
 ** TODO Add HistGen
+Need to fake rebinning?
 ** TODO Write CLI driver for TextGen/HistGen
 ** TODO Test/debug
 ** TODO Figure out why li9calc is off
 ** TODO Produce and check yolo inputs
 ** TODO Run fitter chain
+** TODO Fix IbdSelector histogram binning (240 bins)
 * Things to do
 ** DONE Fix accidentals/DMC calc and compare 1+ daily value to LBNL [3/4]
 CLOSED: [2020-01-15 Wed 23:30]
@@ -63,6 +67,10 @@ With current janky environment, do not compile C++ from within PyROOT! The "wron
 - https://root-forum.cern.ch/t/how-to-load-an-shared-object-that-also-depends-on-clang-llvm-in-cling/38054
 - https://sft.its.cern.ch/jira/browse/ROOT-6325
 ** jupyter console
+*** Wrong sys.path?
+https://github.com/jupyter/notebook/issues/3311
+If necessary go to ~/.local/share/jupyter/kernels and create a new one pointing to the appropriate Python. It can be used with e.g. =jupyter console --kernel=mykernel=.
+*** Needed patches
 In ROOT.py, the inputhook-based event loop won't work, so use the old threading-based approach instead. Also, JupyROOT messes up tab-completion so don't import it. Patch ROOT.py like:
 #+begin_src diff
 --- ROOT.py.bak	2019-06-25 01:52:11.000000000 -0700
@@ -257,8 +265,9 @@ bash/stage2_job.sh $tag $configname
 #+end_src
 
 *** Submitting
+Use IBDSEL_DRYRUN=1 to preview the sbatch command without submitting
 #+begin_src bash
-scripts/submit_stage2_knl.sh $tag $configname 10
+scripts/submit_stage2_knl.sh $tag $configname $njob
 #+end_src
 
 *** Iterating
@@ -266,6 +275,7 @@ scripts/submit_stage2_knl.sh $tag $configname 10
 *** End result
 6k daily stage2 files 
 ** Merging stage2
+Expect 7 minutes.
 #+begin_src bash
 python/merge2_worker.py $tag $configname
 #+end_src

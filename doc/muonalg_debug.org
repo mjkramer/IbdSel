@@ -19,6 +19,7 @@ from root_pandas import read_root
 #+begin_src jupyter-python :results silent
 import pandas.io.formats.format as pf
 
+# Sprinkle some commas in our numbers
 class IntArrayFormatter(pf.GenericArrayFormatter):
     def _format_strings(self):
         formatter = self.formatter or '{:,d}'.format

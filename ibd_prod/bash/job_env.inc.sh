@@ -11,3 +11,5 @@ export IBDSEL_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)
 
 export PYTHONPATH=$IBDSEL_HOME/ibd_prod/python:$PYTHONPATH
 export LD_LIBRARY_PATH=$IBDSEL_HOME/selector/_build:$LD_LIBRARY_PATH
+
+export NO_JUPYROOT=1            # for jupyter console; see NOTES.org
