@@ -31,7 +31,8 @@ def gen_hists_(phase, tag, config):
         path_in = stage2_pbp_path(site, phase, tag, config)
         f = R.TFile(path_in)
 
-        for det in dets_for_phase(site, phase):
+        # fitter expects all 8 dets in the file, even in 6/7AD periods
+        for det in dets_for_phase(site, 2):  # phase 2 = 8AD
             h_ibd = f.Get(f'h_ibd_AD{det}')
             h_acc = f.Get(f'h_single_AD{det}')
 
@@ -40,14 +41,24 @@ def gen_hists_(phase, tag, config):
             name_acc_lbnl = f'h_accidental_eprompt_inclusive_eh{site}_ad{det}'
             name_acc_fine = f'h_accidental_eprompt_fine_inclusive_eh{site}_ad{det}'
 
-            h_ibd_lbnl = h_ibd.Rebin(nbins_lbnl, name_ibd_lbnl,
-                                     binning_lbnl())
-            h_ibd_fine = h_ibd.Rebin(nbins_fine, name_ibd_fine,
-                                     binning_fine())
-            h_acc_lbnl = h_acc.Rebin(nbins_lbnl, name_acc_lbnl,
-                                     binning_lbnl())
-            h_acc_fine = h_acc.Rebin(nbins_fine, name_acc_fine,
-                                     binning_fine())
+            if h_ibd:
+                h_ibd_lbnl = h_ibd.Rebin(nbins_lbnl, name_ibd_lbnl,
+                                         binning_lbnl())
+                h_ibd_fine = h_ibd.Rebin(nbins_fine, name_ibd_fine,
+                                         binning_fine())
+                h_acc_lbnl = h_acc.Rebin(nbins_lbnl, name_acc_lbnl,
+                                         binning_lbnl())
+                h_acc_fine = h_acc.Rebin(nbins_fine, name_acc_fine,
+                                         binning_fine())
+            else:
+                h_ibd_lbnl = R.TH1F(name_ibd_lbnl, name_ibd_lbnl,
+                                    nbins_lbnl, binning_lbnl())
+                h_ibd_fine = R.TH1F(name_ibd_fine, name_ibd_fine,
+                                    nbins_fine, binning_fine())
+                h_acc_lbnl = R.TH1F(name_acc_lbnl, name_acc_lbnl,
+                                    nbins_lbnl, binning_lbnl())
+                h_acc_fine = R.TH1F(name_acc_fine, name_acc_fine,
+                                    nbins_fine, binning_fine())
 
             f_ibd.cd()
             h_ibd_lbnl.Write()

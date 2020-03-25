@@ -25,16 +25,17 @@ def gen_text_(out_fname, phase, stage2_dir, config_path):
         w(f'{phase}\t{irow}\t{valstr}')
 
     def dump(irow, func, fmt):
+        nonzero_rows = [8]      # target mass
         vals = []
         for site, det in sitedets():
-            if det in dets_for_phase(site, phase):
+            if det in dets_for_phase(site, phase) or irow in nonzero_rows:
                 vals.append(func(site, det))
             else:
                 vals.append(0)
 
         _dump(irow, vals, fmt)
 
-    w('# Produced on {today()} by IbdSel')
+    w(f'# Produced on {today()} by IbdSel')
     w('# For P17B analysis')
     w('#')
     w('# Stage')
