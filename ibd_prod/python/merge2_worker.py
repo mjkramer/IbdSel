@@ -35,9 +35,9 @@ def merge(tag, config):
             hadd_chunked(files, outfile, chunksize=HADD_CHUNKSIZE)
 
 def copy_config(tag, config):
-    src = os.path.join(data_dir('stage2_dbd'), f'{tag}@{config}',
+    src = os.path.join(data_dir('stage2_dbd', f'{tag}@{config}'),
                        f'config.{config.txt}')
-    dest = os.path.join(data_dir('stage2_pbp'), f'{tag}@{config}')
+    dest = data_dir('stage2_pbp', f'{tag}@{config}')
     os.system(f'cp {src} {dest}')
 
 def main():
