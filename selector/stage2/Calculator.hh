@@ -25,19 +25,22 @@ public:
 
 private:
   TH1F* singlesHist(Det detector);
-  double nPreMuons(Det detector);
   double singlesIntegral(Det detector,
                          double lowE,
                          std::optional<double> optUpperE = std::nullopt);
+  double singlesHz(Det detector, double N);
+
+  double dmcEffSingles(Det detector);
+
+  double nPreMuons(Det detector);
   double nPlusLikeSingles(Det detector);
   double nPromptLikeSingles(Det detector);
   double nDelayedLikeSingles(Det detector);
-  double singlesHz(Det detector, double N);
+
   double preMuonHz(Det detector);
-  double promptLikeHz(Det detector);
   double plusLikeHz(Det detector);
+  double promptLikeHz(Det detector);
   double delayedLikeHz(Det detector);
-  double dmcEffSingles(Det detector);
 
   Pipeline& pipe;
   Phase phase;

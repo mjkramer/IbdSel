@@ -18,10 +18,10 @@ public:
   Site site;
   Det detector;
 
-  // XXX diagnostics
-  Float_t nPlusLikeSingles, nPromptLikeSingles, nDelayedLikeSingles;
-  Float_t promptLikeHz, delayedLikeHz, dmcEffSingles;
+  // For diagnostics and ReCalc
+  Float_t nPreMuons, nPlusLikeSingles, nPromptLikeSingles, nDelayedLikeSingles;
+  Float_t preMuonHz, plusLikeHz, promptLikeHz, delayedLikeHz;
+  Float_t vetoEffSingles, dmcEffSingles;
 
   void initBranches() override;
 };
-

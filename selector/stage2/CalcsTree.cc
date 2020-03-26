@@ -14,7 +14,8 @@ void CalcsTree::initBranches()
   BR(site);
   BR(detector);
 
-  // XXX diagnostics
-  BR(nPlusLikeSingles); BR(nPromptLikeSingles); BR(nDelayedLikeSingles);
-  BR(promptLikeHz); BR(delayedLikeHz); BR(dmcEffSingles);
+  // For diagnostics and ReCalc
+  BR(nPreMuons); BR(nPlusLikeSingles); BR(nPromptLikeSingles); BR(nDelayedLikeSingles);
+  BR(preMuonHz); BR(plusLikeHz); BR(promptLikeHz); BR(delayedLikeHz);
+  BR(vetoEffSingles); BR(dmcEffSingles);
 }

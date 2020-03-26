@@ -220,12 +220,16 @@ void Calculator::writeValues()
     w.data.li9Daily = li9Daily(detector);
     w.data.li9DailyErr = li9DailyErr(detector);
 
-    // XXX diagnostics
+    // For diagnostics and ReCalc
+    w.data.nPreMuons = nPreMuons(detector);
     w.data.nPlusLikeSingles = nPlusLikeSingles(detector);
     w.data.nPromptLikeSingles = nPromptLikeSingles(detector);
     w.data.nDelayedLikeSingles = nDelayedLikeSingles(detector);
+    w.data.preMuonHz = preMuonHz(detector);
+    w.data.plusLikeHz = plusLikeHz(detector);
     w.data.promptLikeHz = promptLikeHz(detector);
     w.data.delayedLikeHz = delayedLikeHz(detector);
+    w.data.vetoEffSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
     w.data.dmcEffSingles = dmcEffSingles(detector);
 
     w.fill();
