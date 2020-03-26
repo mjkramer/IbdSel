@@ -12,8 +12,12 @@ public:
   Calculator(Pipeline& pipe, Phase phase, UInt_t seq, Site site) :
     pipe(pipe), phase(phase), seq(seq), site(site) {}
 
-  double livetime_s();
-  double vetoEff(Det detector, MuonAlg::Purpose purp = MuonAlg::Purpose::ForIBDs);
+  // Mark as 'virtual' those functions that use the Pipeline to access other
+  // algs (except Config) and/or the stage1 input file. This way we can override
+  // them in ReCalc.
+
+  virtual double livetime_s();
+  virtual double vetoEff(Det detector, MuonAlg::Purpose purp = MuonAlg::Purpose::ForIBDs);
   double dmcEff(Det detector);
 
   double accDaily(Det detector);
@@ -24,7 +28,7 @@ public:
   void writeValues();
 
 private:
-  TH1F* singlesHist(Det detector);
+  virtual TH1F* singlesHist(Det detector);
   double nPreMuons(Det detector);
   double singlesIntegral(Det detector,
                          double lowE,
