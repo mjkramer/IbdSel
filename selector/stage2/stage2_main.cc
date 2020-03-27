@@ -54,6 +54,6 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
 
   p.process({inFile});
 
-  Calculator calc(p, phase, seq, site);
-  calc.writeValues();
+  Calculator calc(p, site, phase, seq);
+  calc.writeEntries();
 }

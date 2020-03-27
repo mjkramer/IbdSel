@@ -6,14 +6,21 @@
 #include "../common/Constants.hh"
 
 class TH1F;
+class CalcsTree;
+template <class T> class TreeWriter;
 
 class Calculator {
 public:
-  Calculator(Pipeline& pipe, Phase phase, UInt_t seq, Site site) :
-    pipe(pipe), phase(phase), seq(seq), site(site) {}
+  Calculator(Pipeline& pipe, Site site, Phase phase, UInt_t seq) :
+    pipe(pipe), site(site), phase(phase), seq(seq)  {}
 
-  double livetime_s();
-  double vetoEff(Det detector, MuonAlg::Purpose purp = MuonAlg::Purpose::ForIBDs);
+  // Mark as 'virtual' those functions that use the Pipeline to access other
+  // algs (except Config) and/or the stage1 input file. This way we can override
+  // them in ReCalc.
+
+  virtual double livetime_s();
+  virtual double vetoEff(Det detector,
+                         MuonAlg::Purpose purp = MuonAlg::Purpose::ForIBDs);
   double dmcEff(Det detector);
 
   double accDaily(Det detector);
@@ -21,9 +28,10 @@ public:
   double li9Daily(Det detector);
   double li9DailyErr(Det detector);
 
-  void writeValues();
+  void writeEntry(TreeWriter<CalcsTree>& w, Det detector);
+  virtual void writeEntries(const char* treename = "results");
 
-private:
+protected:
   TH1F* singlesHist(Det detector);
   double singlesIntegral(Det detector,
                          double lowE,
@@ -32,10 +40,10 @@ private:
 
   double dmcEffSingles(Det detector);
 
-  double nPreMuons(Det detector);
-  double nPlusLikeSingles(Det detector);
-  double nPromptLikeSingles(Det detector);
-  double nDelayedLikeSingles(Det detector);
+  virtual double nPreMuons(Det detector);
+  virtual double nPlusLikeSingles(Det detector);
+  virtual double nPromptLikeSingles(Det detector);
+  virtual double nDelayedLikeSingles(Det detector);
 
   double preMuonHz(Det detector);
   double plusLikeHz(Det detector);
@@ -43,9 +51,9 @@ private:
   double delayedLikeHz(Det detector);
 
   Pipeline& pipe;
+  Site site;
   Phase phase;
   UInt_t seq;
-  Site site;
 
   Li9Calc li9calc;
 };

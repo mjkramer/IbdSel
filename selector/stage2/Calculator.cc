@@ -200,38 +200,42 @@ double Calculator::li9DailyErr(Det detector)
   return 0.3 * li9Daily(detector);
 }
 
-void Calculator::writeValues()
+void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
 {
-  TreeWriter<CalcsTree> w("results");
-  w.connect(pipe);
-
   w.data.phase = phase;
   w.data.seq = seq;
   w.data.site = site;
 
   w.data.livetime_s = livetime_s();
 
-  for (Det detector : util::ADsFor(site, phase)) {
-    w.data.detector = detector;
-    w.data.vetoEff = vetoEff(detector);
-    w.data.dmcEff = dmcEff(detector);
-    w.data.accDaily = accDaily(detector);
-    w.data.accDailyErr = accDailyErr(detector);
-    w.data.li9Daily = li9Daily(detector);
-    w.data.li9DailyErr = li9DailyErr(detector);
+  w.data.detector = detector;
+  w.data.vetoEff = vetoEff(detector);
+  w.data.dmcEff = dmcEff(detector);
+  w.data.accDaily = accDaily(detector);
+  w.data.accDailyErr = accDailyErr(detector);
+  w.data.li9Daily = li9Daily(detector);
+  w.data.li9DailyErr = li9DailyErr(detector);
 
-    // For diagnostics and ReCalc
-    w.data.nPreMuons = nPreMuons(detector);
-    w.data.nPlusLikeSingles = nPlusLikeSingles(detector);
-    w.data.nPromptLikeSingles = nPromptLikeSingles(detector);
-    w.data.nDelayedLikeSingles = nDelayedLikeSingles(detector);
-    w.data.preMuonHz = preMuonHz(detector);
-    w.data.plusLikeHz = plusLikeHz(detector);
-    w.data.promptLikeHz = promptLikeHz(detector);
-    w.data.delayedLikeHz = delayedLikeHz(detector);
-    w.data.vetoEffSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
-    w.data.dmcEffSingles = dmcEffSingles(detector);
+  // For diagnostics and ReCalc
+  w.data.nPreMuons = nPreMuons(detector);
+  w.data.nPlusLikeSingles = nPlusLikeSingles(detector);
+  w.data.nPromptLikeSingles = nPromptLikeSingles(detector);
+  w.data.nDelayedLikeSingles = nDelayedLikeSingles(detector);
+  w.data.preMuonHz = preMuonHz(detector);
+  w.data.plusLikeHz = plusLikeHz(detector);
+  w.data.promptLikeHz = promptLikeHz(detector);
+  w.data.delayedLikeHz = delayedLikeHz(detector);
+  w.data.vetoEffSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
+  w.data.dmcEffSingles = dmcEffSingles(detector);
 
-    w.fill();
-  }
+  w.fill();
+}
+
+void Calculator::writeEntries(const char* treename)
+{
+  TreeWriter<CalcsTree> w(treename);
+  w.connect(pipe);
+
+  for (Det detector : util::ADsFor(site, phase))
+    writeEntry(w, detector);
 }
