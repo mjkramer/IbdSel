@@ -23,6 +23,9 @@ stage1: LIBNAME = stage1
 stage2: $(BUILD_DIR)/stage2.exe $(BUILD_DIR)/stage2.so
 stage2: LIBNAME = stage2
 
+.PHONY: recalc
+recalc: $(BUILD_DIR)/recalc.exe stage2
+
 CC := g++
 LD := $(CC)
 
