@@ -36,7 +36,7 @@ def merge(tag, config):
 
 def copy_config(tag, config):
     src = os.path.join(data_dir('stage2_dbd', f'{tag}@{config}'),
-                       f'config.{config.txt}')
+                       f'config.{config}.txt')
     dest = data_dir('stage2_pbp', f'{tag}@{config}')
     os.system(f'cp {src} {dest}')
 
