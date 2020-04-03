@@ -1,5 +1,6 @@
 "Utilities for handling the SelectorFramework config file format"
 
+
 class ConfigFile(dict):
     "Wrapper with a dict interface"
 
@@ -25,3 +26,8 @@ class ConfigFile(dict):
                     pass
 
             self[key] = val
+
+    def write(self, path):
+        with open(path, 'w') as f:
+            for key, val in self.items():
+                f.write(f"{key} {val}\n")
