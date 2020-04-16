@@ -42,8 +42,12 @@ double Calculator::singlesIntegral(Det detector,
 {
   const auto h = singlesHist(detector);
   const int lowBin = h->FindBin(lowE);
-  const int highBin = optUpperE ? h->FindBin(*optUpperE) :
-    h->GetNbinsX() + 1;         // include overflow bin
+  // Assuming we're using 0.1 MeV bins, and optUpperE is a multiple of 0.1 MeV,
+  // FindBin will give us the bin whose low edge is optUpperE, which means we'd
+  // include [optUpperE, optUpperE + 0.1) in the integral, which we don't want!
+  // Thus we must subtract 1 from the bin#.
+  const int highBin = optUpperE ? h->FindBin(*optUpperE) - 1 :
+    h->GetNbinsX() + 1;         // no upper limit? then include overflow bin
 
   return h->Integral(lowBin, highBin);
 }
