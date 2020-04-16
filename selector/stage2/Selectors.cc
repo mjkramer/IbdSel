@@ -35,7 +35,7 @@ SingleSel::SingleSel(Det det) :
   SelectorBase(det, MuonAlg::Purpose::ForSingles)
 {
   auto hname = Form("h_single_AD%d", int(det));
-  hist = new TH1F(hname, hname, 240, 0, 12);
+  hist = new TH1F(hname, hname, 400, 0, 20);
 }
 
 void SingleSel::finalize(Pipeline& _p)

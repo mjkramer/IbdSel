@@ -6,6 +6,7 @@
 
 #include "../SelectorFramework/core/TreeWriter.hh"
 
+#include <cfloat>               // FLT_MAX
 
 class MultCutTool;
 class TH1F;
@@ -42,7 +43,7 @@ private:
 class SingleSel : public SelectorBase {
 public:
   static constexpr float EMIN = 0.7;
-  static constexpr float EMAX = 12;
+  static constexpr float EMAX = FLT_MAX; // no upper limit (we want premuons)
 
   SingleSel(Det det);
   void select(Iter it) override;
