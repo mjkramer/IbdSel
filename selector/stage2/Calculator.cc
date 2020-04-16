@@ -75,12 +75,13 @@ double Calculator::nDelayedLikeSingles(Det detector)
 double Calculator::dmcEffSingles(Det detector)
 {
   const double nPlus = nPlusLikeSingles(detector);
-  const double t = 1e-6 * (MultCutTool::SINGLE_USEC_BEFORE +
-                           MultCutTool::SINGLE_USEC_AFTER);
+  const double nDelayed = nDelayedLikeSingles(detector);
+  const double tPre = 1e-6 * MultCutTool::SINGLE_USEC_BEFORE;
+  const double tPost = 1e-6 * MultCutTool::SINGLE_USEC_AFTER;
   const double eMuSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
   const double T = livetime_s();
 
-  const double arg = (nPlus * t) / (eMuSingles * T);
+  const double arg = (nPlus * tPre + nDelayed * tPost) / (eMuSingles * T);
   return exp(Fukushima::LambertW0(-arg));
 }
 
@@ -158,8 +159,8 @@ double Calculator::accDaily(Det detector)
   // remove that cut. Extra factor ~ exp(-20 * 1e-6) = 0.99998 meh who cares
   const double R = Rd * probOnePro * probZeroPreMu * probZeroPlu * probZeroD;
 
-  // This R assumes veto eff. of 1 (i.e. uncorrected for it) while R IS
-  // corrected for DMC eff by construction (i.e. we are predicting what we'd see
+  // This R assumes veto eff. of 1 (i.e. unreduced by it) while R IS
+  // reduced by DMC eff by construction (i.e. we are predicting what we'd see
   // in the RAW spectrum, modulo veto eff.). In the fitter, we multiply every
   // bkg rate by the veto and DMC efficiencies (*for IBDs*), prior to
   // subtracting from the raw IBD spectrum(?). Therefore, here we must divide by

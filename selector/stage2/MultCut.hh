@@ -12,8 +12,8 @@ public:
   static constexpr float DELAYED_MAX = 12;
   static constexpr int IBD_USEC_BEFORE = 400;
   static constexpr int IBD_USEC_AFTER = 200;
-  static constexpr int SINGLE_USEC_BEFORE = 1000;
-  static constexpr int SINGLE_USEC_AFTER = SINGLE_USEC_BEFORE;
+  static constexpr int SINGLE_USEC_BEFORE = 400;
+  static constexpr int SINGLE_USEC_AFTER = 200;
 
   using Iter = AdBuffer::Iter;
 
@@ -51,7 +51,7 @@ inline bool MultCutTool::ibdDmcOk(Iter itP, Iter itD, Det det) const
 
 inline bool MultCutTool::singleDmcOk(Iter it, Det det) const
 {
-  Cuts cuts {SINGLE_USEC_BEFORE, SINGLE_USEC_AFTER, PROMPT_MIN, PROMPT_MIN,
-    std::numeric_limits<float>::max()};
+  Cuts cuts {SINGLE_USEC_BEFORE, SINGLE_USEC_AFTER, PROMPT_MIN, DELAYED_MIN,
+    DELAYED_MAX};
   return dmcOk(std::nullopt, it, det, cuts, muonAlgSingles);
 }
