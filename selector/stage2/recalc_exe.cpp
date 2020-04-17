@@ -8,6 +8,7 @@ void recalc(const char* confFile, const char* stage2File, Site site, Phase phase
   Pipeline p;
   p.makeOutFile(stage2File, Pipeline::DefaultFile, false /* reopen */, "UPDATE");
   p.makeTool<Config>(confFile);
+  p.makeTool<MultCutTool>();    // so calc can access mult cut parameters
   p.process({});                // just to initialize Config
 
   ReCalc recalc(p, site, phase);

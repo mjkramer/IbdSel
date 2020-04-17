@@ -16,6 +16,12 @@
 
 #include <cmath>
 
+Calculator::Calculator(Pipeline& pipe, Site site, Phase phase, UInt_t seq) :
+  pipe(pipe), site(site), phase(phase), seq(seq)
+{
+  multCut = pipe.getTool<MultCutTool>();
+}
+
 double Calculator::livetime_s()
 {
   const auto h = (TH1F*) pipe.inFile()->Get(keys::HistLivetime);
@@ -36,9 +42,9 @@ TH1F* Calculator::singlesHist(Det detector)
   return alg->hist;
 }
 
-double Calculator::singlesIntegral(Det detector,
-                                   double lowE,
-                                   std::optional<double> optUpperE)
+double Calculator::singlesCount(Det detector,
+                                double lowE,
+                                std::optional<double> optUpperE)
 {
   const auto h = singlesHist(detector);
   const int lowBin = h->FindBin(lowE);
@@ -52,40 +58,7 @@ double Calculator::singlesIntegral(Det detector,
   return h->Integral(lowBin, highBin);
 }
 
-double Calculator::nPreMuons(Det detector)
-{
-  return singlesIntegral(detector, 12);
-}
-
-double Calculator::nPlusLikeSingles(Det detector)
-{
-  return singlesIntegral(detector, 0.7);
-}
-
-double Calculator::nPromptLikeSingles(Det detector)
-{
-  return singlesIntegral(detector, 0.7, 12);
-}
-
-double Calculator::nDelayedLikeSingles(Det detector)
-{
-  return singlesIntegral(detector, 6, 12);
-}
-
-double Calculator::dmcEffSingles(Det detector)
-{
-  const double nPlus = nPlusLikeSingles(detector);
-  const double nDelayed = nDelayedLikeSingles(detector);
-  const double tPre = 1e-6 * MultCutTool::SINGLE_USEC_BEFORE;
-  const double tPost = 1e-6 * MultCutTool::SINGLE_USEC_AFTER;
-  const double eMuSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
-  const double T = livetime_s();
-
-  const double arg = (nPlus * tPre + nDelayed * tPost) / (eMuSingles * T);
-  return exp(Fukushima::LambertW0(-arg));
-}
-
-double Calculator::singlesHz(Det detector, double N)
+double Calculator::calcSinglesHz(Det detector, double N)
 {
   const double eMuSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
   const double eDmcSingles = dmcEffSingles(detector);
@@ -94,39 +67,112 @@ double Calculator::singlesHz(Det detector, double N)
   return N / (eDmcSingles * eMuSingles * T);
 }
 
+// XXX get rid of me
+double Calculator::nPreMuons(Det detector)
+{
+  return singlesCount(detector, IbdSel::PROMPT_MAX);
+}
+
+double Calculator::nPlusLikeSingles(Det detector)
+{
+  return singlesCount(detector, IbdSel::PROMPT_MIN);
+}
+
+double Calculator::nPromptLikeSingles(Det detector)
+{
+  return singlesCount(detector, IbdSel::PROMPT_MIN, IbdSel::PROMPT_MAX);
+}
+
+double Calculator::nDelayedLikeSingles(Det detector)
+{
+  return singlesCount(detector, IbdSel::DELAYED_MIN, IbdSel::DELAYED_MAX);
+}
+
+double Calculator::dmcEffSingles(Det detector)
+{
+  const MultCutTool::Cuts& cuts = multCut->singleCuts;
+
+  const double nBefore = singlesCount(detector,
+                                      cuts.emin_before, cuts.emax_before);
+  const double nAfter = singlesCount(detector,
+                                     cuts.emin_after, cuts.emax_after);
+  const double tBefore = 1e-6 * cuts.usec_before;
+  const double tAfter = 1e-6 * cuts.usec_after;
+
+  const double eMuSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
+  const double T = livetime_s();
+
+  const double arg =
+    ((nBefore * tBefore) + (nAfter * tAfter)) / (eMuSingles * T);
+  return exp(Fukushima::LambertW0(-arg));
+}
+
+double Calculator::singlesHz(Det detector,
+                             double lowE,
+                             std::optional<double> optUpperE)
+{
+  const double N = singlesCount(detector, lowE, optUpperE);
+  return calcSinglesHz(detector, N);
+}
+
 double Calculator::preMuonHz(Det detector)
 {
   const double N = nPreMuons(detector);
-  return singlesHz(detector, N);
+  return calcSinglesHz(detector, N);
 }
 
 double Calculator::promptLikeHz(Det detector)
 {
   const double N = nPromptLikeSingles(detector);
-  return singlesHz(detector, N);
+  return calcSinglesHz(detector, N);
 }
 
 double Calculator::plusLikeHz(Det detector)
 {
   const double N = nPlusLikeSingles(detector);
-  return singlesHz(detector, N);
+  return calcSinglesHz(detector, N);
 }
 
 double Calculator::delayedLikeHz(Det detector)
 {
   const double N = nDelayedLikeSingles(detector);
-  return singlesHz(detector, N);
+  return calcSinglesHz(detector, N);
 }
 
 double Calculator::dmcEff(Det detector)
 {
-  const double tL = 1e-6 * MultCutTool::IBD_USEC_BEFORE;
-  const double tR = 1e-6 * MultCutTool::IBD_USEC_AFTER;
-  const double Rplu = plusLikeHz(detector);
-  const double Rd = delayedLikeHz(detector);
+  const MultCutTool::Cuts& cuts = multCut->ibdCuts;
 
-  const double arg = (Rplu * tL) + (Rd * tR);
+  const double rBefore = singlesHz(detector,
+                                   cuts.emin_before, cuts.emax_before);
+  const double rAfter = singlesHz(detector,
+                                  cuts.emin_after, cuts.emax_after);
+  const double tBefore = 1e-6 * cuts.usec_before;
+  const double tAfter = 1e-6 * cuts.usec_after;
+
+  const double arg = (rBefore * tBefore) + (rAfter * tAfter);
   return exp(-arg);
+}
+
+// Get the rate for singles that lie in [keep_min, keep_max]
+// but do NOT lie in [drop_min, drop_max]
+double Calculator::subtractSinglesHz(Det detector,
+                                     float keep_min, float keep_max,
+                                     float drop_min, float drop_max)
+{
+  float result = 0;
+
+  if (keep_min < drop_min) {
+    float top = keep_max < drop_min ? keep_max : drop_min;
+    result += singlesHz(detector, keep_min, top);
+  }
+
+  if (keep_max > drop_max) {
+    float bottom = keep_min > drop_max ? keep_min : drop_max;
+    result += singlesHz(detector, bottom, keep_max);
+  }
+
+  return result;
 }
 
 // This rate (as for all bkgs) is "ideal", meaning we need to multiply by mu/dmc
@@ -135,29 +181,36 @@ double Calculator::dmcEff(Det detector)
 // used in the fitter's "Theta13" input file.
 double Calculator::accDaily(Det detector)
 {
-  const double Rpro = promptLikeHz(detector);
-  const double Rplu = plusLikeHz(detector);
-  const double RpreMu = preMuonHz(detector);
-  const double Rd = delayedLikeHz(detector);
+  const MultCutTool::Cuts& cuts = multCut->ibdCuts;
+
+  const double rPrompt = promptLikeHz(detector);
+  const double rDelayed = delayedLikeHz(detector);
+  const double rBefore = singlesHz(detector,
+                                   cuts.emin_before, cuts.emax_before);
+  const double rAfter = singlesHz(detector,
+                                  cuts.emin_after, cuts.emax_after);
+
+  // BBNP => Before-like But Not Prompt-like
+  // Needed since our calculation assumes independent Poisson processes
+  const double rBBNP =
+    subtractSinglesHz(detector, cuts.emin_before, cuts.emax_before,
+                      IbdSel::PROMPT_MIN, IbdSel::PROMPT_MAX);
 
   const double promptWindow = 1e-6 * IbdSel::DT_MAX_US;
   const double prePromptWindowEmptyWindow =
-    (1e-6 * MultCutTool::IBD_USEC_BEFORE) - promptWindow;
-  const double postDelayedEmptyWindow = 1e-6 * MultCutTool::IBD_USEC_AFTER;
+    (1e-6 * cuts.usec_before) - promptWindow;
+  const double postDelayedEmptyWindow = 1e-6 * cuts.usec_after;
 
-  // sanity checks, assuming standard DMC
-  ASSERT(fabs(promptWindow - 200e-6) < 1e-15);
-  ASSERT(fabs(prePromptWindowEmptyWindow - 200e-6) < 1e-15);
-  ASSERT(fabs(postDelayedEmptyWindow - 200e-6) < 1e-15);
-
-  const double probOnePro = (Rpro * promptWindow) * exp(-Rpro * promptWindow);
-  const double probZeroPreMu = exp(-RpreMu * promptWindow);
-  const double probZeroPlu = exp(-Rplu * prePromptWindowEmptyWindow);
-  const double probZeroD = exp(-Rd * postDelayedEmptyWindow);
+  const double probOnePrompt = ((rPrompt * promptWindow) *
+                                exp(-rPrompt * promptWindow));
+  const double probZeroBBNP = exp(-rBBNP * promptWindow);
+  const double probZeroBefore = exp(-rBefore * prePromptWindowEmptyWindow);
+  const double probZeroAfter = exp(-rAfter * postDelayedEmptyWindow);
 
   // XXX In principle we should account for the dt > 1 requirement or else
   // remove that cut. Extra factor ~ exp(-20 * 1e-6) = 0.99998 meh who cares
-  const double R = Rd * probOnePro * probZeroPreMu * probZeroPlu * probZeroD;
+  const double R = rDelayed * probOnePrompt * probZeroBBNP *
+    probZeroBefore * probZeroAfter;
 
   // This R assumes veto eff. of 1 (i.e. unreduced by it) while R IS
   // reduced by DMC eff by construction (i.e. we are predicting what we'd see
@@ -194,8 +247,8 @@ double Calculator::accDailyErr(Det detector)
 double Calculator::li9Daily(Det detector)
 {
   const Config* config = pipe.getTool<Config>();
-  const unsigned shower_pe = config->get<double>("showerMuChgCut");
-  const double showerVeto_ms = 1e-3 * config->get<double>("showerMuPostVeto_us");
+  const unsigned shower_pe = config->get<double>("ibdShowerMuChgCut");
+  const double showerVeto_ms = 1e-3 * config->get<double>("ibdShowerMuPostVeto_us");
 
   return li9calc.li9daily(site, shower_pe, showerVeto_ms);
 }

@@ -1,7 +1,40 @@
-muPreVeto_us 2
-wpMuNhitCut 12
-wpMuPostVeto_us 600
-adMuChgCut 3000
-adMuPostVeto_us 1400
-showerMuChgCut 300000
-showerMuPostVeto_us 400400
+ibdMuPreVeto_us 2
+
+ibdWpMuNhitCut 12
+ibdWpMuPostVeto_us 600
+
+ibdAdMuChgCut 3000
+ibdAdMuPostVeto_us 1400
+
+ibdShowerMuChgCut 300000
+ibdShowerMuPostVeto_us 400400
+
+
+singleMuPreVeto_us 2
+
+singleWpMuNhitCut 12
+singleWpMuPostVeto_us 600
+
+singleAdMuChgCut 3000
+singleAdMuPostVeto_us 1400
+
+singleShowerMuChgCut 300000
+singleShowerMuPostVeto_us 400400
+
+
+ibdDmcUsecBefore 400
+ibdDmcEminBefore 0.7
+ibdDmcEmaxBefore 99999
+
+ibdDmcUsecAfter 200
+ibdDmcEminAfter 6
+ibdDmcEmaxAfter 12
+
+
+singleDmcUsecBefore 400
+singleDmcEminBefore 0.7
+singleDmcEmaxBefore 99999
+
+singleDmcUsecAfter 200
+singleDmcEminAfter 6
+singleDmcEmaxAfter 12

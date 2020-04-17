@@ -8,23 +8,37 @@
 
 #include <algorithm>
 #include <iostream>
+#include <string>
+#include <cctype>               // toupper
+
+template <typename T>
+static T readconf(const Config* config, const char* prefix, std::string name)
+{
+  name[0] = toupper(name[0]);
+  name = std::string(prefix) + name;
+  return config->get<T>(name.c_str());
+}
 
 void MuonAlg::initCuts(const Config* config)
 {
-  BEGIN_CONFIG(config);
+  const char* prefix = purpose == Purpose::ForIBDs ? "ibd" : "single";
 
-  CONFIG(muPreVeto_us);
+#define F(var) var = readconf<float>(config, prefix, #var)
+#define I(var) var = readconf<int>(config, prefix, #var)
 
-  CONFIG(wpMuNhitCut);
-  CONFIG(wpMuPostVeto_us);
+  I(muPreVeto_us);
 
-  CONFIG(adMuChgCut);
-  CONFIG(adMuPostVeto_us);
+  F(wpMuNhitCut);
+  F(wpMuPostVeto_us);
 
-  CONFIG(showerMuChgCut);
-  CONFIG(showerMuPostVeto_us);
+  F(adMuChgCut);
+  F(adMuPostVeto_us);
 
-  END_CONFIG();
+  F(showerMuChgCut);
+  F(showerMuPostVeto_us);
+
+#undef F
+#undef I
 }
 
 void MuonAlg::log(const char* msg, Det det, Time t, const MuonTree* muon) const
@@ -49,10 +63,8 @@ void MuonAlg::log(const char* msg, Det det, Time t, const MuonTree* muon) const
 
 void MuonAlg::connect(Pipeline& p)
 {
-  if (purpose == Purpose::ForIBDs) {
-    auto config = p.getTool<Config>();
-    initCuts(config);
-  } // Otherwise just use default cuts
+  auto config = p.getTool<Config>();
+  initCuts(config);
 
   SimpleAlg::connect(p);
 }

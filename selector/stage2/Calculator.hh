@@ -5,14 +5,14 @@
 
 #include "../common/Constants.hh"
 
-class TH1F;
 class CalcsTree;
+class MultCutTool;
 template <class T> class TreeWriter;
+class TH1F;
 
 class Calculator {
 public:
-  Calculator(Pipeline& pipe, Site site, Phase phase, UInt_t seq) :
-    pipe(pipe), site(site), phase(phase), seq(seq)  {}
+  Calculator(Pipeline& pipe, Site site, Phase phase, UInt_t seq);
 
   // Mark as 'virtual' those functions that use the Pipeline to access other
   // algs (except Config) and/or the stage1 input file. This way we can override
@@ -33,10 +33,16 @@ public:
 
 protected:
   TH1F* singlesHist(Det detector);
-  double singlesIntegral(Det detector,
-                         double lowE,
-                         std::optional<double> optUpperE = std::nullopt);
-  double singlesHz(Det detector, double N);
+  double singlesCount(Det detector,
+                      double lowE,
+                      std::optional<double> optUpperE = std::nullopt);
+  double calcSinglesHz(Det detector, double N);
+  double singlesHz(Det detector,
+                   double lowE,
+                   std::optional<double> optUpperE = std::nullopt);
+  double subtractSinglesHz(Det detector,
+                           float keep_min, float keep_max,
+                           float drop_min, float drop_max);
 
   double dmcEffSingles(Det detector);
 
@@ -56,5 +62,6 @@ protected:
   UInt_t seq;
 
   Li9Calc li9calc;
+  MultCutTool* multCut = nullptr;
 };
 

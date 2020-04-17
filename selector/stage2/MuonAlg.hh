@@ -39,16 +39,16 @@ private:
 
   const Purpose purpose;
 
-  double muPreVeto_us = 2;
+  double muPreVeto_us;
 
-  int wpMuNhitCut = 12;
-  double wpMuPostVeto_us = 600;
+  int wpMuNhitCut;
+  double wpMuPostVeto_us;
 
-  double adMuChgCut = 3000;
-  double adMuPostVeto_us = 1400;
+  double adMuChgCut;
+  double adMuPostVeto_us;
 
-  double showerMuChgCut = 300'000 ;
-  double showerMuPostVeto_us = 400'400;
+  double showerMuChgCut;
+  double showerMuPostVeto_us;
 
   bool vetoAroundGaps = false;
 
