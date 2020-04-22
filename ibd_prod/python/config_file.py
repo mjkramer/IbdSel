@@ -12,7 +12,7 @@ class ConfigFile(dict):
         for line in open(path):
             line = line.strip()
 
-            if line[0] == '#':
+            if (not line) or line[0] == '#':
                 continue
 
             key, val = line.split(maxsplit=1)
