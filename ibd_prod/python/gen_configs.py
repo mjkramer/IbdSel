@@ -14,17 +14,23 @@ def template_path():
     return os.path.join(home, "static/configs/config.nominal.txt")
 
 
-def shower(config, outdir):
-    for showerCut in [200_000, 400_000]:
-        for showerTime in [300_000, 500_000]:
-            config["showerMuChgCut"] = showerCut
-            config["showerMuPostVeto_us"] = showerTime
+def shower(config, outdir, ident=None):
+    if ident is None:
+        ident = "shower"
 
-            outname = f"config.muE_{showerCut}_muT_{showerTime}.txt"
+    for showerCut in [200_000, 300_000, 400_000]:
+        for showerTime in [300_000, 400_000, 500_000]:
+            config["ibdShowerMuChgCut"] = showerCut
+            config["ibdShowerMuPostVeto_us"] = showerTime
+
+            outname = f"config.{ident}_muE_{showerCut}_muT_{showerTime}.txt"
             config.write(os.path.join(outdir, outname))
 
 
-def accIsol(config, outdir):
+def accIsol(config, outdir, ident=None):
+    if ident is None:
+        ident = "accIsol"
+
     for usec_before in [400, 700, 1000]:
         for usec_after in [200, 400, 700, 1000]:
             for emin_after in [0.7, 3, 8, 10]:
@@ -32,7 +38,7 @@ def accIsol(config, outdir):
                 config["singleDmcUsecAfter"] = usec_after
                 config["singleDmcEminAfter"] = emin_after
 
-                outname = f"config.{usec_before}_{usec_after}_{emin_after}.txt"
+                outname = f"config.{ident}_{usec_before}_{usec_after}_{emin_after}.txt"
                 config.write(os.path.join(outdir, outname))
 
 
@@ -41,6 +47,7 @@ def main():
     ap.add_argument('studyname', choices=['shower', 'accIsol'])
     ap.add_argument('-d', '--outdir',
                     default=os.getenv('IBDSEL_CONFIGDIR'))
+    ap.add_argument('-i', '--identifier')
     args = ap.parse_args()
 
     if args.outdir is None:
@@ -49,7 +56,7 @@ def main():
 
     config = ConfigFile(template_path())
     os.system(f"mkdir -p {args.outdir}")
-    eval(args.studyname)(config, args.outdir)
+    eval(args.studyname)(config, args.outdir, args.identifier)
 
 
 if __name__ == "__main__":
