@@ -14,6 +14,23 @@ def template_path():
     return os.path.join(home, "static/configs/config.nominal.txt")
 
 
+def shower_nearNom(config, outdir, ident=None):
+    if ident is None:
+        ident = "shower_nearNom"
+
+    # XXX 425 should have been 325!
+    for showerCut in [275_000, 300_000, 425_000]:
+        for showerTime in [375_000, 400_000, 425_000]:
+            if showerCut == 300_000 and showerTime == 400_000:
+                continue
+
+            config["ibdShowerMuChgCut"] = showerCut
+            config["ibdShowerMuPostVeto_us"] = showerTime
+
+            outname = f"config.{ident}_muE_{showerCut}_muT_{showerTime}.txt"
+            config.write(os.path.join(outdir, outname))
+
+
 def shower(config, outdir, ident=None):
     if ident is None:
         ident = "shower"
@@ -44,7 +61,9 @@ def accIsol(config, outdir, ident=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('studyname', choices=['shower', 'accIsol'])
+    ap.add_argument('studyname', choices=['shower',
+                                          'accIsol',
+                                          'shower_nearNom'])
     ap.add_argument('-d', '--outdir',
                     default=os.getenv('IBDSEL_CONFIGDIR'))
     ap.add_argument('-i', '--identifier')
