@@ -20,6 +20,8 @@ Calculator::Calculator(Pipeline& pipe, Site site, Phase phase, UInt_t seq) :
   pipe(pipe), site(site), phase(phase), seq(seq)
 {
   multCut = pipe.getTool<MultCutTool>();
+  singleSel = pipe.getAlg<SingleSel>();
+  ibdSel = pipe.getAlg<IbdSel>();
 }
 
 double Calculator::livetime_s()
@@ -70,22 +72,22 @@ double Calculator::calcSinglesHz(Det detector, double N)
 // XXX get rid of me
 double Calculator::nPreMuons(Det detector)
 {
-  return singlesCount(detector, IbdSel::PROMPT_MAX);
+  return singlesCount(detector, ibdSel->PROMPT_MAX);
 }
 
 double Calculator::nPlusLikeSingles(Det detector)
 {
-  return singlesCount(detector, IbdSel::PROMPT_MIN);
+  return singlesCount(detector, ibdSel->PROMPT_MIN);
 }
 
 double Calculator::nPromptLikeSingles(Det detector)
 {
-  return singlesCount(detector, IbdSel::PROMPT_MIN, IbdSel::PROMPT_MAX);
+  return singlesCount(detector, ibdSel->PROMPT_MIN, ibdSel->PROMPT_MAX);
 }
 
 double Calculator::nDelayedLikeSingles(Det detector)
 {
-  return singlesCount(detector, IbdSel::DELAYED_MIN, IbdSel::DELAYED_MAX);
+  return singlesCount(detector, ibdSel->DELAYED_MIN, ibdSel->DELAYED_MAX);
 }
 
 double Calculator::dmcEffSingles(Det detector)
@@ -194,9 +196,9 @@ double Calculator::accDaily(Det detector)
   // Needed since our calculation assumes independent Poisson processes
   const double rBBNP =
     subtractSinglesHz(detector, cuts.emin_before, cuts.emax_before,
-                      IbdSel::PROMPT_MIN, IbdSel::PROMPT_MAX);
+                      ibdSel->PROMPT_MIN, ibdSel->PROMPT_MAX);
 
-  const double promptWindow = 1e-6 * IbdSel::DT_MAX_US;
+  const double promptWindow = 1e-6 * ibdSel->DT_MAX_US;
   const double prePromptWindowEmptyWindow =
     (1e-6 * cuts.usec_before) - promptWindow;
   const double postDelayedEmptyWindow = 1e-6 * cuts.usec_after;

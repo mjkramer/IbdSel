@@ -1,3 +1,15 @@
+ibdPromptEmin 0.7
+ibdPromptEmax 12
+ibdDelayedEmin 6
+ibdDelayedEmax 12
+ibdDtMinUsec 1
+ibdDtMaxUsec 200
+
+
+singleEmin 0.7
+singleEmax 99999
+
+
 ibdMuPreVeto_us 2
 
 ibdWpMuNhitCut 12

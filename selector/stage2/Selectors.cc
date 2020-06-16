@@ -3,6 +3,7 @@
 #include "MuonAlg.hh"
 
 #include "../SelectorFramework/core/Assert.hh"
+#include "../SelectorFramework/core/ConfigTool.hh"
 
 #include <TH1F.h>
 
@@ -19,6 +20,9 @@ void SelectorBase::connect(Pipeline &p)
   ASSERT(muonAlg->rawTag() == int(purpose));
 
   multCut = p.getTool<MultCutTool>();
+
+  const Config* config = p.getTool<Config>();
+  initCuts(config);
 }
 
 inline
@@ -37,6 +41,13 @@ SingleSel::SingleSel(Det det) :
   auto hname = Form("h_single_AD%d", int(det));
   // Use fine binning since we're doing integrals in Calculator
   hist = new TH1F(hname, hname, 2000, 0, 20);
+}
+
+void SingleSel::initCuts(const Config *config)
+{
+  EMIN = config->get<float>("singleEmin", 0.7);
+  // No upper limit (we want premuons):
+  EMAX = config->get<float>("singleEmax", 99999);
 }
 
 void SingleSel::finalize(Pipeline& _p)
@@ -68,6 +79,16 @@ void IbdSel::connect(Pipeline& p)
 {
   ibdTree.connect(p);
   SelectorBase::connect(p);
+}
+
+void IbdSel::initCuts(const Config *config)
+{
+  PROMPT_MIN = config->get<float>("ibdPromptEmin", 0.7);
+  PROMPT_MAX = config->get<float>("ibdPromptEmax", 12);
+  DELAYED_MIN = config->get<float>("ibdDelayedEmin", 6);
+  DELAYED_MAX = config->get<float>("ibdDelayedEmax", 12);
+  DT_MIN_US = config->get<float>("ibdDtMinUsec", 1);
+  DT_MAX_US = config->get<float>("ibdDtMaxUsec", 200);
 }
 
 void IbdSel::finalize(Pipeline& p)

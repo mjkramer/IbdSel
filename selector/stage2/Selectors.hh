@@ -10,6 +10,7 @@
 
 class MultCutTool;
 class TH1F;
+class Config;
 
 class SelectorBase : public BufferedSimpleAlg<AdBuffer, Det> {
 public:
@@ -24,7 +25,7 @@ public:
     return *current;
   }
 
-
+  virtual void initCuts(const Config* config) = 0;
   virtual void select(Iter it) = 0;
 
   const Det det;
@@ -42,10 +43,11 @@ private:
 
 class SingleSel : public SelectorBase {
 public:
-  static constexpr float EMIN = 0.7;
-  static constexpr float EMAX = FLT_MAX; // no upper limit (we want premuons)
+  float EMIN;
+  float EMAX;
 
   SingleSel(Det det);
+  void initCuts(const Config* config) override;
   void select(Iter it) override;
   void finalize(Pipeline& p) override;
 
@@ -56,15 +58,16 @@ public:
 
 class IbdSel : public SelectorBase {
 public:
-  static constexpr float PROMPT_MIN = 0.7;
-  static constexpr float PROMPT_MAX = 12;
-  static constexpr float DELAYED_MIN = 6;
-  static constexpr float DELAYED_MAX = 12;
-  static constexpr unsigned DT_MIN_US = 1;
-  static constexpr unsigned DT_MAX_US = 200;
+  float PROMPT_MIN;
+  float PROMPT_MAX;
+  float DELAYED_MIN;
+  float DELAYED_MAX;
+  unsigned DT_MIN_US;
+  unsigned DT_MAX_US;
 
   IbdSel(Det detector);
   void connect(Pipeline& p) override;
+  void initCuts(const Config* config) override;
   void select(Iter it) override;
   void finalize(Pipeline& p) override;
 

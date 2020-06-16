@@ -7,6 +7,8 @@
 
 class CalcsTree;
 class MultCutTool;
+class SingleSel;
+class IbdSel;
 template <class T> class TreeWriter;
 class TH1F;
 
@@ -63,5 +65,7 @@ protected:
 
   Li9Calc li9calc;
   MultCutTool* multCut = nullptr;
+  SingleSel* singleSel = nullptr;
+  IbdSel* ibdSel = nullptr;
 };
 
