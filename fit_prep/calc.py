@@ -11,23 +11,12 @@ import ROOT as R
 
 import os
 
-# XXX delete me when deleting Calc.conf etc. (see below)
-from util import load_selector
-load_selector()
-
-
-# XXX If Li9Calc is working from within stage2 again, we can get rid of
-# self.conf and self.li9calc and just use the commented versions of li9Bkg[Err]
 class Calc:
     "Calculate for a given phase"
 
     def __init__(self, phase, stage2_dir, config_path):
         self.phase = phase
         self.hardcoded = Hardcoded(phase)
-
-        # XXX
-        self.conf = ConfigFile(config_path)
-        self.li9calc = R.Li9Calc()
 
         self.files, self.results = {}, {}
         for site in [1, 2, 3]:
@@ -71,20 +60,18 @@ class Calc:
         # return self._livetime_weighted_squared(site, det, 'accDailyErr')
         return 0.01 * self.accBkg(site, det)
 
-    # XXX
-    # def li9Bkg(self, site, det):
-    #     return self._livetime_weighted(site, det, 'li9Bkg')
-    #
-    # def li9BkgErr(self, site, det):
-    #     return self._livetime_weighted(site, det, 'li9BkgErr')
-    def li9Bkg(self, site, _det):
-        shower_pe = self.conf['showerMuChgCut']
-        showerVeto_ms = 1e-3 * self.conf['showerMuPostVeto_us']
-        return self.li9calc.li9daily(site, shower_pe, showerVeto_ms)
+    def li9Bkg(self, site, det):
+        return self._livetime_weighted(site, det, 'li9Daily')
 
+    # XXX Calculator.cc was using a simple 0.3. Now we've moved these fracUnc
+    # to it. So we can delete this in favor of the one below it, once we're
+    # using the updated IbdSel (i.e. after 2020-05-05).
     def li9BkgErr(self, site, det):
         fracUnc = [0.27, 0.29, 0.37]
         return fracUnc[site-1] * self.li9Bkg(site, det)
+
+    # def li9BkgErr(self, site, det):
+    #     return self._livetime_weighted(site, det, 'li9DailyErr')
 
     def totalBkg(self, site, det):
         return (self.accBkg(site, det) +
