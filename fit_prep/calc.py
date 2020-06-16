@@ -63,15 +63,8 @@ class Calc:
     def li9Bkg(self, site, det):
         return self._livetime_weighted(site, det, 'li9Daily')
 
-    # XXX Calculator.cc was using a simple 0.3. Now we've moved these fracUnc
-    # to it. So we can delete this in favor of the one below it, once we're
-    # using the updated IbdSel (i.e. after 2020-05-05).
     def li9BkgErr(self, site, det):
-        fracUnc = [0.27, 0.29, 0.37]
-        return fracUnc[site-1] * self.li9Bkg(site, det)
-
-    # def li9BkgErr(self, site, det):
-    #     return self._livetime_weighted(site, det, 'li9DailyErr')
+        return self._livetime_weighted(site, det, 'li9DailyErr')
 
     def totalBkg(self, site, det):
         return (self.accBkg(site, det) +
