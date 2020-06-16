@@ -31,5 +31,4 @@ ln -s $trueOutdir $outdir
 
 filter_cmd=${filter_cmd:-cat}
 
-gunzip -c $LISTFILEPATH | $filter_cmd > $infile.orig
-cp $infile.orig $infile
+gunzip -c $LISTFILEPATH | $filter_cmd > $infile

@@ -32,7 +32,7 @@ if [ -z $configname ]; then
     exit 1
 fi
 
-stage2_vars $tag $configname
+stage2_vars $tag@$configname
 
 mkdir -p $indir $logdir $trueOutdir
 mkdir -p $(dirname $outdir)

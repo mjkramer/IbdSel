@@ -5,7 +5,7 @@ source bash/stage2_vars.inc.sh
 tag=$1; shift
 configname=$1; shift
 
-stage2_vars $tag $configname
+stage2_vars $tag@$configname
 
 source bash/job_init.inc.sh
 

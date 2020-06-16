@@ -48,7 +48,7 @@ export IBDSEL_USE_BURSTBUF=1
 export IBDSEL_SLURMFILE=slurm/run_${sysname}.sl.sh
 
 source bash/stage2_vars.inc.sh
-stage2_vars DUMMY DUMMY
+stage2_vars DUMMY@DUMMY
 inroot=$(dirname $indir)
 
 basebenchname=bm_$sysname.$nfiles
@@ -64,7 +64,7 @@ for f in $factors; do
     configname=$basebenchname.$uniqueId.$(printf "%03d" $f)
     cp $oldconfigdir/config.nominal.txt $IBDSEL_CONFIGDIR/config.$configname.txt
 
-    stage2_vars $tag $configname
+    stage2_vars $tag@$configname
     scripts/prep_stage2.sh -f "shuf -n $nfiles" $tag $configname
 
     export IBDSEL_NTASKS=$f

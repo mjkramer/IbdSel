@@ -1,13 +1,15 @@
 source bash/common_vars.inc.sh
 
 stage2_vars() {
-    local tag=$1; shift
+    local arr=(${1//@/ }); shift # split $1 at the @ character
+    local tag=${arr[0]}
+    local configname=${arr[1]}
+
     if [ -z "$tag" ]; then
         echo "Specify a tag!"
         exit 1
     fi
 
-    local configname=$1; shift
     if [ -z "$configname" ]; then
         echo "Specify a config!"
         exit 1

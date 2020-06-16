@@ -13,7 +13,7 @@ configname=$1; shift
 njob=$1; shift
 sbatch_extra=$@
 
-stage2_vars $tag $configname
+stage2_vars $tag@$configname
 check_paths
 # check_compiled ../selector/stage2/stage2_main.cc
 

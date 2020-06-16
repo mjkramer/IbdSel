@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Usage: filter_done.sh [-p PENDING] STEP TAG
+# where STEP is e.g. stage1 and TAG is e.g. 2020_01_26
+# or where STEP is e.g. stage2 and TAG is e.g. 2020_01_26@yolo.
+# If jobs are currently running, PENDING should be NUMJOBS * CHUNKSIZE;
+# otherwise you'll get multiple jobs processing the same file.
+
 while getopts "p:" opt; do
     case $opt in
         p)
@@ -24,13 +30,13 @@ if [ -z "$tag" ]; then
     exit 1
 fi
 
-source bash/${step}_vars.sh
+source bash/${step}_vars.inc.sh
 ${step}_vars $tag
 
 echo "Acquiring lock"
 lockfile -5 $infile.lock
 
-awk '{print $2}' $infile.done > $infile.tmp.omit
+cut -d' ' -f2- $infile.done > $infile.omit
 
 if [ -n "$pending" ]; then
     offset=$(cat $infile.offset)
@@ -38,10 +44,11 @@ if [ -n "$pending" ]; then
     # In 0-based indexing, take l = lines[ [o-p, o) ]. Count = p.
     # sed uses 1-based indexing and inclusive ranges: l == lines'[ [o-p+1, o] ]
     sed -n "$((offset - pending + 1)),$((offset))p;$((offset+1))q" \
-        $infile >> $infile.tmp.omit
+        $infile >> $infile.omit
 fi
 
-comm -23 <(sort $infile.orig) <(sort $infile.tmp.omit) > $infile
+cp $infile $infile.prev
+comm -23 <(sort $infile.prev) <(sort $infile.omit) > $infile
 rm $infile.offset
 
-rm -f $infile.lock $infile.tmp.omit
+rm -f $infile.lock
