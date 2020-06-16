@@ -255,7 +255,18 @@ double Calculator::li9Daily(Det detector)
 
 double Calculator::li9DailyErr(Det detector)
 {
-  return 0.3 * li9Daily(detector);
+  // XXX For now just use Chris's uncertainties for the nominal cuts. We should
+  // try to be more precise.
+  switch (site) {
+  case Site::EH1:
+    return 0.27 * li9Daily(detector);
+  case Site::EH2:
+    return 0.29 * li9Daily(detector);
+  case Site::EH3:
+    return 0.37 * li9Daily(detector);
+  }
+
+  throw;
 }
 
 void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
