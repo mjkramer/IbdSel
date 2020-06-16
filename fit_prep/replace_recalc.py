@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# NOTE: The recalc code is currently unused and untested. The idea is to re-run
+# the calculations in Calculator.cc without redoing the whole stage2 selection.
+
 import argparse
 import os
 

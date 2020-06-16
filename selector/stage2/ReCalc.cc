@@ -1,3 +1,6 @@
+// NOTE: The recalc code is currently unused and untested. The idea is to re-run
+// the calculations in Calculator.cc without redoing the whole stage2 selection.
+
 #include "ReCalc.hh"
 
 ReCalc::ReCalc(Pipeline& pipe, Site site, Phase phase) :
