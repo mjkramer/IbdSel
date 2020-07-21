@@ -40,6 +40,7 @@ SingleSel::SingleSel(Det det) :
 {
   auto hname = Form("h_single_AD%d", int(det));
   // Use fine binning since we're doing integrals in Calculator
+  // Go up to 20 MeV so we can calc pre-muon rate (for debugging)
   hist = new TH1F(hname, hname, 2000, 0, 20);
 }
 
@@ -71,8 +72,6 @@ IbdSel::IbdSel(Det detector) :
   SelectorBase(detector, MuonAlg::Purpose::ForIBDs),
   ibdTree(Form("ibd_AD%d", int(detector)))
 {
-  auto hname = Form("h_ibd_AD%d", detector);
-  hist = new TH1F(hname, hname, 240, 0, 12);
 }
 
 void IbdSel::connect(Pipeline& p)
@@ -89,6 +88,9 @@ void IbdSel::initCuts(const Config *config)
   DELAYED_MAX = config->get<float>("ibdDelayedEmax", 12);
   DT_MIN_US = config->get<float>("ibdDtMinUsec", 1);
   DT_MAX_US = config->get<float>("ibdDtMaxUsec", 200);
+
+  auto hname = Form("h_ibd_AD%d", det);
+  hist = new TH1F(hname, hname, 20 * PROMPT_MAX, 0, PROMPT_MAX);
 }
 
 void IbdSel::finalize(Pipeline& p)
