@@ -8,4 +8,5 @@ void IbdTree::initBranches()
   BR(trigD);
   BR(eP);
   BR(eD);
+  BR(dt_us);
 }

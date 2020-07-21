@@ -104,6 +104,7 @@ void IbdSel::save(Iter prompt, Iter delayed)
   ibdTree.data.trigD = delayed->trigNo;
   ibdTree.data.eP = prompt->energy;
   ibdTree.data.eD = delayed->energy;
+  ibdTree.data.dt_us = delayed->time().diff_us(prompt->time());
 
   ibdTree.fill();
 }

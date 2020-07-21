@@ -10,6 +10,7 @@ public:
   UInt_t trigD;
   Float_t eP;
   Float_t eD;
+  Float_t dt_us;
 
   void initBranches() override;
 };
