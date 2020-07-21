@@ -16,7 +16,6 @@ def binning_lbnl():
     return edges
 
 
-# We don't actually need this since stage2 gives us this binning already
 def binning_fine():
     return np.linspace(0, 12, 1 + nbins_fine)
 
