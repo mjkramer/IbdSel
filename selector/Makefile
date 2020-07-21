@@ -93,7 +93,8 @@ $(BUILD_DIR)/%.so: $$($$*_OBJS) $$($$*_DICTS)
 	$(LD) $(LDFLAGS) $^ -shared -o $@
 
 $(BUILD_DIR)/%.exe: $$*/$$*_exe.cpp $(BUILD_DIR)/$$*.so $(BUILD_DIR)/common.so
-	$(CC) $(CFLAGS) $(LDFLAGS) -L$(BUILD_DIR) -l:$*.so -l:common.so $< -o $@
+	@# $(CC) $(CFLAGS) $(LDFLAGS) -L$(BUILD_DIR) -l:$*.so -l:common.so $< -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(abspath $(BUILD_DIR)/$*.so) $(abspath $(BUILD_DIR)/common.so) $< -o $@
 
 .PHONY: clean
 clean:
