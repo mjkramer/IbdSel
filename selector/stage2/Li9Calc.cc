@@ -2,9 +2,15 @@
 
 #include <fstream>
 
-Li9Calc::Li9Calc()
+Li9Calc::Li9Calc() :
+  mode(Mode::Nominal)
 {
   initTable();
+}
+
+void Li9Calc::setMode(Mode mode)
+{
+  this->mode = mode;
 }
 
 void Li9Calc::initTable()
@@ -32,6 +38,24 @@ std::string Li9Calc::dataPath(const char* filename)
   return base + "/" + DATA_DIR + "/" + filename;
 }
 
+double Li9Calc::get(Site site, MuonBin bin)
+{
+  Data& d = table[site][bin];
+
+  switch (mode) {
+  case Mode::Nominal:
+    return d.nomRate;
+  case Mode::NoB12:
+    return d.rateNoB12;
+  case Mode::Fix15pctHe8:
+    return d.rate15pctHe8;
+  case Mode::NoHe8:
+    return d.rateNoHe8;
+  default:
+    throw;
+  }
+}
+
 double Li9Calc::extrapolate(unsigned shower_pe,
                             std::function<double(unsigned)> getter)
 {
@@ -46,13 +70,13 @@ double Li9Calc::extrapolate(unsigned shower_pe,
 
 double Li9Calc::measLowRange(Site site)
 {
-  return get(site, {MIN_PE, MAX_NTAG_PE}).nomRate;
+  return get(site, {MIN_PE, MAX_NTAG_PE});
 }
 
 double Li9Calc::measMidRange(Site site, unsigned shower_pe)
 {
   auto getter = [&](unsigned edge_pe) -> double {
-    return get(site, {MAX_NTAG_PE, edge_pe}).nomRate;
+    return get(site, {MAX_NTAG_PE, edge_pe});
   };
 
   return extrapolate(shower_pe, getter);
@@ -61,7 +85,7 @@ double Li9Calc::measMidRange(Site site, unsigned shower_pe)
 double Li9Calc::measHighRange(Site site, unsigned shower_pe)
 {
   auto getter = [&](unsigned edge_pe) -> double {
-    return get(site, {edge_pe, MAX_PE}).nomRate;
+    return get(site, {edge_pe, MAX_PE});
   };
 
   return extrapolate(shower_pe, getter);

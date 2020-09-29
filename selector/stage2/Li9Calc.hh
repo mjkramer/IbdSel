@@ -8,11 +8,15 @@
 
 class Li9Calc {
 public:
+  enum class Mode { Nominal, NoB12, Fix15pctHe8, NoHe8 };
+
   Li9Calc();
 
   // This return the rate (per AD per day) predicted in our raw spectrum
   // assuming perfect veto/dmc efficiencies
   double li9daily(Site site, double shower_pe, double showerVeto_ms);
+
+  void setMode(Mode mode);
 
 private:
   static constexpr const char* DATA_DIR = "static/li9_data";
@@ -62,10 +66,7 @@ public:
   };
 
 private:
-  Data& get(Site site, MuonBin bin)
-  {
-    return table[site][bin];
-  }
+  double get(Site site, MuonBin bin);
 
   using SiteTable = std::map<MuonBin, Data>;
   using Table = std::map<Site, SiteTable>;
@@ -81,5 +82,6 @@ private:
 
   Table table;
   LivetimeTable adLivedays;
+  Mode mode;
 };
 
