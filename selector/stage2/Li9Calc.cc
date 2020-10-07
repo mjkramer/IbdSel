@@ -28,7 +28,7 @@ void Li9Calc::initTable()
     ifs >> bin.lowerPE >> bin.upperPE;
 
     Data& d = table[Site(site)][bin];
-    ifs >> d.nomRate >> d.statUnc >> d.rateNoB12 >> d.rate15pctHe8 >> d.rateNoHe8;
+    ifs >> d.nomRate >> d.statUnc >> d.chi2 >> d.rateNoB12 >> d.rate15pctHe8 >> d.rateNoHe8;
   }
 }
 
@@ -91,29 +91,28 @@ double Li9Calc::measHighRange(Site site, unsigned shower_pe)
   return extrapolate(shower_pe, getter);
 }
 
+// Note: Shower veto is now NOT applied in Li9 selection
 double Li9Calc::li9daily(Site site, double shower_pe, double showerVeto_ms)
 {
+  // n-tagged; won't be affected by shower veto; 8/6 MeV near/far prompt cut:
   const double totLow = measLowRange(site);
+  // not n-tagged; won't be affected by shower veto; 8/6 MeV near/far prompt cut:
   const double totMid = measMidRange(site, shower_pe);
+  // not n-tagged; WILL be partially removed by shower veto; 3.5 MeV prompt cut:
   const double totHigh = measHighRange(site, shower_pe);
 
-  const double ibdSelSurvProb = exp(-showerVeto_ms / LI9_LIFETIME_MS);
-  const double survRatio = ibdSelSurvProb / LI9_SEL_SURV_PROB;
+  const double showerVetoSurvProb = exp(-showerVeto_ms / LI9_LIFETIME_MS);
 
   const size_t isite = int(site) - 1;
   const double denom = LIVEDAYS[isite] * NDET_WEIGHTED[isite] *
-    VETO_EFFS[isite] * MULT_EFF * DT_EFF;
+    VETO_EFFS[isite] * MULT_EFFS[isite];
   const double lowPePromptEff =
     site == Site::EH3 ? FAR_LOW_PE_PROMPT_EFF : NEAR_LOW_PE_PROMPT_EFF;
 
-  // XXX
-  const double highPeFudgeFactor =
-    site == Site::EH3 ? LI9_SEL_SURV_PROB : 1;
-
   const double predCount =
-    totLow / lowPePromptEff +
+    totLow / lowPePromptEff / NTAG_EFF +
     totMid / lowPePromptEff +
-    totHigh / HIGH_PE_PROMPT_EFF * survRatio * highPeFudgeFactor;
+    totHigh / HIGH_PE_PROMPT_EFF * showerVetoSurvProb;
 
   return predCount / denom;
 }
