@@ -14,7 +14,8 @@ public:
 
   // This return the rate (per AD per day) predicted in our raw spectrum
   // assuming perfect veto/dmc efficiencies
-  double li9daily(Site site, double shower_pe, double showerVeto_ms);
+  double li9daily_nearest(Site site, double shower_pe, double showerVeto_ms);
+  double li9daily_linreg(Site site, double shower_pe, double showerVeto_ms);
 
   void setMode(Mode mode);
 
@@ -24,9 +25,12 @@ private:
 
   static constexpr unsigned MIN_PE = 5'000;
   static constexpr unsigned MAX_NTAG_PE = 160'000;
-  static constexpr unsigned MIN_VETO_BDRY_PE = 170'000;
-  static constexpr unsigned MAX_VETO_BDRY_PE = 600'000;
+
+  // for linear regression:
+  static constexpr unsigned MIN_VETO_BDRY_PE = 180'000; // inclusive
+  static constexpr unsigned MAX_VETO_BDRY_PE = 500'000; // inclusive
   static constexpr unsigned DELTA_VETO_BDRY_PE = 10'000;
+
   static constexpr unsigned MAX_PE = 9'999'999;
 
   static constexpr double LI9_LIFETIME_MS = 257;
@@ -80,7 +84,7 @@ private:
   double measLowRange(Site site);
   double measMidRange(Site site, unsigned shower_pe);
   double measHighRange(Site site, unsigned shower_pe);
-  double extrapolate(unsigned shower_pe,
+  double interpolate(unsigned shower_pe,
                      std::function<double(unsigned)> getter);
 
   Table table;

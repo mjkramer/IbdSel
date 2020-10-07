@@ -252,7 +252,7 @@ double Calculator::li9Daily(Det detector)
   const unsigned shower_pe = config->get<double>("ibdShowerMuChgCut");
   const double showerVeto_ms = 1e-3 * config->get<double>("ibdShowerMuPostVeto_us");
 
-  return li9calc.li9daily(site, shower_pe, showerVeto_ms);
+  return li9calc.li9daily_linreg(site, shower_pe, showerVeto_ms);
 }
 
 double Calculator::li9DailyErr(Det detector)

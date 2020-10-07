@@ -1,5 +1,8 @@
 #include "Li9Calc.hh"
 
+#include <TGraph.h>
+#include <TF1.h>
+
 #include <fstream>
 
 Li9Calc::Li9Calc() :
@@ -56,7 +59,7 @@ double Li9Calc::get(Site site, MuonBin bin)
   }
 }
 
-double Li9Calc::extrapolate(unsigned shower_pe,
+double Li9Calc::interpolate(unsigned shower_pe,
                             std::function<double(unsigned)> getter)
 {
   const unsigned delta = DELTA_VETO_BDRY_PE;
@@ -79,7 +82,7 @@ double Li9Calc::measMidRange(Site site, unsigned shower_pe)
     return get(site, {MAX_NTAG_PE, edge_pe});
   };
 
-  return extrapolate(shower_pe, getter);
+  return interpolate(shower_pe, getter);
 }
 
 double Li9Calc::measHighRange(Site site, unsigned shower_pe)
@@ -88,11 +91,11 @@ double Li9Calc::measHighRange(Site site, unsigned shower_pe)
     return get(site, {edge_pe, MAX_PE});
   };
 
-  return extrapolate(shower_pe, getter);
+  return interpolate(shower_pe, getter);
 }
 
 // Note: Shower veto is now NOT applied in Li9 selection
-double Li9Calc::li9daily(Site site, double shower_pe, double showerVeto_ms)
+double Li9Calc::li9daily_nearest(Site site, double shower_pe, double showerVeto_ms)
 {
   // n-tagged; won't be affected by shower veto; 8/6 MeV near/far prompt cut:
   const double totLow = measLowRange(site);
@@ -102,12 +105,12 @@ double Li9Calc::li9daily(Site site, double shower_pe, double showerVeto_ms)
   const double totHigh = measHighRange(site, shower_pe);
 
   const double showerVetoSurvProb = exp(-showerVeto_ms / LI9_LIFETIME_MS);
+  const double lowPePromptEff =
+    site == Site::EH3 ? FAR_LOW_PE_PROMPT_EFF : NEAR_LOW_PE_PROMPT_EFF;
 
   const size_t isite = int(site) - 1;
   const double denom = LIVEDAYS[isite] * NDET_WEIGHTED[isite] *
     VETO_EFFS[isite] * MULT_EFFS[isite];
-  const double lowPePromptEff =
-    site == Site::EH3 ? FAR_LOW_PE_PROMPT_EFF : NEAR_LOW_PE_PROMPT_EFF;
 
   const double predCount =
     totLow / lowPePromptEff / NTAG_EFF +
@@ -115,4 +118,21 @@ double Li9Calc::li9daily(Site site, double shower_pe, double showerVeto_ms)
     totHigh / HIGH_PE_PROMPT_EFF * showerVetoSurvProb;
 
   return predCount / denom;
+}
+
+double Li9Calc::li9daily_linreg(Site site, double shower_pe, double showerVeto_ms)
+{
+  const int N = (MAX_VETO_BDRY_PE - MIN_VETO_BDRY_PE) / DELTA_VETO_BDRY_PE + 1;
+
+  double cuts[N];
+  double rates[N];
+
+  for (int i = 0; i < N; ++i) {
+    cuts[i] = MIN_VETO_BDRY_PE + i*DELTA_VETO_BDRY_PE;
+    rates[i] = li9daily_nearest(site, cuts[i], showerVeto_ms);
+  }
+
+  TGraph graph(N, cuts, rates);
+  graph.Fit("pol1", "0Q");
+  return graph.GetFunction("pol1")->Eval(shower_pe);
 }
