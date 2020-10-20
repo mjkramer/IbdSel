@@ -7,3 +7,4 @@ dbg/
 yasu/
 .ccls-cache/
 _build/
+build/
