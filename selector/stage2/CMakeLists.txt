@@ -36,7 +36,7 @@ add_executable(stage2.exe
 
 target_include_directories(stage2 PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
 target_include_directories(stage2 PUBLIC "${CMAKE_CURRENT_LIST_DIR}/external")
-ROOT_GENERATE_DICTIONARY(Dict_stage2 "${STAGE2_HEADERS}" MODULE stage2)
+ROOT_GENERATE_DICTIONARY(Dict_stage2 "${STAGE2_HEADERS}" MODULE stage2 OPTIONS -interpreteronly)
 target_link_libraries(stage2 PUBLIC common)
 target_link_libraries(stage2.exe PUBLIC stage2)
 target_compile_definitions(stage2 PRIVATE IBDSEL_BASE="${IBDSEL_BASE}")

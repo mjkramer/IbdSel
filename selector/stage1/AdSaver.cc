@@ -3,12 +3,12 @@
 #include "EventReader.hh"
 #include "MuonSaver.hh"
 
-#include "../common/AdTree.hh"
-#include "../common/Constants.hh"
-#include "../common/Misc.hh"
+#include "AdTree.hh"
+#include "Constants.hh"
+#include "Misc.hh"
 
-#include "../SelectorFramework/core/SimpleAlg.hh"
-#include "../SelectorFramework/core/TreeWriter.hh"
+#include "SimpleAlg.hh"
+#include "TreeWriter.hh"
 
 AdSaver::AdSaver(Det det) :
   det(det),
