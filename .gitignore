@@ -1,2 +1,4 @@
 *.pyc
 .ccls-cache
+.clangd
+.envrc

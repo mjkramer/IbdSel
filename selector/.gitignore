@@ -8,3 +8,4 @@ yasu/
 .ccls-cache/
 _build/
 build/
+compile_commands.json
