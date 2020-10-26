@@ -1,4 +1,4 @@
 [submodule "SelectorFramework"]
 	path = selector/SelectorFramework
-	url = https://git.jinr.ru/DayaBay/SelectorFramework.git
+	url = git@git.jinr.ru:DayaBay/SelectorFramework.git
         branch = master
