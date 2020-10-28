@@ -17,6 +17,7 @@ public:
   struct Cuts {
     float usec_before, emin_before, emax_before;
     float usec_after, emin_after, emax_after;
+    bool isIHEP;
   };
 
   Cuts ibdCuts;
