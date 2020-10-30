@@ -26,3 +26,10 @@ add_subdirectory(SelectorFramework)
 add_subdirectory(common)
 add_subdirectory(stage1)
 add_subdirectory(stage2)
+
+install(TARGETS SelectorFramework common stage1 stage2
+        LIBRARY DESTINATION lib)
+install(FILES ${CMAKE_BINARY_DIR}/SelectorFramework/libSelectorFramework_rdict.pcm DESTINATION lib)
+install(FILES ${CMAKE_BINARY_DIR}/stage1/libstage1_rdict.pcm DESTINATION lib)
+install(FILES ${CMAKE_BINARY_DIR}/stage2/libstage2_rdict.pcm DESTINATION lib)
+install(FILES ${CMAKE_BINARY_DIR}/common/libcommon_rdict.pcm DESTINATION lib)
