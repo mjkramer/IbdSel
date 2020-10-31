@@ -15,13 +15,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('tag')
     ap.add_argument('config')
+    ap.add_argument('--bcw', action='store_true',
+                    help='Use BCW binning')
+    ap.add_argument('--suffix')
     args = ap.parse_args()
 
-    outdir = data_dir('fit_input', f'{args.tag}@{args.config}')
+    outconfig = args.config + (f"@{args.suffix}" if args.suffix else "")
+
+    outdir = data_dir('fit_input', f'{args.tag}@{outconfig}')
     os.system(f'mkdir -p {outdir}')
 
-    gen_hists(args.tag, args.config)
-    gen_text(args.tag, args.config)
+    gen_hists(args.tag, args.config, outconfig, bcw=args.bcw)
+    gen_text(args.tag, args.config, outconfig)
 
 
 if __name__ == '__main__':

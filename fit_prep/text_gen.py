@@ -115,9 +115,9 @@ def gen_text_(out_fname, phase, stage2_dir, config_path):
     outf.close()
 
 
-def gen_text(tag, config):
+def gen_text(tag, config, outconfig):
     for phase in [1, 2, 3]:
-        out_fname = fit_text_input_path(phase, tag, config)
+        out_fname = fit_text_input_path(phase, tag, outconfig)
         stage2_dir = data_dir('stage2_pbp', f'{tag}@{config}')
         config_path = configfile_path(tag, config)
 
