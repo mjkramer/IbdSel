@@ -6,12 +6,7 @@ import argparse
 import os
 import sys
 
-from config_file import ConfigFile
-
-
-def template_path():
-    home = os.getenv("IBDSEL_HOME")
-    return os.path.join(home, "static/configs/config.nominal.txt")
+from config_file import ConfigFile, template_path
 
 
 def shower_nearNom(config, outdir, ident=None):
