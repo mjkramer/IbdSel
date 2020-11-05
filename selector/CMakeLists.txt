@@ -4,6 +4,11 @@ project(IbdSel LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+set(CMAKE_SKIP_BUILD_RPATH ON)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 find_package(Boost REQUIRED)
 if(Boost_FOUND)
@@ -37,6 +42,8 @@ add_subdirectory(stage2)
 install(TARGETS SelectorFramework common stage1 stage2
         LIBRARY DESTINATION lib
         PUBLIC_HEADER DESTINATION include)
+install(TARGETS stage1.exe stage2.exe
+    RUNTIME DESTINATION bin)
 
 install(FILES ${CMAKE_BINARY_DIR}/SelectorFramework/libSelectorFramework_rdict.pcm DESTINATION lib)
 install(FILES ${CMAKE_BINARY_DIR}/stage1/libstage1_rdict.pcm DESTINATION lib)
