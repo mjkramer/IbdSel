@@ -1,6 +1,6 @@
 #include "MultCut.hh"
 
-#include "../SelectorFramework/core/Assert.hh"
+#include "Assert.hh"
 
 #include <limits>
 

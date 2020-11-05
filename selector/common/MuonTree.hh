@@ -2,8 +2,8 @@
 
 #include "Constants.hh"
 
-#include "../SelectorFramework/core/BaseIO.hh"
-#include "../SelectorFramework/core/Util.hh"
+#include "BaseIO.hh"
+#include "Util.hh"
 
 class MuonTree : public TreeBase {
 public:

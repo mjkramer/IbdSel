@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "../common/Misc.hh"
+#include "Misc.hh"
 
 void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase)
 {

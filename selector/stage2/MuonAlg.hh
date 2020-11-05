@@ -2,9 +2,9 @@
 
 #include "Readers.hh"
 
-#include "../SelectorFramework/core/ConfigTool.hh"
-#include "../SelectorFramework/core/RingBuf.hh"
-#include "../SelectorFramework/core/SimpleAlg.hh"
+#include "ConfigTool.hh"
+#include "RingBuf.hh"
+#include "SimpleAlg.hh"
 
 class MuonAlg : public SimpleAlg<MuonReader> {
   static constexpr unsigned BUF_SIZE = 10000;

@@ -2,8 +2,8 @@
 #include "MultCut.hh"
 #include "MuonAlg.hh"
 
-#include "../SelectorFramework/core/Assert.hh"
-#include "../SelectorFramework/core/ConfigTool.hh"
+#include "Assert.hh"
+#include "ConfigTool.hh"
 
 #include <TH1F.h>
 

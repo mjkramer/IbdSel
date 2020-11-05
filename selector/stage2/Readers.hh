@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../common/AdTree.hh"
-#include "../common/Constants.hh"
-#include "../common/MuonTree.hh"
+#include "AdTree.hh"
+#include "Constants.hh"
+#include "MuonTree.hh"
 
-#include "../SelectorFramework/core/TimeSyncReader.hh"
+#include "TimeSyncReader.hh"
 
 class MuonReader : public TimeSyncReader<MuonTree> {
 public:

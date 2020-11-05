@@ -2,10 +2,10 @@
 
 #include "EventReader.hh"
 
-#include "../common/MuonTree.hh"
+#include "MuonTree.hh"
 
-#include "../SelectorFramework/core/SimpleAlg.hh"
-#include "../SelectorFramework/core/TreeWriter.hh"
+#include "SimpleAlg.hh"
+#include "TreeWriter.hh"
 
 class MuonSaver : public SimpleAlg<EventReader> {
   static constexpr int WP_MIN_NHIT = 12;

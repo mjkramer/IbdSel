@@ -3,7 +3,7 @@
 #include "Li9Calc.hh"
 #include "MuonAlg.hh"
 
-#include "../common/Constants.hh"
+#include "Constants.hh"
 
 class CalcsTree;
 class MultCutTool;

@@ -2,10 +2,10 @@
 
 #include "EventReader.hh"
 
-#include "../common/AdTree.hh"
+#include "AdTree.hh"
 
-#include "../SelectorFramework/core/SimpleAlg.hh"
-#include "../SelectorFramework/core/TreeWriter.hh"
+#include "SimpleAlg.hh"
+#include "TreeWriter.hh"
 
 class MuonSaver;
 

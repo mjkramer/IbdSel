@@ -2,9 +2,9 @@
 
 #include "Selectors.hh"
 
-#include "../common/Constants.hh"
+#include "Constants.hh"
 
-#include "../SelectorFramework/core/Util.hh"
+#include "Util.hh"
 
 #include <algorithm>
 #include <iostream>

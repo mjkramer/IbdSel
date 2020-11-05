@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common/Constants.hh"
+#include "Constants.hh"
 
 namespace stage2 {
 

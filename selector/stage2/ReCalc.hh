@@ -6,8 +6,8 @@
 #include "Calculator.hh"
 #include "CalcsTree.hh"
 
-#include "../SelectorFramework/core/DirectReader.hh"
-#include "../SelectorFramework/core/TreeWriter.hh"
+#include "DirectReader.hh"
+#include "TreeWriter.hh"
 
 class ReCalc : public Calculator {
 public:

@@ -3,11 +3,11 @@
 #include "Readers.hh"
 #include "stage2_globals.hh"
 
-#include "../common/Misc.hh"
+#include "Misc.hh"
 
-#include "../SelectorFramework/core/Kernel.hh"
-#include "../SelectorFramework/core/RingBuf.hh"
-#include "../SelectorFramework/core/Util.hh"
+#include "Kernel.hh"
+#include "RingBuf.hh"
+#include "Util.hh"
 
 #include <algorithm>
 

@@ -4,7 +4,7 @@
 #include "IbdTree.hh"
 #include "MuonAlg.hh"
 
-#include "../SelectorFramework/core/TreeWriter.hh"
+#include "TreeWriter.hh"
 
 #include <cfloat>               // FLT_MAX
 

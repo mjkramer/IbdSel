@@ -9,7 +9,7 @@
 #include "Readers.hh"
 #include "Selectors.hh"
 
-#include "../common/Misc.hh"
+#include "Misc.hh"
 
 using CM = ClockMode;
 

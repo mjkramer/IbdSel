@@ -5,12 +5,12 @@
 #include "MuonAlg.hh"
 #include "Selectors.hh"
 
-#include "../common/Misc.hh"
+#include "Misc.hh"
 
 #include "external/FukushimaLambertW.hh"
 
-#include "../SelectorFramework/core/Assert.hh"
-#include "../SelectorFramework/core/Kernel.hh"
+#include "Assert.hh"
+#include "Kernel.hh"
 
 #include <TH1F.h>
 

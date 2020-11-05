@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../common/Constants.hh"
+#include "Constants.hh"
 
-#include "../SelectorFramework/core/BaseIO.hh"
+#include "BaseIO.hh"
 
 class CalcsTree : public TreeBase {
 public:

@@ -3,7 +3,7 @@
 #include "AdBuffer.hh"
 #include "MuonAlg.hh"
 
-#include "../common/Constants.hh"
+#include "Constants.hh"
 
 class MultCutTool : public Tool {
 public:

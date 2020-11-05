@@ -1,5 +1,5 @@
 #pragma once
 
-#include "../common/Constants.hh"
+#include "Constants.hh"
 
 void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase);

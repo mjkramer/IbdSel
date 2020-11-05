@@ -2,10 +2,10 @@
 
 #include "EventReader.hh"
 
-#include "../common/Constants.hh"
+#include "Constants.hh"
 
-#include "../SelectorFramework/core/Kernel.hh"
-#include "../SelectorFramework/core/SimpleAlg.hh"
+#include "Kernel.hh"
+#include "SimpleAlg.hh"
 
 #include <TH1F.h>
 

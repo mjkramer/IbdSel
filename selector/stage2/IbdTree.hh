@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../SelectorFramework/core/BaseIO.hh"
+#include "BaseIO.hh"
 
 class IbdTree : public TreeBase {
 public:
