@@ -73,7 +73,7 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
 
     return true;
   } 
-  else if (cuts.isIHEP) {
+  else { // ihep multiplicity cut case
     const auto dt_PD = itD->time().diff_us(optItP.value()->time());
     for (Iter other = itD.earlier();
         itD->time().diff_us(other->time()) < cuts.usec_after + dt_PD; // 200 us + dt
