@@ -18,9 +18,18 @@ def main():
     ap.add_argument('--bcw', action='store_true',
                     help='Use BCW binning')
     ap.add_argument('--suffix')
+    ap.add_argument('--pars-after-suffix', type=int)
     args = ap.parse_args()
 
-    outconfig = args.config + (f"@{args.suffix}" if args.suffix else "")
+    if args.suffix:
+        if args.pars_after_suffix:
+            parts = args.config.split("_")
+            outconfig = "_".join(parts[:-args.pars_after_suffix]) + \
+                f"@{args.suffix}_" + "_".join(parts[-args.pars_after_suffix:])
+        else:
+            outconfig = args.config + "@" + args.suffix
+    else:
+        outconfig = args.config
 
     outdir = data_dir('fit_input', f'{args.tag}@{outconfig}')
     os.system(f'mkdir -p {outdir}')
