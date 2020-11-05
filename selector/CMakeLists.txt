@@ -22,13 +22,22 @@ execute_process(
     )
 string(STRIP ${IBDSEL_BASE} IBDSEL_BASE)
 
+include(CMakePrintHelpers)
+
+function(install_headers target_name)
+    file(GLOB_RECURSE INSTALL_HEADERS ${CMAKE_CURRENT_SOURCE_DIR} "*.hh")
+    set_property(TARGET ${target_name} APPEND PROPERTY PUBLIC_HEADER "${INSTALL_HEADERS}")
+endfunction()
+
 add_subdirectory(SelectorFramework)
 add_subdirectory(common)
 add_subdirectory(stage1)
 add_subdirectory(stage2)
 
 install(TARGETS SelectorFramework common stage1 stage2
-        LIBRARY DESTINATION lib)
+        LIBRARY DESTINATION lib
+        PUBLIC_HEADER DESTINATION include)
+
 install(FILES ${CMAKE_BINARY_DIR}/SelectorFramework/libSelectorFramework_rdict.pcm DESTINATION lib)
 install(FILES ${CMAKE_BINARY_DIR}/stage1/libstage1_rdict.pcm DESTINATION lib)
 install(FILES ${CMAKE_BINARY_DIR}/stage2/libstage2_rdict.pcm DESTINATION lib)

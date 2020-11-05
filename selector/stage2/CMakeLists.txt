@@ -40,3 +40,4 @@ ROOT_GENERATE_DICTIONARY(Dict_stage2 "${STAGE2_HEADERS}" MODULE stage2 OPTIONS -
 target_link_libraries(stage2 PUBLIC common)
 target_link_libraries(stage2.exe PUBLIC stage2)
 target_compile_definitions(stage2 PRIVATE IBDSEL_BASE="${IBDSEL_BASE}")
+install_headers(stage2)
