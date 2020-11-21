@@ -17,19 +17,18 @@ public:
   struct Cuts {
     float usec_before, emin_before, emax_before;
     float usec_after, emin_after, emax_after;
-    bool isIHEP;
   };
 
   Cuts ibdCuts;
   Cuts singleCuts;
 
-private:
-  void initCuts(const Config* config);
-  bool dmcOk(std::optional<Iter> optItP,
+protected:
+  virtual void initCuts(const Config* config) = 0;
+  virtual bool dmcOk(std::optional<Iter> optItP,
              Iter itD,
              Det det,
              Cuts cuts,
-             const MuonAlg* muonAlg) const;
+             const MuonAlg* muonAlg) const = 0;
 
   const MuonAlg* muonAlgIBDs;
   const MuonAlg* muonAlgSingles;
@@ -44,3 +43,24 @@ inline bool MultCutTool::singleDmcOk(Iter it, Det det) const
 {
   return dmcOk(std::nullopt, it, det, singleCuts, muonAlgSingles);
 }
+
+
+class MultCutToolBcw : public MultCutTool {
+private:
+  void initCuts(const Config* config) override;
+  bool dmcOk(std::optional<Iter> optItP,
+             Iter itD,
+             Det det,
+             Cuts cuts,
+             const MuonAlg* muonAlg) const override;
+};
+
+class MultCutToolIhep : public MultCutTool {
+private:
+  void initCuts(const Config* config) override;
+  bool dmcOk(std::optional<Iter> optItP,
+             Iter itD,
+             Det det,
+             Cuts cuts,
+             const MuonAlg* muonAlg) const override;
+};

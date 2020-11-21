@@ -34,21 +34,39 @@ singleShowerMuChgCut 300000
 singleShowerMuPostVeto_us 400400
 
 
-ibdDmcUsecBefore 400
-ibdDmcEminBefore 0.7
-ibdDmcEmaxBefore 99999
+ibdDmcBcwUsecBefore 400
+ibdDmcBcwEminBefore 0.7
+ibdDmcBcwEmaxBefore 99999
 
-ibdDmcUsecAfter 200
-ibdDmcEminAfter 6
-ibdDmcEmaxAfter 12
+ibdDmcBcwUsecAfter 200
+ibdDmcBcwEminAfter 6
+ibdDmcBcwEmaxAfter 12
 
 
-singleDmcUsecBefore 400
-singleDmcEminBefore 0.7
-singleDmcEmaxBefore 99999
+singleDmcBcwUsecBefore 400
+singleDmcBcwEminBefore 0.7
+singleDmcBcwEmaxBefore 99999
 
-singleDmcUsecAfter 200
-singleDmcEminAfter 6
-singleDmcEmaxAfter 12
+singleDmcBcwUsecAfter 200
+singleDmcBcwEminAfter 6
+singleDmcBcwEmaxAfter 12
 
-isIHEP 0
+
+
+
+ibdDmcIhepUsecBefore 200
+ibdDmcIhepEminBefore 0.7
+ibdDmcIhepEmaxBefore 99999
+
+ibdDmcIhepUsecAfter 200
+ibdDmcIhepEminAfter 0.7
+ibdDmcIhepEmaxAfter 99999
+
+
+singleDmcIhepUsecBefore 400
+singleDmcIhepEminBefore 0.7
+singleDmcIhepEmaxBefore 99999
+
+singleDmcIhepUsecAfter 200
+singleDmcIhepEminAfter 6
+singleDmcIhepEmaxAfter 12

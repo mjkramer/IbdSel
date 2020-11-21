@@ -50,7 +50,7 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   // Clock is needed for TimeSyncTool (i.e. all the readers)
   p.makeTool<Clock>();
 
-  p.makeTool<MultCutTool>();
+  p.makeTool<MultCutToolBcw>();
 
   p.process({inFile});
 
