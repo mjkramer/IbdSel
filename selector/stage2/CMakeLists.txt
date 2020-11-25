@@ -13,6 +13,7 @@ set(STAGE2_HEADERS
     stage2_globals.hh
     stage2_main.hh
     stage2_ihep.hh
+    stage2_dubna.hh
     FukushimaLambertW.hh
 )
 
@@ -29,6 +30,7 @@ add_library(stage2 SHARED
     Selectors.cc
     stage2_main.cc
     stage2_ihep.cc
+    stage2_dubna.cc
     external/FukushimaLambertW.cc
 )
 
