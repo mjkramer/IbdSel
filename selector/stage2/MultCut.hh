@@ -64,3 +64,13 @@ private:
              Cuts cuts,
              const MuonAlg* muonAlg) const override;
 };
+
+class MultCutToolDubna : public MultCutTool {
+private:
+  void initCuts(const Config* config) override;
+  bool dmcOk(std::optional<Iter> optItP,
+             Iter itD,
+             Det det,
+             Cuts cuts,
+             const MuonAlg* muonAlg) const override;
+};

@@ -53,7 +53,6 @@ singleDmcBcwEmaxAfter 12
 
 
 
-
 ibdDmcIhepUsecBefore 200
 ibdDmcIhepEminBefore 0.7
 ibdDmcIhepEmaxBefore 99999
@@ -70,3 +69,22 @@ singleDmcIhepEmaxBefore 99999
 singleDmcIhepUsecAfter 200
 singleDmcIhepEminAfter 6
 singleDmcIhepEmaxAfter 12
+
+
+
+ibdDmcDubnaUsecBefore 400
+ibdDmcDubnaEminBefore 0.7
+ibdDmcDubnaEmaxBefore 99999
+
+ibdDmcDubnaUsecAfter 200
+ibdDmcDubnaEminAfter 0
+ibdDmcDubnaEmaxAfter 99999
+
+
+singleDmcDubnaUsecBefore 400
+singleDmcDubnaEminBefore 0.7
+singleDmcDubnaEmaxBefore 99999
+
+singleDmcDubnaUsecAfter 200
+singleDmcDubnaEminAfter 6
+singleDmcDubnaEmaxAfter 12

@@ -127,3 +127,60 @@ void MultCutToolIhep::initCuts(const Config* config)
   singleCuts.emin_after = g("singleDmcIhepEminAfter");
   singleCuts.emax_after = g("singleDmcIhepEmaxAfter");
 }
+
+
+bool MultCutToolDubna::dmcOk(std::optional<Iter> optItP,
+                        Iter itD,
+                        Det det,
+                        Cuts cuts,
+                        const MuonAlg* muonAlg) const
+{
+  for (Iter other = itD.earlier();
+      itD->time().diff_us(other->time()) < cuts.usec_before;
+      other = other.earlier()) {
+
+    if (optItP && other == *optItP)
+      continue;
+
+    if (other->energy > cuts.emin_before &&
+        other->energy < cuts.emax_before) {
+      return false;
+    }
+  }
+
+  for (Iter other = itD.later();
+      other->time().diff_us(itD->time()) < cuts.usec_after;
+      other = other.later()) {
+
+    if (other->energy > cuts.emin_after &&
+        other->energy < cuts.emax_after &&
+        // XXX remove the following if we restore the "full DMC" 200us pre-veto
+        not muonAlg->isVetoed(other->time(), det)) {
+
+      return false;
+    }
+  }
+  return true;
+}
+
+
+void MultCutToolDubna::initCuts(const Config* config)
+{
+  auto g = [&](const char* k) { return config->get<float>(k); };
+
+  ibdCuts.usec_before = g("ibdDmcDubnaUsecBefore");
+  ibdCuts.emin_before = g("ibdDmcDubnaEminBefore");
+  ibdCuts.emax_before = g("ibdDmcDubnaEmaxBefore");
+
+  ibdCuts.usec_after = g("ibdDmcDubnaUsecAfter");
+  ibdCuts.emin_after = g("ibdDmcDubnaEminAfter");
+  ibdCuts.emax_after = g("ibdDmcDubnaEmaxAfter");
+
+  singleCuts.usec_before = g("singleDmcDubnaUsecBefore");
+  singleCuts.emin_before = g("singleDmcDubnaEminBefore");
+  singleCuts.emax_before = g("singleDmcDubnaEmaxBefore");
+
+  singleCuts.usec_after = g("singleDmcDubnaUsecAfter");
+  singleCuts.emin_after = g("singleDmcDubnaEminAfter");
+  singleCuts.emax_after = g("singleDmcDubnaEmaxAfter");
+}
