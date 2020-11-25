@@ -1,5 +1,4 @@
 #include "stage2_ihep.hh"
-#include "stage2_main.hh"
 
 #include "AdBuffer.hh"
 #include "CalcsTree.hh"
