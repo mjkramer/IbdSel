@@ -32,9 +32,9 @@ def phase_for_day(day):
         return 1
     if 300 <= day <= 1824:
         return 2
-    if 1860 <= day <= 2076:
+    if 1860 <= day:
         return 3
-    raise ValueError(f'Day {day} is not part of P17B')
+    raise ValueError(f'Invalid day')
 
 def dets_for_phase(site, phase):
     if site == 1:
