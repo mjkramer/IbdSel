@@ -2,7 +2,9 @@
 
 source bash/stage1_vars.inc.sh
 
-LISTFILEPATH=../static/filelist/paths.physics.good.p17b.v3.sync.txt.gz
+P17B_LIST=../static/filelist/paths.physics.good.p17b.v3.sync.txt.gz
+
+LISTFILEPATH=${LISTFILEPATH:-${P17B_LIST}}
 
 while getopts "f:" opt; do
     case $opt in
@@ -31,4 +33,10 @@ ln -s $trueOutdir $outdir
 
 filter_cmd=${filter_cmd:-cat}
 
-gunzip -c $LISTFILEPATH | $filter_cmd > $infile
+if [[ ${LISTFILEPATH##*.} == "gz" ]]; then
+    cat_cmd="gunzip -c"
+else
+    cat_cmd=cat
+fi
+
+$cat_cmd $LISTFILEPATH | $filter_cmd | shuf > $infile
