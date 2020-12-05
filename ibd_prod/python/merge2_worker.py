@@ -2,10 +2,13 @@
 
 # takes 7 minutes to do p17b
 
-import argparse, os
-from glob import glob
+import argparse
 from collections import defaultdict
+from glob import glob
+import os
+import sys
 
+from prod_io import LockfileListReader, LockfileListWriter
 from prod_util import data_dir, phase_for_day, stage2_pbp_path
 from prod_util import unbuf_stdout
 from hadd import hadd_chunked
@@ -42,12 +45,32 @@ def copy_config(tag, config):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('tag')
-    ap.add_argument('config')
+    ap.add_argument('-l', '--listfile',
+                    help='File with each line like: 2020_01_26 nominal')
+    ap.add_argument('tag', nargs='?')
+    ap.add_argument('config', nargs='?')
     args = ap.parse_args()
 
-    merge(args.tag, args.config)
-    copy_config(args.tag, args.config)
+    def do_merge(tag, config):
+        merge(tag, config)
+        copy_config(tag, config)
+
+    if args.listfile:
+        reader = LockfileListReader(args.listfile, chunksize=1)
+        writer = LockfileListWriter(args.listfile + ".done", chunksize=1)
+
+        with writer:
+            for line in reader:
+                tag, config = line.strip().split()
+
+                do_merge(tag, config)
+
+                writer.log(line)
+
+    if not args.listfile:
+        assert args.tag and args.config
+        do_merge(args.tag, args.config)
+
 
 if __name__ == '__main__':
     unbuf_stdout()
