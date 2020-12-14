@@ -39,6 +39,8 @@ private:
 
   static constexpr double LI9_SEL_SURV_PROB = 0.21; // exp(-400/257)
 
+  // XXX where did 0.98 come from? I can't find it. We should switch to unity
+  // since that's what RunBkgAna seems to use?
   static constexpr double NTAG_EFF = 0.98; // 45% uncertainty
 
   static constexpr double NEAR_LOW_PE_PROMPT_EFF = 0.15; // 8 MeV
@@ -47,7 +49,10 @@ private:
 
   static constexpr double LIVEDAYS[3] = {1737, 1729, 1737};
   static constexpr double NDET_WEIGHTED[3] = {1.8888, 1.8925, 3.8921};
-  static constexpr double VETO_EFFS[3] = {0.82, 0.85, 0.98};
+  // XXX we should be using the veto efficiencies *without* the shower veto!
+  // static constexpr double VETO_EFFS[3] = {0.82, 0.85, 0.98};
+  // These are the efficiencies w/o shower veto (EHx-AD1 8AD, muveto_toy):
+  static constexpr double VETO_EFFS[3] = {0.8711, 0.9015, 0.9883};
 
   // static constexpr double MULT_EFF = 0.97;
   static constexpr double MULT_EFFS[3] = {0.9772, 0.9782, 0.9829};
