@@ -7,7 +7,7 @@
 #include "../SelectorFramework/core/SimpleAlg.hh"
 
 class MuonAlg : public SimpleAlg<MuonReader> {
-  static constexpr unsigned BUF_SIZE = 10000;
+  static constexpr unsigned BUF_SIZE = 100'000;
 
 public:
   enum class Purpose { ForIBDs, ForSingles };
