@@ -13,6 +13,10 @@ public:
   UInt_t runNo;
   UShort_t fileNo;
 
+  Float_t x;
+  Float_t y;
+  Float_t z;
+
   Time time() const { return { trigSec, trigNanoSec }; }
 
   void initBranches() override;

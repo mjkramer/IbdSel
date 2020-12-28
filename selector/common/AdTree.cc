@@ -9,4 +9,8 @@ void AdTree::initBranches()
   BR(trigNo);
   BR(runNo);
   BR(fileNo);
+
+  BR(x);
+  BR(y);
+  BR(z);
 }

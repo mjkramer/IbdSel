@@ -44,6 +44,9 @@ void AdSaver::save(const algdata_t<EventReader>& e)
   tree.data.trigNanoSec = e.triggerTimeNanoSec;
   tree.data.energy = e.energy;
   tree.data.trigNo = e.triggerNumber;
+  tree.data.x = e.x;
+  tree.data.y = e.y;
+  tree.data.z = e.z;
 
   tree.fill();
 }
