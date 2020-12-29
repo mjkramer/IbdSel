@@ -1,7 +1,7 @@
 "Calculate the things"
 
-from config_file import ConfigFile
 from hardcoded import Hardcoded
+from delayed_eff import DelayedEffCalc
 
 from prod_util import dets_for_phase, idet
 
@@ -31,6 +31,8 @@ class Calc:
                 self.results[(site, det)] = \
                     results.query(f'detector == {det}')
 
+        self.delEffCalc = DelayedEffCalc(config_path)
+
     def _livetime_weighted(self, site, det, var):
         r = self.results[(site, det)]
         return (r[var] * r.livetime_s).sum() / r.livetime_s.sum()
@@ -38,6 +40,9 @@ class Calc:
     def _livetime_weighted_squared(self, site, det, var):
         r = self.results[(site, det)]
         return sqrt((r[var]**2 * r.livetime_s).sum()) / r.livetime_s.sum()
+
+    def _relDelEff(self, site, det):
+        return self.delEffCalc.scale_factor(self.phase, site, det)
 
     def ibdCount(self, site, det):
         tree = self.files[site].Get(f'ibd_AD{det}')
@@ -61,10 +66,12 @@ class Calc:
         return 0.01 * self.accBkg(site, det)
 
     def li9Bkg(self, site, det):
-        return self._livetime_weighted(site, det, 'li9Daily')
+        scale = self._relDelEff(site, det)
+        return scale * self._livetime_weighted(site, det, 'li9Daily')
 
     def li9BkgErr(self, site, det):
-        return self._livetime_weighted(site, det, 'li9DailyErr')
+        scale = self._relDelEff(site, det)
+        return scale * self._livetime_weighted(site, det, 'li9DailyErr')
 
     def totalBkg(self, site, det):
         return (self.accBkg(site, det) +
@@ -81,22 +88,28 @@ class Calc:
                     self.alphanBkgErr(site, det)**2)
 
     def fastnBkg(self, site, det):
-        return self._hardcoded(site, det, 'fastnBkg')
+        scale = self._relDelEff(site, det)
+        return scale * self._hardcoded(site, det, 'fastnBkg')
 
     def fastnBkgErr(self, site, det):
-        return self._hardcoded(site, det, 'fastnBkgErr')
+        scale = self._relDelEff(site, det)
+        return scale * self._hardcoded(site, det, 'fastnBkgErr')
 
+    # TODO scale for modified delayed cut
     def amcBkg(self, site, det):
         return self._hardcoded(site, det, 'amcBkg')
 
+    # TODO scale for modified delayed cut
     def amcBkgErr(self, site, det):
         return self._hardcoded(site, det, 'amcBkgErr')
 
     def alphanBkg(self, site, det):
-        return self._hardcoded(site, det, 'alphanBkg')
+        scale = self._relDelEff(site, det)
+        return scale * self._hardcoded(site, det, 'alphanBkg')
 
     def alphanBkgErr(self, site, det):
-        return self._hardcoded(site, det, 'alphanBkgErr')
+        scale = self._relDelEff(site, det)
+        return scale * self._hardcoded(site, det, 'alphanBkgErr')
 
     def targetMass(self, site, det):
         return self._hardcoded(site, det, 'targetMass')
