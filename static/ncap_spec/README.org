@@ -1,0 +1,8 @@
+This directory contains IBD neutron capture spectra for delayed energies of 4-12 MeV, consisting predominantly of nGd captures with a small contribution from nC captures. These spectra are used by fit_prep for adjusting the rates of the Li9, fast neutron, and alpha-n backgrounds when the IBD selection's delayed energy lower cut is modified from the nominal 6 MeV.
+
+These spectra were produced by fit_prep/get_ncap_spec.py using the output from running IBD selection on P17B, with a delayed energy cut of 4-12 MeV:
+
+#+begin_src bash
+# From ibd_prod
+../fit_prep/get_ncap_spec.py ../../data/stage2_pbp/2020_01_26@del4MeV ../../data/fit_input/2020_01_26@del4MeV ../static/ncap_spec/ncap_spec_P17B.root
+#+end_src
