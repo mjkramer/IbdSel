@@ -23,10 +23,7 @@ public:
   virtual double livetime_s();
   virtual double vetoEff(Det detector,
                          MuonAlg::Purpose purp = MuonAlg::Purpose::ForIBDs);
-  double dmcEff(Det detector);
 
-  double accDaily(Det detector);
-  double accDailyErr(Det detector);
   double li9Daily(Det detector);
   double li9DailyErr(Det detector);
 
@@ -34,30 +31,6 @@ public:
   virtual void writeEntries(const char* treename = "results");
 
 protected:
-  TH1F* singlesHist(Det detector);
-  double singlesCount(Det detector,
-                      double lowE,
-                      std::optional<double> optUpperE = std::nullopt);
-  double calcSinglesHz(Det detector, double N);
-  double singlesHz(Det detector,
-                   double lowE,
-                   std::optional<double> optUpperE = std::nullopt);
-  double subtractSinglesHz(Det detector,
-                           float keep_min, float keep_max,
-                           float drop_min, float drop_max);
-
-  double dmcEffSingles(Det detector);
-
-  virtual double nPreMuons(Det detector);
-  virtual double nPlusLikeSingles(Det detector);
-  virtual double nPromptLikeSingles(Det detector);
-  virtual double nDelayedLikeSingles(Det detector);
-
-  double preMuonHz(Det detector);
-  double plusLikeHz(Det detector);
-  double promptLikeHz(Det detector);
-  double delayedLikeHz(Det detector);
-
   Pipeline& pipe;
   Site site;
   Phase phase;
