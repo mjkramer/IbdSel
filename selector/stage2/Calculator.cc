@@ -8,8 +8,6 @@
 
 #include "../common/Misc.hh"
 
-#include "external/FukushimaLambertW.hh"
-
 #include "../SelectorFramework/core/Assert.hh"
 #include "../SelectorFramework/core/Kernel.hh"
 
@@ -66,10 +64,10 @@ double Calculator::li9DailyErr(Det detector)
 
 void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
 {
-  const TH1F* hSing = pipe.getAlg<SingleSel>(detector)->hist;
+  TH1F* hSing = pipe.getAlg<SingleSel>(detector)->hist;
   const double vetoEffSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
   SinglesCalc singCalc(hSing, vetoEffSingles, livetime_s(),
-                       multCut->singleCuts,
+                       multCut->singleCuts, vetoEffSingles,
                        ibdSel->PROMPT_MIN, ibdSel->PROMPT_MAX,
                        ibdSel->DELAYED_MIN, ibdSel->DELAYED_MAX,
                        ibdSel->DT_MAX_US);
@@ -84,7 +82,7 @@ void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
   w.data.vetoEff = vetoEff(detector);
   w.data.dmcEff = singCalc.dmcEff(multCut->ibdCuts);
   w.data.accDaily = singCalc.accDaily(multCut->ibdCuts);
-  w.data.accDailyErr = singCalc.accDailyErr();
+  w.data.accDailyErr = singCalc.accDailyErr(multCut->ibdCuts, site);
   w.data.li9Daily = li9Daily(detector);
   w.data.li9DailyErr = li9DailyErr(detector);
 

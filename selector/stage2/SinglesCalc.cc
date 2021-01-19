@@ -1,14 +1,19 @@
 #include "SinglesCalc.hh"
 
+#include "external/FukushimaLambertW.hh"
+
+
 #include <TH1F.h>
 
-SinglesCalc::SinglesCalc(const TH1F* hSing, double eMu, double livetime_s,
+SinglesCalc::SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
                          MultCutTool::Cuts singleMultCuts,
+                         double eMuSingles,
                          double promptMin, double promptMax,
                          double delayedMin, double delayedMax,
                          double dt_max_us) :
   hSing(hSing), eMu(eMu), livetime_s(livetime_s),
   singleMultCuts(singleMultCuts),
+  eMuSingles(eMuSingles),
   promptMin(promptMin), promptMax(promptMax),
   delayedMin(delayedMin), delayedMax(delayedMax),
   dt_max_us(dt_max_us)
@@ -66,8 +71,7 @@ double SinglesCalc::dmcEffSingles()
   const double tBefore = 1e-6 * cuts.usec_before;
   const double tAfter = 1e-6 * cuts.usec_after;
 
-  const double eMuSingles = vetoEff(MuonAlg::Purpose::ForSingles);
-  const double T = livetime_s();
+  const double T = livetime_s;
 
   const double arg =
     ((nBefore * tBefore) + (nAfter * tAfter)) / (eMuSingles * T);
@@ -183,7 +187,7 @@ double SinglesCalc::accDaily(MultCutTool::Cuts ibdMultCuts)
   return R / dmcEff(ibdMultCuts) * units::hzToDaily; // hz * 86_400
 }
 
-double SinglesCalc::accDailyErr(MultCutTool::Cuts ibdMultCuts)
+double SinglesCalc::accDailyErr(MultCutTool::Cuts ibdMultCuts, Site site)
 {
   // TODO implement proper statistical calculation. For now, use empirical
   // formula based on old LBNL selection (assuming full day's worth of
