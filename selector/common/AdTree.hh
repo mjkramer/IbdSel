@@ -8,6 +8,7 @@ public:
   UInt_t trigSec;
   UInt_t trigNanoSec;
   Float_t energy;
+  Float_t x, y, z;
 
   UInt_t trigNo;
   UInt_t runNo;

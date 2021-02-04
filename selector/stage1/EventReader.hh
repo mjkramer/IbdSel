@@ -14,6 +14,7 @@ public:
   Short_t detector;
   UInt_t triggerType, triggerNumber, triggerTimeSec, triggerTimeNanoSec;
   Float_t energy;
+  Float_t x, y, z;
 
   // CalibStats
   Int_t nHit;
