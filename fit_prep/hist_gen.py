@@ -1,7 +1,8 @@
 import numpy as np
 import ROOT as R
 
-from prod_util import dets_for_phase, stage2_pbp_path
+from config_file import ConfigFile
+from prod_util import configfile_path, dets_for_phase, stage2_pbp_path
 from prod_util import fit_hist_ibd_path, fit_hist_acc_path
 
 nbins_lbnl = 37
@@ -9,16 +10,21 @@ nbins_bcw = 26
 nbins_fine = 240
 
 
-def binning_lbnl():
-    edges = np.concatenate([[0.7],
+def min_energy(tag, config):
+    cfg = ConfigFile(configfile_path(tag, config))
+    return cfg["ibdPromptEmin"]
+
+
+def binning_lbnl(emin=0.7):
+    edges = np.concatenate([[emin],
                             np.arange(1, 8, 0.2),
                             [8, 12]])
     assert len(edges) == 1 + nbins_lbnl
     return edges
 
 
-def binning_bcw():
-    edges = np.concatenate([[0.7],
+def binning_bcw(emin=0.7):
+    edges = np.concatenate([[emin],
                             np.arange(1.3, 7.3, 0.25),
                             [7.3, 12]])
     assert len(edges) == 1 + nbins_bcw
@@ -51,7 +57,8 @@ def gen_hists_(phase, tag, config, outconfig, bcw=False):
             name_acc_fine = f'h_accidental_eprompt_fine_inclusive_{suffix}'
 
             nbins = nbins_bcw if bcw else nbins_lbnl
-            binning = binning_bcw() if bcw else binning_lbnl()
+            emin = min_energy(tag, config)
+            binning = binning_bcw(emin) if bcw else binning_lbnl(emin)
 
             if h_ibd:
                 h_ibd_coarse = h_ibd.Rebin(nbins, name_ibd_coarse,
