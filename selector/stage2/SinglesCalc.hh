@@ -10,14 +10,15 @@ class SinglesCalc {
 public:
   SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
               MultCutTool::Cuts singleMultCuts,
+              MultCutTool::Cuts ibdMultCuts,
               double eMuSingles,
               double promptMin, double promptMax,
               double delayedMin, double delayedMax,
               double dt_max_us);
 
-  double dmcEff(MultCutTool::Cuts ibdMultCuts);
-  double accDaily(MultCutTool::Cuts ibdMultCuts);
-  double accDailyErr(MultCutTool::Cuts ibdMultCuts, Site site);
+  double dmcEff();
+  double accDaily();
+  double accDailyErr(Site site);
   double nPreMuons();
   double nPlusLikeSingles();
   double nPromptLikeSingles();
@@ -42,7 +43,7 @@ private:
   TH1F* hSing;
   double eMu;
   double livetime_s;
-  MultCutTool::Cuts singleMultCuts;
+  MultCutTool::Cuts singleMultCuts, ibdMultCuts;
   double eMuSingles;
   double promptMin, promptMax;
   double delayedMin, delayedMax;

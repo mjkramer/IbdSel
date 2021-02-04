@@ -67,7 +67,8 @@ void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
   TH1F* hSing = pipe.getAlg<SingleSel>(detector)->hist;
   const double vetoEffSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
   SinglesCalc singCalc(hSing, vetoEffSingles, livetime_s(),
-                       multCut->singleCuts, vetoEffSingles,
+                       multCut->singleCuts, multCut->ibdCuts,
+                       vetoEffSingles,
                        ibdSel->PROMPT_MIN, ibdSel->PROMPT_MAX,
                        ibdSel->DELAYED_MIN, ibdSel->DELAYED_MAX,
                        ibdSel->DT_MAX_US);
@@ -80,9 +81,9 @@ void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
 
   w.data.detector = detector;
   w.data.vetoEff = vetoEff(detector);
-  w.data.dmcEff = singCalc.dmcEff(multCut->ibdCuts);
-  w.data.accDaily = singCalc.accDaily(multCut->ibdCuts);
-  w.data.accDailyErr = singCalc.accDailyErr(multCut->ibdCuts, site);
+  w.data.dmcEff = singCalc.dmcEff();
+  w.data.accDaily = singCalc.accDaily();
+  w.data.accDailyErr = singCalc.accDailyErr(site);
   w.data.li9Daily = li9Daily(detector);
   w.data.li9DailyErr = li9DailyErr(detector);
 

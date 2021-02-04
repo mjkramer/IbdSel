@@ -7,12 +7,14 @@
 
 SinglesCalc::SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
                          MultCutTool::Cuts singleMultCuts,
+                         MultCutTool::Cuts ibdMultCuts,
                          double eMuSingles,
                          double promptMin, double promptMax,
                          double delayedMin, double delayedMax,
                          double dt_max_us) :
   hSing(hSing), eMu(eMu), livetime_s(livetime_s),
   singleMultCuts(singleMultCuts),
+  ibdMultCuts(ibdMultCuts),
   eMuSingles(eMuSingles),
   promptMin(promptMin), promptMax(promptMax),
   delayedMin(delayedMin), delayedMax(delayedMax),
@@ -109,7 +111,7 @@ double SinglesCalc::delayedLikeHz()
   return calcSinglesHz(N);
 }
 
-double SinglesCalc::dmcEff(MultCutTool::Cuts ibdMultCuts)
+double SinglesCalc::dmcEff()
 {
   const MultCutTool::Cuts& cuts = ibdMultCuts;
 
@@ -146,7 +148,7 @@ double SinglesCalc::subtractSinglesHz(float keep_min, float keep_max,
 // eff before subtracting from raw spectrum i.e. we DON'T need to multiply by
 // mu/dmc eff before subtracting from corrected spectrum. This is the convention
 // used in the fitter's "Theta13" input file.
-double SinglesCalc::accDaily(MultCutTool::Cuts ibdMultCuts)
+double SinglesCalc::accDaily()
 {
   const MultCutTool::Cuts& cuts = ibdMultCuts;
 
@@ -184,10 +186,10 @@ double SinglesCalc::accDaily(MultCutTool::Cuts ibdMultCuts)
   // subtracting from the raw IBD spectrum(?). Therefore, here we must divide by
   // the DMC efficiency for IBDs, to pre-cancel-out this multiplication.
 
-  return R / dmcEff(ibdMultCuts) * units::hzToDaily; // hz * 86_400
+  return R / dmcEff() * units::hzToDaily; // hz * 86_400
 }
 
-double SinglesCalc::accDailyErr(MultCutTool::Cuts ibdMultCuts, Site site)
+double SinglesCalc::accDailyErr(Site site)
 {
   // TODO implement proper statistical calculation. For now, use empirical
   // formula based on old LBNL selection (assuming full day's worth of
@@ -195,7 +197,7 @@ double SinglesCalc::accDailyErr(MultCutTool::Cuts ibdMultCuts, Site site)
   // statistical uncertainty with a 1% systematic based on IHEP's comparisons of
   // different methods for calculating the accidentals rate.
 
-  const double rate = accDaily(ibdMultCuts);
+  const double rate = accDaily();
 
   switch (site) {
   case Site::EH1:
