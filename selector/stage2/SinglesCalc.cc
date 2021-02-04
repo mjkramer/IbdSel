@@ -47,7 +47,7 @@ double SinglesCalc::singlesCount(double lowE,
 
 double SinglesCalc::calcSinglesHz(double N)
 {
-  return N / (dmcEffSingles() * eMu * livetime_s);
+  return N / (dmcEffSingles() * eMuSingles * livetime_s);
 }
 
 // XXX get rid of me
