@@ -44,10 +44,11 @@ def gen_hists_(phase, tag, config, outconfig, bcw=False):
             h_ibd = f.Get(f'h_ibd_AD{det}')
             h_acc = f.Get(f'h_single_AD{det}')
 
-            name_ibd_coarse = f'h_ibd_eprompt_inclusive_eh{site}_ad{det}'
-            name_ibd_fine = f'h_ibd_eprompt_fine_inclusive_eh{site}_ad{det}'
-            name_acc_coarse = f'h_accidental_eprompt_inclusive_eh{site}_ad{det}'
-            name_acc_fine = f'h_accidental_eprompt_fine_inclusive_eh{site}_ad{det}'
+            suffix = f'eh{site}_ad{det}'
+            name_ibd_coarse = f'h_ibd_eprompt_inclusive_{suffix}'
+            name_ibd_fine = f'h_ibd_eprompt_fine_inclusive_{suffix}'
+            name_acc_coarse = f'h_accidental_eprompt_inclusive_{suffix}'
+            name_acc_fine = f'h_accidental_eprompt_fine_inclusive_{suffix}'
 
             nbins = nbins_bcw if bcw else nbins_lbnl
             binning = binning_bcw() if bcw else binning_lbnl()
