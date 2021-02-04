@@ -41,7 +41,7 @@ SingleSel::SingleSel(Det det) :
   auto hname = Form("h_single_AD%d", int(det));
   // Use fine binning since we're doing integrals in Calculator
   // Go up to 20 MeV so we can calc pre-muon rate (for debugging)
-  hist = new TH1F(hname, hname, 2000, 0, 20);
+  hist = new TH1F(hname, hname, 4000, 0, 20);
 }
 
 void SingleSel::initCuts(const Config *config)
