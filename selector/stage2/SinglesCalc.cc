@@ -5,6 +5,8 @@
 
 #include <TH1F.h>
 
+static double fine_integral(TH1F* h, double x1, double x2);
+
 SinglesCalc::SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
                          MultCutTool::Cuts singleMultCuts,
                          MultCutTool::Cuts ibdMultCuts,
@@ -26,15 +28,20 @@ SinglesCalc::SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
 double SinglesCalc::singlesCount(double lowE,
                                  std::optional<double> optUpperE)
 {
-  const int lowBin = hSing->FindBin(lowE);
+  // const int lowBin = hSing->FindBin(lowE);
   // Assuming we're using 0.1 MeV bins, and optUpperE is a multiple of 0.1 MeV,
   // FindBin will give us the bin whose low edge is optUpperE, which means we'd
   // include [optUpperE, optUpperE + 0.1) in the integral, which we don't want!
   // Thus we must subtract 1 from the bin#.
-  const int highBin = optUpperE ? hSing->FindBin(*optUpperE) - 1 :
-    hSing->GetNbinsX() + 1;         // no upper limit? then include overflow bin
+  // const int highBin = optUpperE ? hSing->FindBin(*optUpperE) - 1 :
+  //   hSing->GetNbinsX() + 1;         // no upper limit? then include overflow bin
 
-  return hSing->Integral(lowBin, highBin);
+  // XXX this is wrong if the cuts do not align with the bins, see fine_integral
+  // in misc_ana/AccUncMC
+  // return hSing->Integral(lowBin, highBin);
+
+  const double maxE = hSing->GetXaxis()->GetXmax();
+  return fine_integral(hSing, lowE, optUpperE.value_or(maxE));
 }
 
 
@@ -209,4 +216,27 @@ double SinglesCalc::accDailyErr(Site site)
   }
 
   throw;
+}
+
+static double fine_integral(TH1F* h, double x1, double x2)
+{
+  const int bin1 = h->FindBin(x1);
+  const double frac1 =
+    1 - ((x1 - h->GetBinLowEdge(bin1)) / h->GetBinWidth(bin1));
+
+  const int bin2 = h->FindBin(x2);
+  const double frac2 =
+    bin2 == bin1
+    ? -(1 - (x2 - h->GetBinLowEdge(bin2)) / h->GetBinWidth(bin2))
+    : (x2 - h->GetBinLowEdge(bin2)) / h->GetBinWidth(bin2);
+
+  const double middle_integral =
+    bin2 - bin1 < 2
+    ? 0
+    : h->Integral(bin1 + 1, bin2 - 1);
+
+  return
+    frac1 * h->GetBinContent(bin1) +
+    middle_integral +
+    frac2 * h->GetBinContent(bin2);
 }
