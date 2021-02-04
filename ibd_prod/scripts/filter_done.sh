@@ -33,8 +33,10 @@ fi
 source bash/${step}_vars.inc.sh
 ${step}_vars $tag
 
-echo "Acquiring lock"
-lockfile -5 $infile.lock
+if [[ -n "$pending" ]]; then
+    echo "Acquiring lock"
+    lockfile -5 $infile.lock
+fi
 
 cut -d' ' -f2- $infile.done > $infile.omit
 
