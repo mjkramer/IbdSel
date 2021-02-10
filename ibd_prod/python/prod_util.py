@@ -21,7 +21,8 @@ def unbuf_stdout():
 def phase_for_run(runno):
     if 21221 <= runno <= 26694:
         return 1
-    if 34523 <= runno <= 67012:
+    # if 34523 <= runno <= 67012:
+    if 30000 <= runno <= 67012:
         return 2
     if runno >= 67625:
         return 3
@@ -30,7 +31,8 @@ def phase_for_run(runno):
 def phase_for_day(day):
     if 0 <= day <= 217:
         return 1
-    if 300 <= day <= 1824:
+    # if 300 <= day <= 1824:
+    if 218 <= day <= 1824:
         return 2
     if 1860 <= day:
         return 3
