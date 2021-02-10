@@ -116,7 +116,6 @@ class Calc:
         scale = self._amcScale(site, det)
         return scale * self._hardcoded(site, det, 'amcBkg')
 
-    # TODO scale for modified delayed cut
     def amcBkgErr(self, site, det):
         scale = self._amcScale(site, det)
         return scale * self._hardcoded(site, det, 'amcBkgErr')
@@ -137,9 +136,10 @@ class Calc:
     def targetMass(self, site, det):
         return self._hardcoded(site, det, 'targetMass')
 
-    # unused
+    # XXX change to absolute delayed efficiency
     def delayedEff(self, site, det):
-        return self._hardcoded(site, det, 'delayedEff')
+        return self._relDelEff(site, det)
+        # return self._hardcoded(site, det, 'delayedEff')
 
     # unused
     def powerErr(self, site, det):
