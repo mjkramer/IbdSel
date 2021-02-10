@@ -62,6 +62,9 @@ void SingleSel::select(Iter it)
       not muonAlg->isVetoed(it->time(), det) &&
       multCut->singleDmcOk(it, det)) {
 
+    if (it->z > 0)
+      return;
+
     hist->Fill(it->energy);
   }
 }
@@ -125,6 +128,9 @@ void IbdSel::select(Iter it)
       if (PROMPT_MIN < prompt->energy && prompt->energy < PROMPT_MAX &&
           dt_us(prompt) > DT_MIN_US &&
           multCut->ibdDmcOk(prompt, it, det)) {
+
+        if (prompt->z > 0)
+          continue;
 
         save(prompt, it);
 

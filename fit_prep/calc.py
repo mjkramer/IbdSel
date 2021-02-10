@@ -70,7 +70,7 @@ class Calc:
     def _li9Scale(self, site, det):
         scaleP = self.promptEffCalc.li9_rel_eff(site, det)
         scaleD = self._relDelEff(site, det)
-        return scaleP * scaleD
+        return scaleP * scaleD * 0.5
 
     def li9Bkg(self, site, det):
         scale = self._li9Scale(site, det)
@@ -97,7 +97,7 @@ class Calc:
     def _fastnScale(self, site, det):
         scaleP = self.promptEffCalc.fastn_rel_eff(site, det)
         scaleD = self._relDelEff(site, det)
-        return scaleP * scaleD
+        return scaleP * scaleD * 0.5
 
     def fastnBkg(self, site, det):
         scale = self._fastnScale(site, det)
@@ -110,7 +110,8 @@ class Calc:
     # TODO scale for modified delayed cut
     def _amcScale(self, site, det):
         scaleP = self.promptEffCalc.amc_rel_eff(site, det)
-        return scaleP
+        # return scaleP
+        return 0
 
     def amcBkg(self, site, det):
         scale = self._amcScale(site, det)
@@ -123,7 +124,7 @@ class Calc:
     def _alphanScale(self, site, det):
         scaleP = self.promptEffCalc.alphan_rel_eff(site, det)
         scaleD = self._relDelEff(site, det)
-        return scaleP * scaleD
+        return scaleP * scaleD * 0.5
 
     def alphanBkg(self, site, det):
         scale = self._alphanScale(site, det)
