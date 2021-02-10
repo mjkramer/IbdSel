@@ -27,7 +27,11 @@ function sbatch_cmd() {
     local njob=$1; shift
     local extra=$@
 
-    local array="--array=1-$njob"
+    if [ -n "$IBDSEL_MAX_RUNNING" ]; then
+        local joblim="%${IBDSEL_MAX_RUNNING}"
+    fi
+
+    local array="--array=1-$njob$joblim"
     local walltime="-t $IBDSEL_WALLTIME"
     local exports="--export="$(echo ${!IBDSEL_*} | tr ' ' ,)
     local logdest="-o $logdir/$logfmt"
