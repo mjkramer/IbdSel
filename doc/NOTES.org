@@ -1,3 +1,10 @@
+* New action items
+** TODO Why are we getting "MuonAlg is exhausted" for some files in P19A?
+EH3 day 2323, see /global/homes/m/mkramer/mywork/ThesisAnalysis/IbdSel/log/stage2/p19a@nominal/slurm_knl-37251880_3.out
+See also StrongAmC day 272, 31804 127: /global/homes/m/mkramer/mywork/ThesisAnalysis/IbdSel/log/stage2/StrongAmC@nominal/slurm_knl-38721779_1.out
+** TODO Make h_ncap bins half as small. Consider using fine_integral. Currently our binning is too coarse.
+** TODO Switch from relative to absolute delayed efficiencies in fit_prep.
+** TODO Redo muon veto studies after fix in SinglesCalc::singlesCount (eMu -> eMuSingles)
 * Action items
 BB: screen on cori06
 ** TODO Benchmark 500 files around n=68

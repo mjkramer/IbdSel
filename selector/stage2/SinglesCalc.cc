@@ -7,6 +7,7 @@
 
 static double fine_integral(TH1F* h, double x1, double x2);
 
+// XXX get rid of eMu?
 SinglesCalc::SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
                          MultCutTool::Cuts singleMultCuts,
                          MultCutTool::Cuts ibdMultCuts,
@@ -47,6 +48,9 @@ double SinglesCalc::singlesCount(double lowE,
 
 double SinglesCalc::calcSinglesHz(double N)
 {
+  // previously was using eMu not eMuSingles
+  // could this have caused buggy results when varying muon veto?
+  // XXX check accidentals rates / DMC effs on those theta13 files
   return N / (dmcEffSingles() * eMuSingles * livetime_s);
 }
 
@@ -166,6 +170,7 @@ double SinglesCalc::accDaily()
 
   // BBNP => Before-like But Not Prompt-like
   // Needed since our calculation assumes independent Poisson processes
+  // XXX isn't this normally just preMuonHz?
   const double rBBNP =
     subtractSinglesHz(cuts.emin_before, cuts.emax_before,
                       promptMin, promptMax);
