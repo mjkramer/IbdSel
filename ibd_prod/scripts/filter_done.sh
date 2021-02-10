@@ -50,7 +50,7 @@ if [ -n "$pending" ]; then
 fi
 
 cp $infile $infile.prev
-comm -23 <(sort $infile.prev) <(sort $infile.omit) > $infile
+comm -23 <(sort $infile.prev) <(sort $infile.omit) | shuf > $infile
 rm $infile.offset
 
 rm -f $infile.lock
