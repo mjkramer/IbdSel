@@ -129,7 +129,7 @@ void IbdSel::select(Iter it)
           dt_us(prompt) > DT_MIN_US &&
           multCut->ibdDmcOk(prompt, it, det)) {
 
-        if (prompt->z > 0)
+        if (prompt->z > 0 || it->z > 0)
           continue;
 
         save(prompt, it);
