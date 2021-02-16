@@ -50,7 +50,8 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
       continue;
 
     if (other->energy > cuts.emin_before &&
-        other->energy < cuts.emax_before) {
+        other->energy < cuts.emax_before &&
+        other->z < 0) {
       return false;
     }
   }
@@ -62,7 +63,8 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
     if (other->energy > cuts.emin_after &&
         other->energy < cuts.emax_after &&
         // XXX remove the following if we restore the "full DMC" 200us pre-veto
-        not muonAlg->isVetoed(other->time(), det)) {
+        not muonAlg->isVetoed(other->time(), det) &&
+        other->z < 0) {
 
       return false;
     }
