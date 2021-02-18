@@ -9,4 +9,10 @@ void IbdTree::initBranches()
   BR(eP);
   BR(eD);
   BR(dt_us);
+  BR(xP);
+  BR(yP);
+  BR(zP);
+  BR(xD);
+  BR(yD);
+  BR(zD);
 }
