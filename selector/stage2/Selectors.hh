@@ -9,6 +9,7 @@
 #include <cfloat>               // FLT_MAX
 
 class MultCutTool;
+class VertexCutTool;
 class TH1F;
 class Config;
 
@@ -33,6 +34,7 @@ public:
 protected:
   const MuonAlg* muonAlg;
   const MultCutTool* multCut;
+  const VertexCutTool* vertexCut;
 
 private:
   const MuonAlg::Purpose purpose;

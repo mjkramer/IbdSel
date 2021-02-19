@@ -5,6 +5,8 @@
 
 #include "../common/Constants.hh"
 
+class VertexCutTool;
+
 class MultCutTool : public Tool {
 public:
   using Iter = AdBuffer::Iter;
@@ -32,6 +34,8 @@ private:
 
   const MuonAlg* muonAlgIBDs;
   const MuonAlg* muonAlgSingles;
+
+  const VertexCutTool* vertexCut;
 };
 
 inline bool MultCutTool::ibdDmcOk(Iter itP, Iter itD, Det det) const

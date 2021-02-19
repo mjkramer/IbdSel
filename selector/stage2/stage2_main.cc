@@ -8,6 +8,7 @@
 #include "MuonAlg.hh"
 #include "Readers.hh"
 #include "Selectors.hh"
+#include "VertexCut.hh"
 
 #include "../common/Misc.hh"
 
@@ -51,6 +52,7 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   p.makeTool<Clock>();
 
   p.makeTool<MultCutTool>();
+  p.makeTool<VertexCutTool>();
 
   p.process({inFile});
 

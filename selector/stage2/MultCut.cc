@@ -1,4 +1,5 @@
 #include "MultCut.hh"
+#include "VertexCut.hh"
 
 #include "../SelectorFramework/core/Assert.hh"
 
@@ -13,6 +14,8 @@ void MultCutTool::connect(Pipeline& pipeline)
   ASSERT(muonAlgIBDs->rawTag() == int(MuonAlg::Purpose::ForIBDs));
   muonAlgSingles = pipeline.getAlg<MuonAlg>(MuonAlg::Purpose::ForSingles);
   ASSERT(muonAlgSingles->rawTag() == int(MuonAlg::Purpose::ForSingles));
+
+  vertexCut = pipeline.getTool<VertexCutTool>();
 }
 
 void MultCutTool::initCuts(const Config* config)
@@ -50,7 +53,8 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
       continue;
 
     if (other->energy > cuts.emin_before &&
-        other->energy < cuts.emax_before) {
+        other->energy < cuts.emax_before &&
+        vertexCut->vertexOk(other)) {
       return false;
     }
   }
@@ -62,7 +66,8 @@ bool MultCutTool::dmcOk(std::optional<Iter> optItP,
     if (other->energy > cuts.emin_after &&
         other->energy < cuts.emax_after &&
         // XXX remove the following if we restore the "full DMC" 200us pre-veto
-        not muonAlg->isVetoed(other->time(), det)) {
+        not muonAlg->isVetoed(other->time(), det) &&
+        vertexCut->vertexOk(other)) {
 
       return false;
     }

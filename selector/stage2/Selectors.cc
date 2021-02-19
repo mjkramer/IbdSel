@@ -1,6 +1,7 @@
 #include "Selectors.hh"
 #include "MultCut.hh"
 #include "MuonAlg.hh"
+#include "VertexCut.hh"
 
 #include "../SelectorFramework/core/Assert.hh"
 #include "../SelectorFramework/core/ConfigTool.hh"
@@ -20,6 +21,7 @@ void SelectorBase::connect(Pipeline &p)
   ASSERT(muonAlg->rawTag() == int(purpose));
 
   multCut = p.getTool<MultCutTool>();
+  vertexCut = p.getTool<VertexCutTool>();
 
   const Config* config = p.getTool<Config>();
   initCuts(config);
@@ -59,6 +61,7 @@ void SingleSel::finalize(Pipeline& _p)
 void SingleSel::select(Iter it)
 {
   if (EMIN < it->energy && it->energy < EMAX &&
+      vertexCut->vertexOk(it) &&
       not muonAlg->isVetoed(it->time(), det) &&
       multCut->singleDmcOk(it, det)) {
 
@@ -122,6 +125,7 @@ void IbdSel::select(Iter it)
   auto dt_us = [&](Iter other) { return it->time().diff_us(other->time()); };
 
   if (DELAYED_MIN < it->energy && it->energy < DELAYED_MAX &&
+      vertexCut->vertexOk(it) &&
       not muonAlg->isVetoed(it->time(), det)) {
 
     for (Iter prompt = it.earlier();
@@ -130,6 +134,7 @@ void IbdSel::select(Iter it)
 
       if (PROMPT_MIN < prompt->energy && prompt->energy < PROMPT_MAX &&
           dt_us(prompt) > DT_MIN_US &&
+          vertexCut->vertexOk(prompt) &&
           multCut->ibdDmcOk(prompt, it, det)) {
 
         save(prompt, it);
