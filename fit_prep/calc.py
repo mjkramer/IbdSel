@@ -3,6 +3,7 @@
 from hardcoded import Hardcoded
 from delayed_eff import DelayedEffCalc
 from prompt_eff import PromptEffCalc
+from vertex_eff import VertexEffCalc
 
 from prod_util import dets_for_phase, idet
 
@@ -11,6 +12,7 @@ from numpy import sqrt
 import ROOT as R
 
 import os
+
 
 class Calc:
     "Calculate for a given phase"
@@ -34,6 +36,7 @@ class Calc:
 
         self.delEffCalc = DelayedEffCalc(config_path)
         self.promptEffCalc = PromptEffCalc(config_path)
+        self.vertexEffCalc = VertexEffCalc(config_path, phase)
 
     def _livetime_weighted(self, site, det, var):
         r = self.results[(site, det)]
@@ -70,7 +73,8 @@ class Calc:
     def _li9Scale(self, site, det):
         scaleP = self.promptEffCalc.li9_rel_eff(site, det)
         scaleD = self._relDelEff(site, det)
-        return scaleP * scaleD
+        scaleV = self.vertexEffCalc.li9_eff()
+        return scaleP * scaleD * scaleV
 
     def li9Bkg(self, site, det):
         scale = self._li9Scale(site, det)
@@ -97,7 +101,8 @@ class Calc:
     def _fastnScale(self, site, det):
         scaleP = self.promptEffCalc.fastn_rel_eff(site, det)
         scaleD = self._relDelEff(site, det)
-        return scaleP * scaleD
+        scaleV = self.vertexEffCalc.fastn_eff()
+        return scaleP * scaleD * scaleV
 
     def fastnBkg(self, site, det):
         scale = self._fastnScale(site, det)
@@ -110,7 +115,8 @@ class Calc:
     # TODO scale for modified delayed cut
     def _amcScale(self, site, det):
         scaleP = self.promptEffCalc.amc_rel_eff(site, det)
-        return scaleP
+        scaleV = self.vertexEffCalc.amc_eff()
+        return scaleP * scaleV
 
     def amcBkg(self, site, det):
         scale = self._amcScale(site, det)
@@ -123,7 +129,8 @@ class Calc:
     def _alphanScale(self, site, det):
         scaleP = self.promptEffCalc.alphan_rel_eff(site, det)
         scaleD = self._relDelEff(site, det)
-        return scaleP * scaleD
+        scaleV = self.vertexEffCalc.alphan_eff()
+        return scaleP * scaleD * scaleV
 
     def alphanBkg(self, site, det):
         scale = self._alphanScale(site, det)
@@ -138,7 +145,10 @@ class Calc:
 
     # XXX change to absolute delayed efficiency
     def delayedEff(self, site, det):
-        return self._relDelEff(site, det)
+        eff = self._relDelEff(site, det)
+        # NOTE: Here we fold in the vertex efficiency for IBDs. Then
+        # ToyMC/fitter will do the right thing.
+        return eff * self.vertexEffCalc.ibd_eff(site, det)
         # return self._hardcoded(site, det, 'delayedEff')
 
     # unused
