@@ -55,13 +55,16 @@ class VertexEffCalc:
         return (maxZ - minZ) / (nom_maxZ - nom_minZ)
 
     def _z_factor_amc(self):
-        "XXX FIXME Don't assume uniform distribution in top half. Use \
-        something based on the AmC paper."
+        "Assume a linear profile from 0 to maxZ. See Fig 2 of 1512.00295."
         nom_minZ = 0
-        nom_maxZ = 1700
+        # nom_maxZ = 1700
+        nom_maxZ = 1500
         minZ = max(self.cut.minZ, nom_minZ)
         maxZ = min(self.cut.maxZ, nom_maxZ)
-        return (maxZ - minZ) / (nom_maxZ - nom_minZ)
+        # return (maxZ - minZ) / (nom_maxZ - nom_minZ)
+        nom = maxZ**2 - minZ**2 - nom_minZ * (maxZ - minZ)
+        denom = nom_maxZ**2 - nom_minZ * nom_maxZ
+        return nom / denom
 
     def _uniform_eff(self):
         return self._z_factor_uniform() * self._cyl_factor()
