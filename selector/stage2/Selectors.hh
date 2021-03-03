@@ -81,7 +81,7 @@ public:
   void select(Iter it) override;
   void finalize(Pipeline& p) override;
 
-  TH1F* hist;
+  TH1F *histP, *histD;
 
 private:
   void save(Iter prompt, Iter delayed);
