@@ -42,10 +42,10 @@ public:
 protected:
   const MuonAlg* muonAlg;
   const VertexCutTool* vertexCut;
+  const int multCutTag;
 
 private:
   const MuonAlg::Purpose muonAlgPurpose;
-  const int multCutTag;
   Iter current;
 };
 
@@ -56,7 +56,7 @@ public:
   float EMIN;
   float EMAX;
 
-  SingleSel(Det det, int tag = 0);
+  SingleSel(Det det, int multCutTag = 0);
   void initCuts(const Config* config) override;
   void select(Iter it) override;
   void finalize(Pipeline& p) override;
@@ -75,7 +75,7 @@ public:
   unsigned DT_MIN_US;
   unsigned DT_MAX_US;
 
-  IbdSel(Det detector, int tag = 0);
+  IbdSel(Det detector, int multCutTag = 0);
   void connect(Pipeline& p) override;
   void initCuts(const Config* config) override;
   void select(Iter it) override;

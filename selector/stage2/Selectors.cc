@@ -40,10 +40,13 @@ Algorithm::Status SelectorBase::consume_iter(Iter it)
 
 // ----------------------------------------------------------------------
 
-SingleSel::SingleSel(Det det, int tag) :
-  SelectorBase(det, MuonAlg::Purpose::ForSingles, tag)
+SingleSel::SingleSel(Det det, int multCutTag) :
+  SelectorBase(det, MuonAlg::Purpose::ForSingles, multCutTag)
 {
   auto hname = Form("h_single_AD%d", int(det));
+  if (multCutTag == TAG_LOW_DELAYED_EMIN)
+    hname = Form("%s_low", hname);
+
   // Use fine binning since we're doing integrals in Calculator
   // Go up to 20 MeV so we can calc pre-muon rate (for debugging)
   hist = new TH1F(hname, hname, 4000, 0, 20);
@@ -58,7 +61,8 @@ void SingleSel::initCuts(const Config *config)
 
 void SingleSel::finalize(Pipeline& _p)
 {
-  hist->Write();
+  if (multCutTag == 0)
+    hist->Write();
 }
 
 void SingleSel::select(Iter it)
@@ -75,14 +79,17 @@ void SingleSel::select(Iter it)
 // ----------------------------------------------------------------------
 
 IbdSel::IbdSel(Det detector, int tag) :
-  SelectorBase(detector, MuonAlg::Purpose::ForIBDs, tag),
-  ibdTree(Form("ibd_AD%d", int(detector)))
+  SelectorBase(detector, MuonAlg::Purpose::ForIBDs, tag)
 {
+  if (multCutTag == 0)
+    ibdTree = TreeWriter<IbdTree>(Form("ibd_AD%d", int(detector)));
 }
 
 void IbdSel::connect(Pipeline& p)
 {
-  ibdTree.connect(p);
+  if (multCutTag == 0)
+    ibdTree.connect(p);
+
   SelectorBase::connect(p);
 }
 
@@ -96,6 +103,9 @@ void IbdSel::initCuts(const Config *config)
   DT_MAX_US = config->get<float>("ibdDtMaxUsec", 200);
 
   auto hname = Form("h_ibd_AD%d", det);
+  if (multCutTag == TAG_LOW_DELAYED_EMIN)
+    hname = Form("%s_low", hname);
+
   hist = new TH1F(hname, hname, 20 * PROMPT_MAX, 0, PROMPT_MAX);
 }
 
@@ -106,6 +116,9 @@ void IbdSel::finalize(Pipeline& p)
 
 void IbdSel::save(Iter prompt, Iter delayed)
 {
+  if (multCutTag != 0)
+    return;
+
   ibdTree.data.runNo = delayed->runNo;
   ibdTree.data.fileNo = delayed->fileNo;
   ibdTree.data.trigP = prompt->trigNo;

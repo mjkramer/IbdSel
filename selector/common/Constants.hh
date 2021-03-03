@@ -23,3 +23,7 @@ namespace keys {
 namespace units {
   constexpr float hzToDaily = 86'400;
 }
+
+// For evaluating efficiency of delayed energy cut
+const int TAG_LOW_DELAYED_EMIN = 1;
+const float LOW_DELAYED_EMIN = 4;
