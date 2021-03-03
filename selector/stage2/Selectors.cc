@@ -136,24 +136,24 @@ void IbdSel::save(Iter prompt, Iter delayed)
   ibdTree.fill();
 }
 
-void IbdSel::select(Iter it)
+void IbdSel::select(Iter delayed)
 {
-  auto dt_us = [&](Iter other) { return it->time().diff_us(other->time()); };
+  auto dt_us = [&](Iter other) { return delayed->time().diff_us(other->time()); };
 
-  if (DELAYED_MIN < it->energy && it->energy < DELAYED_MAX &&
-      vertexCut->vertexOk(it) &&
-      not muonAlg->isVetoed(it->time(), det)) {
+  if (DELAYED_MIN < delayed->energy && delayed->energy < DELAYED_MAX &&
+      vertexCut->vertexOk(delayed) &&
+      not muonAlg->isVetoed(delayed->time(), det)) {
 
-    for (Iter prompt = it.earlier();
+    for (Iter prompt = delayed.earlier();
          dt_us(prompt) < DT_MAX_US;
          prompt = prompt.earlier()) {
 
       if (PROMPT_MIN < prompt->energy && prompt->energy < PROMPT_MAX &&
           dt_us(prompt) > DT_MIN_US &&
           vertexCut->vertexOk(prompt) &&
-          multCut->ibdDmcOk(prompt, it, det)) {
+          multCut->ibdDmcOk(prompt, delayed, det)) {
 
-        save(prompt, it);
+        save(prompt, delayed);
 
         hist->Fill(prompt->energy);
       }
