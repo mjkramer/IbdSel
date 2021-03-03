@@ -11,6 +11,8 @@ class MultCutTool : public Tool {
 public:
   using Iter = AdBuffer::Iter;
 
+  using Tool::Tool;
+
   void connect(Pipeline& pipeline) override;
 
   bool ibdDmcOk(Iter itP, Iter itD, Det det) const;

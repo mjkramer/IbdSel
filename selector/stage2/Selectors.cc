@@ -8,19 +8,22 @@
 
 #include <TH1F.h>
 
-SelectorBase::SelectorBase(Det det, MuonAlg::Purpose purpose) :
-  BufferedSimpleAlg<AdBuffer, Det>(det),
+SelectorBase::SelectorBase(Det det, MuonAlg::Purpose muonAlgPurpose,
+                           int multCutTag) :
   det(det),
-  purpose(purpose) {}
+  muonAlgPurpose(muonAlgPurpose),
+  multCutTag(multCutTag),
+  BufferedSimpleAlg(TAG(det, multCutTag))
+  {}
 
 void SelectorBase::connect(Pipeline &p)
 {
-  BufferedSimpleAlg<AdBuffer, Det>::connect(p);
+  BufferedSimpleAlg<AdBuffer>::connect(p);
 
-  muonAlg = p.getAlg<MuonAlg>(purpose);
-  ASSERT(muonAlg->rawTag() == int(purpose));
+  muonAlg = p.getAlg<MuonAlg>(muonAlgPurpose);
+  ASSERT(muonAlg->rawTag() == int(muonAlgPurpose));
 
-  multCut = p.getTool<MultCutTool>();
+  multCut = p.getTool<MultCutTool>(multCutTag);
   vertexCut = p.getTool<VertexCutTool>();
 
   const Config* config = p.getTool<Config>();
@@ -37,8 +40,8 @@ Algorithm::Status SelectorBase::consume_iter(Iter it)
 
 // ----------------------------------------------------------------------
 
-SingleSel::SingleSel(Det det) :
-  SelectorBase(det, MuonAlg::Purpose::ForSingles)
+SingleSel::SingleSel(Det det, int tag) :
+  SelectorBase(det, MuonAlg::Purpose::ForSingles, tag)
 {
   auto hname = Form("h_single_AD%d", int(det));
   // Use fine binning since we're doing integrals in Calculator
@@ -71,8 +74,8 @@ void SingleSel::select(Iter it)
 
 // ----------------------------------------------------------------------
 
-IbdSel::IbdSel(Det detector) :
-  SelectorBase(detector, MuonAlg::Purpose::ForIBDs),
+IbdSel::IbdSel(Det detector, int tag) :
+  SelectorBase(detector, MuonAlg::Purpose::ForIBDs, tag),
   ibdTree(Form("ibd_AD%d", int(detector)))
 {
 }

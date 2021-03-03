@@ -13,15 +13,21 @@ class VertexCutTool;
 class TH1F;
 class Config;
 
-class SelectorBase : public BufferedSimpleAlg<AdBuffer, Det> {
+class SelectorBase : public BufferedSimpleAlg<AdBuffer> {
 public:
   using Iter = AdBuffer::Iter;
 
-  SelectorBase(Det det, MuonAlg::Purpose purpose);
+  // lowercase tag is used to select the MultCut
+  static int TAG(Det det, int tag = 0)
+  {
+    return (tag << 8) + int(det);
+  }
+
+  SelectorBase(Det det, MuonAlg::Purpose muonAlgPurpose, int tag);
 
   void connect(Pipeline& p) override;
   Algorithm::Status consume_iter(Iter it) final;
-  const AdTree& getCurrent() const // for logging purposes
+  const AdTree& getCurrent() const // for logging muonAlgPurposes
   {
     return *current;
   }
@@ -31,13 +37,15 @@ public:
 
   const Det det;
 
+  const MultCutTool* multCut;
+
 protected:
   const MuonAlg* muonAlg;
-  const MultCutTool* multCut;
   const VertexCutTool* vertexCut;
 
 private:
-  const MuonAlg::Purpose purpose;
+  const MuonAlg::Purpose muonAlgPurpose;
+  const int multCutTag;
   Iter current;
 };
 
@@ -48,7 +56,7 @@ public:
   float EMIN;
   float EMAX;
 
-  SingleSel(Det det);
+  SingleSel(Det det, int tag = 0);
   void initCuts(const Config* config) override;
   void select(Iter it) override;
   void finalize(Pipeline& p) override;
@@ -67,7 +75,7 @@ public:
   unsigned DT_MIN_US;
   unsigned DT_MAX_US;
 
-  IbdSel(Det detector);
+  IbdSel(Det detector, int tag = 0);
   void connect(Pipeline& p) override;
   void initCuts(const Config* config) override;
   void select(Iter it) override;

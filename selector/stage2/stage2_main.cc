@@ -44,6 +44,13 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
     p.makeAlg<SingleSel>(detector);
     p.makeAlg<IbdSel>(detector);
 
+    // For evaluating delayed cut efficiency:
+    // NB: Even though we're not changing the energy range for this singles
+    // selection, we ARE using a different DMC
+    p.makeAlg<SingleSel>(detector, TAG_LOW_DELAYED_EMIN);
+    IbdSel& sel = p.makeAlg<IbdSel>(detector, TAG_LOW_DELAYED_EMIN);
+    sel.DELAYED_MIN = LOW_DELAYED_EMIN;
+
     if (not lastAD)
       p.makeAlg<PrefetchLooper<AdReader, Det>>(detector);
   }
@@ -54,8 +61,26 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
   p.makeTool<MultCutTool>();
   p.makeTool<VertexCutTool>();
 
-  p.process({inFile});
+  // For evaluating delayed cut efficiency:
+  p.makeTool<MultCutTool>(TAG_LOW_DELAYED_EMIN);
+
+  p.connect({inFile});
+
+  // IbdSel and MultCut need to be "connected" before we modify their cuts,
+  // otherwise our changes will be overwritten
+  for (const Det detector : allADs) {
+    const int tag = IbdSel::TAG(detector, TAG_LOW_DELAYED_EMIN);
+    auto* sel = p.getAlg<IbdSel>(tag);
+    sel->DELAYED_MIN = LOW_DELAYED_EMIN;
+  }
+
+  auto* mc = p.getAlg<MultCutTool>(TAG_LOW_DELAYED_EMIN);
+  mc->ibdCuts.emin_after = LOW_DELAYED_EMIN;
+  mc->singleCuts.emin_after = LOW_DELAYED_EMIN;
+
+  p.loop();
 
   Calculator calc(p, site, phase, seq);
   calc.writeEntries();
 }
+
