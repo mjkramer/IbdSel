@@ -34,7 +34,7 @@ class Calc:
                 self.results[(site, det)] = \
                     results.query(f'detector == {det}')
 
-        self.delEffCalc = DelayedEffCalc(config_path)
+        self.delEffCalc = DelayedEffCalc(config_path, self)
         self.promptEffCalc = PromptEffCalc(config_path)
         self.vertexEffCalc = VertexEffCalc(config_path, phase)
 

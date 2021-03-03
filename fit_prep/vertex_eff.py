@@ -19,7 +19,7 @@ class VertexEffCalc:
     def __init__(self, config_path, phase,
                  reftag="2021_02_03", refconfig="yolo5"):
         self.dfs = self._load_dfs(phase, reftag, refconfig)
-        self.cut = self._load_cut(config_path)
+        self.cut = self.load_cut(config_path)
 
     @staticmethod
     def _load_dfs(phase, reftag, refconfig):
@@ -31,7 +31,7 @@ class VertexEffCalc:
         return result
 
     @staticmethod
-    def _load_cut(config_path):
+    def load_cut(config_path):
         config = ConfigFile(config_path)
         cut = VertexCut()
         cut.minZ = config.get("minZ", cut.minZ)

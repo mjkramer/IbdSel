@@ -5,21 +5,19 @@ import os
 import ROOT as R
 
 from config_file import ConfigFile
+from get_ncap_spec import get_ncap_spec
+from vertex_eff import DelayedEffCalc
 
 
 class DelayedEffCalc:
-    def __init__(self, config_path):
+    def __init__(self, config_path, calc):
         config = ConfigFile(config_path)
         self.cut = config["ibdDelayedEmin"]
-
-        home = os.getenv("IBDSEL_HOME")
-        ncap_spec_path = f"{home}/static/ncap_spec/ncap_spec_P17B.root"
-        self.specfile = R.TFile(ncap_spec_path)
+        self.vtxcut = DelayedEffCalc.load_cut(config_path)
+        self.calc = calc
 
     def scale_factor(self, phase, site, det):
-        nADs = [6, 8, 7][phase-1]
-        hname = f"h_ncap_{nADs}ad_eh{site}_ad{det}"
-        h = self.specfile.Get(hname)
+        h = get_ncap_spec(phase, site, det, self.calc, self.vtxcut)
 
         nom = h.Integral(h.FindBin(self.cut), h.FindBin(12))
         denom = h.Integral(h.FindBin(6), h.FindBin(12))
