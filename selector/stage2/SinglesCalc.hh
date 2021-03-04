@@ -8,7 +8,7 @@ class TH1F;
 
 class SinglesCalc {
 public:
-  SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
+  SinglesCalc(TH1F* hSing, double livetime_s,
               MultCutTool::Cuts singleMultCuts,
               MultCutTool::Cuts ibdMultCuts,
               double eMuSingles,

@@ -7,8 +7,7 @@
 
 static double fine_integral(TH1F* h, double x1, double x2);
 
-// XXX get rid of eMu?
-SinglesCalc::SinglesCalc(TH1F* hSing, double eMu, double livetime_s,
+SinglesCalc::SinglesCalc(TH1F* hSing, double livetime_s,
                          MultCutTool::Cuts singleMultCuts,
                          MultCutTool::Cuts ibdMultCuts,
                          double eMuSingles,
