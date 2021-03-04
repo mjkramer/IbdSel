@@ -19,8 +19,6 @@ Calculator::Calculator(Pipeline& pipe, Site site, Phase phase, UInt_t seq) :
   pipe(pipe), site(site), phase(phase), seq(seq)
 {
   multCut = pipe.getTool<MultCutTool>();
-  singleSel = pipe.getAlg<SingleSel>();
-  ibdSel = pipe.getAlg<IbdSel>();
 }
 
 double Calculator::livetime_s()
@@ -63,7 +61,7 @@ double Calculator::li9DailyErr(Det detector)
 }
 
 void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, SinglesCalc& singCalc,
-                                 Float_t vetoEffSingles)
+                                 Float_t vetoEffSingles, IbdSel* ibdSel)
 {
   IbdSel* ibdSelLow = pipe.getAlg<IbdSel>(IbdSel::TAG(detector, TAG_LOW_DELAYED_EMIN));
   SingleSel* singleSelLow = pipe.getAlg<SingleSel>(SingleSel::TAG(detector, TAG_LOW_DELAYED_EMIN));
@@ -81,7 +79,14 @@ void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, Singles
   // hadd etc.
 
   // auto h_ncap = std::make_unique<TH1F>("h_ncap", "h_ncap", 160, 4, 12);
-  auto h_ncap = std::unique_ptr<TH1F>((TH1F*)ibdSelLow->histD->Clone());
+  // auto h_ncap = std::unique_ptr<TH1F>((TH1F*)ibdSelLow->histD->Clone());
+  auto h_ncap = std::unique_ptr<TH1F>((TH1F*)hSingLow->Clone());
+  h_ncap->Reset();
+  auto h_ibd = ibdSelLow->histD;
+  for (int bin = h_ibd->FindBin(ibdSelLow->DELAYED_MIN);
+       bin <= h_ibd->FindBin(ibdSelLow->DELAYED_MAX);
+       ++bin)
+    h_ncap->Fill(h_ibd->GetBinCenter(bin), h_ibd->GetBinContent(bin));
 
 
   auto* hSingLowD = (TH1F*) hSingLow->Clone();
@@ -112,6 +117,7 @@ void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, Singles
 
 void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
 {
+  IbdSel* ibdSel = pipe.getAlg<IbdSel>(detector);
   TH1F* hSing = pipe.getAlg<SingleSel>(detector)->hist;
   const double vetoEffSingles = vetoEff(detector, MuonAlg::Purpose::ForSingles);
   SinglesCalc singCalc(hSing, livetime_s(),
@@ -147,7 +153,7 @@ void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
   w.data.vetoEffSingles = vetoEffSingles;
   w.data.dmcEffSingles = singCalc.dmcEffSingles();
 
-  writeDelayedEff(w, detector, singCalc, vetoEffSingles);
+  writeDelayedEff(w, detector, singCalc, vetoEffSingles, ibdSel);
 
   w.fill();
 }

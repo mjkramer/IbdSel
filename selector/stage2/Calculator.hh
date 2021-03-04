@@ -30,7 +30,7 @@ public:
 
   void writeEntry(TreeWriter<CalcsTree>& w, Det detector);
   void writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, SinglesCalc& singCalc,
-                       Float_t vetoEffSingles);
+                       Float_t vetoEffSingles, IbdSel* ibdSel);
   virtual void writeEntries(const char* treename = "results");
 
 protected:
@@ -41,7 +41,5 @@ protected:
 
   Li9Calc li9calc;
   MultCutTool* multCut = nullptr;
-  SingleSel* singleSel = nullptr;
-  IbdSel* ibdSel = nullptr;
 };
 

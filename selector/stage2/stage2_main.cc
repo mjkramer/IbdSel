@@ -74,7 +74,7 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
     sel->DELAYED_MIN = LOW_DELAYED_EMIN;
   }
 
-  auto* mc = p.getAlg<MultCutTool>(TAG_LOW_DELAYED_EMIN);
+  auto* mc = p.getTool<MultCutTool>(TAG_LOW_DELAYED_EMIN);
   mc->ibdCuts.emin_after = LOW_DELAYED_EMIN;
   mc->singleCuts.emin_after = LOW_DELAYED_EMIN;
 

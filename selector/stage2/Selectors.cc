@@ -18,6 +18,9 @@ SelectorBase::SelectorBase(Det det, MuonAlg::Purpose muonAlgPurpose,
 
 void SelectorBase::connect(Pipeline &p)
 {
+  // Without this, we try to find AdBuffer whose tag includes our multCutTag
+  this->pred_ = [&](const AdBuffer& reader) { return reader.rawTag() == int(det); };
+
   BufferedSimpleAlg<AdBuffer>::connect(p);
 
   muonAlg = p.getAlg<MuonAlg>(muonAlgPurpose);
