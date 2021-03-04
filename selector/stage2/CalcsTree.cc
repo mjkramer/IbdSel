@@ -9,6 +9,9 @@ void CalcsTree::initBranches()
   BR(accDaily); BR(accDailyErr);
   BR(li9Daily); BR(li9DailyErr);
 
+  BR(delayedEffRel), BR(delayedEffAbs);
+  BR(accDailyLowDelCut);
+
   BR(seq);
   BR(phase);
   BR(site);

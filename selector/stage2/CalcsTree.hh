@@ -13,6 +13,9 @@ public:
   Float_t accDaily, accDailyErr;
   Float_t li9Daily, li9DailyErr;
 
+  Float_t delayedEffRel, delayedEffAbs;
+  Float_t accDailyLowDelCut;
+
   UInt_t seq;
   Phase phase;
   Site site;

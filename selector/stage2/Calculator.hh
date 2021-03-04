@@ -9,6 +9,7 @@ class CalcsTree;
 class MultCutTool;
 class SingleSel;
 class IbdSel;
+class SinglesCalc;
 template <class T> class TreeWriter;
 class TH1F;
 
@@ -28,6 +29,8 @@ public:
   double li9DailyErr(Det detector);
 
   void writeEntry(TreeWriter<CalcsTree>& w, Det detector);
+  void writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, SinglesCalc& singCalc,
+                       Float_t vetoEffSingles);
   virtual void writeEntries(const char* treename = "results");
 
 protected:
