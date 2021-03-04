@@ -80,7 +80,7 @@ void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, Singles
 
   // auto h_ncap = std::make_unique<TH1F>("h_ncap", "h_ncap", 160, 4, 12);
   // auto h_ncap = std::unique_ptr<TH1F>((TH1F*)ibdSelLow->histD->Clone());
-  auto h_ncap = std::unique_ptr<TH1F>((TH1F*)hSingLow->Clone());
+  auto h_ncap = std::unique_ptr<TH1F>((TH1F*)hSingLow->Clone(Form("h_ncap_ad%d", int(detector))));
   h_ncap->Reset();
   auto h_ibd = ibdSelLow->histD;
   for (int bin = h_ibd->FindBin(ibdSelLow->DELAYED_MIN);
@@ -101,18 +101,23 @@ void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, Singles
 
   // NB we use singCalc.dmcEff, not singCalcLow.dmcEff, since we are predicting the raw measurement
   // and accDaily already corrects for singCalcLow.dmcEff
-  const float accLow = singCalcLow.accDaily() * livetime_s() * singCalc.dmcEff() * vetoEff(detector);
+  const float accLow = singCalcLow.accDaily() * livetime_s() / 86400
+    * singCalc.dmcEff() * vetoEff(detector);
   h_ncap->Add(hSingLowD, -accLow);
 
   w.data.delayedEffAbs = h_ncap->Integral(h_ncap->FindBin(ibdSel->DELAYED_MIN),
                                        h_ncap->FindBin(ibdSel->DELAYED_MAX)) /
-    h_ncap->Integral();
+    h_ncap->Integral(h_ncap->FindBin(ibdSelLow->DELAYED_MIN),
+                     h_ncap->FindBin(ibdSelLow->DELAYED_MAX));
 
   w.data.delayedEffRel = h_ncap->Integral(h_ncap->FindBin(ibdSel->DELAYED_MIN),
                                           h_ncap->FindBin(ibdSel->DELAYED_MAX)) /
     h_ncap->Integral(h_ncap->FindBin(6), h_ncap->FindBin(12));
 
   w.data.accDailyLowDelCut = singCalcLow.accDaily();
+
+  pipe.getOutFile()->cd();
+  h_ncap->Write();
 }
 
 void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
