@@ -12,8 +12,10 @@ def today():
     return DT.now().strftime('%b. %-m, %Y')
 
 
-def gen_text_(out_fname, phase, stage2_dir, config_path):
-    calc = Calc(phase, stage2_dir, config_path)
+def gen_text_(out_fname, phase, stage2_dir, config_path,
+              delayed_eff_mode, delayed_eff_impl):
+    calc = Calc(phase, stage2_dir, config_path,
+                delayed_eff_mode, delayed_eff_impl)
 
     outf = open(out_fname, 'w')
 
@@ -115,10 +117,11 @@ def gen_text_(out_fname, phase, stage2_dir, config_path):
     outf.close()
 
 
-def gen_text(tag, config, outconfig):
+def gen_text(tag, config, outconfig, delayed_eff_mode, delayed_eff_impl):
     for phase in [1, 2, 3]:
         out_fname = fit_text_input_path(phase, tag, outconfig)
         stage2_dir = data_dir('stage2_pbp', f'{tag}@{config}')
         config_path = configfile_path(tag, config)
 
-        gen_text_(out_fname, phase, stage2_dir, config_path)
+        gen_text_(out_fname, phase, stage2_dir, config_path,
+                  delayed_eff_mode, delayed_eff_impl)

@@ -17,7 +17,8 @@ import os
 class Calc:
     "Calculate for a given phase"
 
-    def __init__(self, phase, stage2_dir, config_path):
+    def __init__(self, phase, stage2_dir, config_path,
+                 delayed_eff_mode, delayed_eff_impl):
         self.phase = phase
         self.hardcoded = Hardcoded(phase)
 
@@ -34,9 +35,14 @@ class Calc:
                 self.results[(site, det)] = \
                     results.query(f'detector == {det}')
 
-        self.delEffCalc = DelayedEffCalc(config_path, self)
+        # self.delEffCalc = DelayedEffCalc(config_path, self)
         self.promptEffCalc = PromptEffCalc(config_path)
         self.vertexEffCalc = VertexEffCalc(config_path, phase)
+
+        self.delayed_eff_mode = delayed_eff_mode
+        self.delayed_eff_impl = delayed_eff_impl
+        if delayed_eff_impl == "add-then-calc":
+            raise NotImplementedError("add-then-calc")
 
     def _livetime_weighted(self, site, det, var):
         r = self.results[(site, det)]
@@ -47,7 +53,17 @@ class Calc:
         return sqrt((r[var]**2 * r.livetime_s).sum()) / r.livetime_s.sum()
 
     def _relDelEff(self, site, det):
-        return self.delEffCalc.scale_factor(self.phase, site, det)
+        # return self.delEffCalc.scale_factor(self.phase, site, det)
+        if self.delayed_eff_impl == "calc-then-add":
+            return self._livetime_weighted(site, det, "delayedEffRel")
+        else:
+            raise NotImplementedError("add-then-calc")
+
+    def _absDelEff(self, site, det):
+        if self.delayed_eff_impl == "calc-then-add":
+            return self._livetime_weighted(site, det, "delayedEffAbs")
+        else:
+            raise NotImplementedError("add-then-calc")
 
     def ibdCount(self, site, det):
         tree = self.files[site].Get(f'ibd_AD{det}')
@@ -143,9 +159,15 @@ class Calc:
     def targetMass(self, site, det):
         return self._hardcoded(site, det, 'targetMass')
 
-    # XXX change to absolute delayed efficiency
     def delayedEff(self, site, det):
-        eff = self._relDelEff(site, det)
+        if self.delayed_eff_mode == "rel":
+            eff = self._relDelEff(site, det)
+        elif self.delayed_eff_mode == "abs":
+            eff = self._absDelEff(site, det)
+        elif self.delayed_eff_mode == "flat":
+            eff = 0.88
+        else:
+            raise Exception(f"delayed_eff_mode = {self.delayed_eff_mode}???")
         # NOTE: Here we fold in the vertex efficiency for IBDs. Then
         # ToyMC/fitter will do the right thing.
         return eff * self.vertexEffCalc.ibd_eff(site, det)

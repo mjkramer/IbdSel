@@ -19,6 +19,11 @@ def main():
                     help='Use BCW binning')
     ap.add_argument('--suffix')
     ap.add_argument('--pars-after-suffix', type=int)
+    ap.add_argument('--delayed-eff-mode', choices=["abs", "rel", "flat"],
+                    default="rel")
+    ap.add_argument('--delayed-eff-impl',
+                    choices=["calc-then-add", "add-then-calc"],
+                    default="calc-then-add")
     args = ap.parse_args()
 
     if args.suffix:
@@ -35,7 +40,8 @@ def main():
     os.system(f'mkdir -p {outdir}')
 
     gen_hists(args.tag, args.config, outconfig, bcw=args.bcw)
-    gen_text(args.tag, args.config, outconfig)
+    gen_text(args.tag, args.config, outconfig,
+             args.delayed_eff_mode, args.delayed_eff_impl)
 
 
 if __name__ == '__main__':

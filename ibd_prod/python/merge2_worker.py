@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # takes 7 minutes to do p17b
+# TODO merge the three halls in parallel
 
 import argparse
 from collections import defaultdict
