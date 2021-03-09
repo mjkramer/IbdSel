@@ -24,6 +24,8 @@ def main():
     ap.add_argument('--delayed-eff-impl',
                     choices=["calc-then-add", "add-then-calc"],
                     default="calc-then-add")
+    ap.add_argument('--vtx-eff-ref',
+                    help="tag@config to use as reference for vertex eff")
     args = ap.parse_args()
 
     if args.suffix:
@@ -41,7 +43,8 @@ def main():
 
     gen_hists(args.tag, args.config, outconfig, bcw=args.bcw)
     gen_text(args.tag, args.config, outconfig,
-             args.delayed_eff_mode, args.delayed_eff_impl)
+             args.delayed_eff_mode, args.delayed_eff_impl,
+             args.vtx_eff_ref)
 
 
 if __name__ == '__main__':

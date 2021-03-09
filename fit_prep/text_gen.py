@@ -3,19 +3,22 @@
 from calc import Calc
 
 from prod_util import sitedets, dets_for_phase
-from prod_util import data_dir, fit_text_input_path, configfile_path
+from prod_util import fit_text_input_path
 
 from datetime import datetime as DT
+import os
 
 
 def today():
     return DT.now().strftime('%b. %-m, %Y')
 
 
-def gen_text_(out_fname, phase, stage2_dir, config_path,
-              delayed_eff_mode, delayed_eff_impl):
-    calc = Calc(phase, stage2_dir, config_path,
-                delayed_eff_mode, delayed_eff_impl)
+def gen_text_(out_fname, phase, tag, config,
+              delayed_eff_mode, delayed_eff_impl,
+              vtx_eff_nom_tagconf=None):
+    calc = Calc(phase, tag, config,
+                delayed_eff_mode, delayed_eff_impl,
+                vtx_eff_nom_tagconf)
 
     outf = open(out_fname, 'w')
 
@@ -116,12 +119,30 @@ def gen_text_(out_fname, phase, stage2_dir, config_path,
 
     outf.close()
 
+    auxname = "aux_" + os.path.basename(out_fname)
+    auxpath = os.path.dirname(out_fname) + "/" + auxname
+    outf_aux = open(auxpath, "w")
 
-def gen_text(tag, config, outconfig, delayed_eff_mode, delayed_eff_impl):
+    def dump_aux(name, func, fmt):
+        vals = []
+        for site, det in sitedets():
+            if det in dets_for_phase(site, phase):
+                vals.append(func(site, det))
+            else:
+                vals.append(0)
+
+        line = f"{name}\t" + "\t".join([fmt % v for v in vals])
+        outf_aux.write(line + "\n")
+
+    dump_aux("delayedEff", calc.actualDelayedEff, "%.4f")
+    dump_aux("vertexEff", calc.vertexEff, "%.4f")
+
+
+def gen_text(tag, config, outconfig, delayed_eff_mode, delayed_eff_impl,
+             vtx_eff_nom_tagconf=None):
     for phase in [1, 2, 3]:
         out_fname = fit_text_input_path(phase, tag, outconfig)
-        stage2_dir = data_dir('stage2_pbp', f'{tag}@{config}')
-        config_path = configfile_path(tag, config)
 
-        gen_text_(out_fname, phase, stage2_dir, config_path,
-                  delayed_eff_mode, delayed_eff_impl)
+        gen_text_(out_fname, phase, tag, config,
+                  delayed_eff_mode, delayed_eff_impl,
+                  vtx_eff_nom_tagconf)

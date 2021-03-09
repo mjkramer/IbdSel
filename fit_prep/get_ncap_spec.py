@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# NOTE: Retired, see comments in delayed_eff
+
 import argparse
 
 import ROOT as R
@@ -10,7 +12,8 @@ from prod_util import idet as get_idet
 from util import read_theta13_file
 
 
-def get_ncap_spec(phase, site, det, calc, vtxcut,
+def get_ncap_spec(phase, site, det, calc,
+                  # vtxcut,
                   tag="2021_02_03", config="del4MeV"):
     stage2_file = stage2_pbp_path(site, phase, tag, config)
 
@@ -21,12 +24,13 @@ def get_ncap_spec(phase, site, det, calc, vtxcut,
     h = R.TH1F(hname, htitle, 160, 4, 12)
 
     tree = stage2_file.Get(f"ibd_AD{det}")
-    sel = f"zP >= {vtxcut.minZ} && zD >= {vtxcut.minZ}"
-    sel += f" && zP <= {vtxcut.maxZ} && zD <= {vtxcut.maxZ}"
-    sel += f" && sqrt(xP*xP + yP*yP) >= {vtxcut.minR}"
-    sel += f" && sqrt(xD*xD + yD*yD) >= {vtxcut.minR}"
-    sel += f" && sqrt(xP*xP + yP*yP) <= {vtxcut.maxR}"
-    sel += f" && sqrt(xD*xD + yD*yD) <= {vtxcut.maxR}"
+    # sel = f"zP >= {vtxcut.minZ} && zD >= {vtxcut.minZ}"
+    # sel += f" && zP <= {vtxcut.maxZ} && zD <= {vtxcut.maxZ}"
+    # sel += f" && sqrt(xP*xP + yP*yP) >= {vtxcut.minR}"
+    # sel += f" && sqrt(xD*xD + yD*yD) >= {vtxcut.minR}"
+    # sel += f" && sqrt(xP*xP + yP*yP) <= {vtxcut.maxR}"
+    # sel += f" && sqrt(xD*xD + yD*yD) <= {vtxcut.maxR}"
+    sel = ""
     tree.Draw(f"eD>>{hname}", sel, "goff")
 
     h_sing_orig = stage2_file.Get(f"h_single_AD{det}")

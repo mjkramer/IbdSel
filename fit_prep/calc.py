@@ -1,32 +1,34 @@
 "Calculate the things"
 
 from hardcoded import Hardcoded
-from delayed_eff import DelayedEffCalc
+# from delayed_eff import DelayedEffCalc
 from prompt_eff import PromptEffCalc
-from vertex_eff import VertexEffCalc
+from vertex_eff import VertexEffCalc, DummyVertexEffCalc
 
 from prod_util import dets_for_phase, idet
+from prod_util import stage2_pbp_path, configfile_path
 
 from root_pandas import read_root
 from numpy import sqrt
 import ROOT as R
 
-import os
-
 
 class Calc:
     "Calculate for a given phase"
 
-    def __init__(self, phase, stage2_dir, config_path,
-                 delayed_eff_mode, delayed_eff_impl):
+    def __init__(self, phase, tag, config,
+                 delayed_eff_mode="rel",
+                 delayed_eff_impl="calc-then-add",
+                 vtx_eff_nom_tagconf=None):
         self.phase = phase
+        self.delayed_eff_mode = delayed_eff_mode
+        self.delayed_eff_impl = delayed_eff_impl
+
         self.hardcoded = Hardcoded(phase)
 
         self.files, self.results = {}, {}
         for site in [1, 2, 3]:
-            nADs = [6, 8, 7][phase-1]
-            fname = f'stage2.pbp.eh{site}.{nADs}ad.root'
-            path = os.path.join(stage2_dir, fname)
+            path = stage2_pbp_path(site, phase, tag, config)
 
             self.files[site] = R.TFile(path)
 
@@ -35,12 +37,18 @@ class Calc:
                 self.results[(site, det)] = \
                     results.query(f'detector == {det}')
 
+        cfg_path = configfile_path(tag, config)
         # self.delEffCalc = DelayedEffCalc(config_path, self)
-        self.promptEffCalc = PromptEffCalc(config_path)
-        self.vertexEffCalc = VertexEffCalc(config_path, phase)
+        self.promptEffCalc = PromptEffCalc(cfg_path)
 
-        self.delayed_eff_mode = delayed_eff_mode
-        self.delayed_eff_impl = delayed_eff_impl
+        if vtx_eff_nom_tagconf:
+            nom_tag, nom_conf = vtx_eff_nom_tagconf.split("@")
+            self.vertexEffCalc = VertexEffCalc(self, phase,
+                                               tag, config,
+                                               nom_tag, nom_conf)
+        else:
+            self.vertexEffCalc = DummyVertexEffCalc()
+
         if delayed_eff_impl == "add-then-calc":
             raise NotImplementedError("add-then-calc")
 
@@ -159,18 +167,24 @@ class Calc:
     def targetMass(self, site, det):
         return self._hardcoded(site, det, 'targetMass')
 
-    def delayedEff(self, site, det):
+    def actualDelayedEff(self, site, det):
         if self.delayed_eff_mode == "rel":
-            eff = self._relDelEff(site, det)
+            return self._relDelEff(site, det)
         elif self.delayed_eff_mode == "abs":
-            eff = self._absDelEff(site, det)
+            return self._absDelEff(site, det)
         elif self.delayed_eff_mode == "flat":
-            eff = 0.88
+            return 0.88
         else:
             raise Exception(f"delayed_eff_mode = {self.delayed_eff_mode}???")
+
+    def vertexEff(self, site, det):
+        return self.vertexEffCalc.ibd_eff(site, det)
+
+    def delayedEff(self, site, det):
         # NOTE: Here we fold in the vertex efficiency for IBDs. Then
         # ToyMC/fitter will do the right thing.
-        return eff * self.vertexEffCalc.ibd_eff(site, det)
+        eff = self.actualDelayedEff(site, det)
+        return eff * self.vertexEff(site, det)
         # return self._hardcoded(site, det, 'delayedEff')
 
     # unused

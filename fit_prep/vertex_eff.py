@@ -1,10 +1,14 @@
 from dataclasses import dataclass
 from functools import lru_cache
 
-from root_pandas import read_root
-
 from config_file import ConfigFile
-from prod_util import dets_for_phase, stage2_pbp_path
+from prod_util import configfile_path
+
+import calc as _calc
+
+
+def Calc(*a, **kw):
+    return _calc.Calc(*a, **kw)
 
 
 @dataclass
@@ -16,22 +20,39 @@ class VertexCut:
 
 
 class VertexEffCalc:
-    def __init__(self, config_path, phase,
-                 reftag="2021_02_03", refconfig="yolo5"):
-        self.dfs = self._load_dfs(phase, reftag, refconfig)
-        self.cut = self.load_cut(config_path)
+    def __init__(self, owner_calc, phase, tag, config,
+                 nom_tag="2021_02_03", nom_config="test_newDelEff_fullDet"):
+        self.owner_calc = owner_calc
 
-    @staticmethod
-    def _load_dfs(phase, reftag, refconfig):
-        result = {}
         for site in [1, 2, 3]:
-            path = stage2_pbp_path(site, phase, reftag, refconfig)
-            for det in dets_for_phase(site, phase):
-                result[(site, det)] = read_root(path, f"ibd_AD{det}")
-        return result
+            self.nom_calc = Calc(phase, nom_tag, nom_config,
+                                 self.owner_calc.delayed_eff_mode,
+                                 self.owner_calc.delayed_eff_impl)
+
+        cfg_path = configfile_path(tag, config)
+        self.cut = self._load_cut(cfg_path)
 
     @staticmethod
-    def load_cut(config_path):
+    def _corr_evt(calc, site, det):
+        obs_evt = calc.ibdCount(site, det)
+        tot_bkg = calc.totalBkg(site, det)
+        veto_eff = calc.vetoEff(site, det)
+        mult_eff = calc.dmcEff(site, det)
+        livetime = calc.livetime(site, det)
+
+        obs_bkg = tot_bkg * livetime * veto_eff * mult_eff
+
+        return (obs_evt - obs_bkg) / (livetime * veto_eff * mult_eff)
+
+    @lru_cache(8)
+    def ibd_eff(self, site, det):
+        corr_rate = self._corr_evt(self.owner_calc, site, det)
+        corr_rate_nom = self._corr_evt(self.nom_calc, site, det)
+
+        return corr_rate / corr_rate_nom
+
+    @staticmethod
+    def _load_cut(config_path):
         config = ConfigFile(config_path)
         cut = VertexCut()
         cut.minZ = config.get("minZ", cut.minZ)
@@ -72,18 +93,6 @@ class VertexEffCalc:
     def _amc_eff(self):
         return self._z_factor_amc() * self._cyl_factor()
 
-    @lru_cache(8)
-    def ibd_eff(self, site, det):
-        df = self.dfs[(site, det)]
-        cut = self.cut
-        cond_z = f"{cut.minZ} <= zP <= {cut.maxZ}"
-        cond_z += f" and {cut.minZ} <= zD <= {cut.maxZ}"
-        cond_r = f"{cut.minR} <= sqrt(xP**2 + yP**2) <= {cut.maxR}"
-        cond_r += f" and {cut.minR} <= sqrt(xD**2 + yD**2) <= {cut.maxR}"
-
-        num = len(df.query(f"{cond_z} and {cond_r}"))
-        return num / len(df)
-
     def li9_eff(self):
         return self._uniform_eff()
 
@@ -95,3 +104,10 @@ class VertexEffCalc:
 
     def alphan_eff(self):
         return self._uniform_eff()
+
+
+class DummyVertexEffCalc:
+    def __getattribute__(self, name):
+        def unity(*a, **kw):
+            return 1.
+        return unity
