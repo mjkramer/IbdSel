@@ -26,6 +26,8 @@ def main():
                     default="calc-then-add")
     ap.add_argument('--vtx-eff-ref',
                     help="tag@config to use as reference for vertex eff")
+    ap.add_argument('--outconfig',
+                    help='Manually specify name of output config')
     args = ap.parse_args()
 
     if args.suffix:
@@ -37,6 +39,9 @@ def main():
             outconfig = args.config + "@" + args.suffix
     else:
         outconfig = args.config
+
+    if args.outconfig:
+        outconfig = args.outconfig
 
     outdir = data_dir('fit_input', f'{args.tag}@{outconfig}')
     os.system(f'mkdir -p {outdir}')
