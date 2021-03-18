@@ -5,6 +5,7 @@ from hardcoded import Hardcoded
 from prompt_eff import PromptEffCalc
 from vertex_eff import VertexEffCalc, DummyVertexEffCalc
 
+from config_file import ConfigFile
 from prod_util import dets_for_phase, idet
 from prod_util import stage2_pbp_path, configfile_path
 
@@ -16,9 +17,12 @@ import ROOT as R
 class Calc:
     "Calculate for a given phase"
 
+    # NOTE: Recommend delayed_eff_impl="add-then-calc" because the daily
+    # delayedEffRel (from IbdSel) can suffer from division-by-zero on days with
+    # low statistics.
     def __init__(self, phase, tag, config,
                  delayed_eff_mode="rel",
-                 delayed_eff_impl="calc-then-add",
+                 delayed_eff_impl="add-then-calc",
                  vtx_eff_nom_tagconf=None):
         self.phase = phase
         self.delayed_eff_mode = delayed_eff_mode
@@ -38,6 +42,7 @@ class Calc:
                     results.query(f'detector == {det}')
 
         cfg_path = configfile_path(tag, config)
+        self.cfg = ConfigFile(cfg_path)
         # self.delEffCalc = DelayedEffCalc(config_path, self)
         self.promptEffCalc = PromptEffCalc(cfg_path)
 
@@ -49,9 +54,6 @@ class Calc:
         else:
             self.vertexEffCalc = DummyVertexEffCalc()
 
-        if delayed_eff_impl == "add-then-calc":
-            raise NotImplementedError("add-then-calc")
-
     def _livetime_weighted(self, site, det, var):
         r = self.results[(site, det)]
         return (r[var] * r.livetime_s).sum() / r.livetime_s.sum()
@@ -60,18 +62,26 @@ class Calc:
         r = self.results[(site, det)]
         return sqrt((r[var]**2 * r.livetime_s).sum()) / r.livetime_s.sum()
 
+    def _delEff_addThenCalc(self, site, det, ref_emin, ref_emax):
+        h = self.files[site].Get(f"h_ncap_ad{det}")
+        emin = self.cfg["ibdDelayedEmin"]
+        emax = self.cfg["ibdDelayedEmax"]
+        nom = h.Integral(h.FindBin(emin), h.FindBin(emax))
+        denom = h.Integral(h.FindBin(ref_emin), h.FindBin(ref_emax))
+        return nom / denom
+
     def _relDelEff(self, site, det):
         # return self.delEffCalc.scale_factor(self.phase, site, det)
         if self.delayed_eff_impl == "calc-then-add":
             return self._livetime_weighted(site, det, "delayedEffRel")
-        else:
-            raise NotImplementedError("add-then-calc")
+        else:                   # add-then-calc
+            return self._delEff_addThenCalc(site, det, 6, 12)
 
     def _absDelEff(self, site, det):
         if self.delayed_eff_impl == "calc-then-add":
             return self._livetime_weighted(site, det, "delayedEffAbs")
         else:
-            raise NotImplementedError("add-then-calc")
+            return self._delEff_addThenCalc(site, det, 0, 12)
 
     def ibdCount(self, site, det):
         tree = self.files[site].Get(f'ibd_AD{det}')

@@ -22,8 +22,8 @@ def main():
     ap.add_argument('--delayed-eff-mode', choices=["abs", "rel", "flat"],
                     default="rel")
     ap.add_argument('--delayed-eff-impl',
-                    choices=["calc-then-add", "add-then-calc"],
-                    default="calc-then-add")
+                    choices=["add-then-calc", "calc-then-add"],
+                    default="add-then-calc")
     ap.add_argument('--vtx-eff-ref',
                     help="tag@config to use as reference for vertex eff")
     ap.add_argument('--outconfig',
