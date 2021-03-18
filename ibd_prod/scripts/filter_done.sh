@@ -53,4 +53,4 @@ cp $infile $infile.prev
 comm -23 <(sort $infile.prev) <(sort $infile.omit) | shuf > $infile
 rm $infile.offset
 
-rm -f $infile.lock
+rm -f $infile.lock $infile.done.lock
