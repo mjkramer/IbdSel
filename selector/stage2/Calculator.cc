@@ -97,7 +97,8 @@ void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, Singles
        ++bin)
     hSingLowD->Fill(hSingLow->GetBinCenter(bin), hSingLow->GetBinContent(bin));
 
-  hSingLowD->Scale(1 / hSingLowD->Integral());
+  if (hSingLowD->Integral())
+    hSingLowD->Scale(1 / hSingLowD->Integral());
 
   // NB we use singCalc.dmcEff, not singCalcLow.dmcEff, since we are predicting the raw measurement
   // and accDaily already corrects for singCalcLow.dmcEff
