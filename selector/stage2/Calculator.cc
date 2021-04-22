@@ -174,6 +174,9 @@ void Calculator::writeEntries(const char* treename)
 
 double fine_integral(TH1* h, double x1, double x2)
 {
+  x1 = x1 > h->GetXaxis()->GetXmin() ? x1 : h->GetXaxis()->GetXmin();
+  x2 = x2 < h->GetXaxis()->GetXmax() ? x2 : h->GetXaxis()->GetXmax();
+
   const int bin1 = h->FindBin(x1);
   const double frac1 =
     1 - ((x1 - h->GetBinLowEdge(bin1)) / h->GetBinWidth(bin1));
