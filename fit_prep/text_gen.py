@@ -15,9 +15,11 @@ def today():
 
 def gen_text_(out_fname, phase, tag, config,
               delayed_eff_mode, delayed_eff_impl,
+              delayed_eff_ref=None,
               vtx_eff_nom_tagconf=None):
     calc = Calc(phase, tag, config,
                 delayed_eff_mode, delayed_eff_impl,
+                delayed_eff_ref,
                 vtx_eff_nom_tagconf)
 
     outf = open(out_fname, 'w')
@@ -138,11 +140,8 @@ def gen_text_(out_fname, phase, tag, config,
     dump_aux("vertexEff", calc.vertexEff, "%.4f")
 
 
-def gen_text(tag, config, outconfig, delayed_eff_mode, delayed_eff_impl,
-             vtx_eff_nom_tagconf=None):
+def gen_text(tag, config, outconfig, *a, **kw):
     for phase in [1, 2, 3]:
         out_fname = fit_text_input_path(phase, tag, outconfig)
 
-        gen_text_(out_fname, phase, tag, config,
-                  delayed_eff_mode, delayed_eff_impl,
-                  vtx_eff_nom_tagconf)
+        gen_text_(out_fname, phase, tag, config, *a, **kw)

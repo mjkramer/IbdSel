@@ -1,7 +1,7 @@
 "Calculate the things"
 
 from hardcoded import Hardcoded
-# from delayed_eff import DelayedEffCalc
+from delayed_eff import DelayedEffCalc
 from prompt_eff import PromptEffCalc
 from vertex_eff import VertexEffCalc, DummyVertexEffCalc
 
@@ -23,9 +23,15 @@ class Calc:
     def __init__(self, phase, tag, config,
                  delayed_eff_mode="rel",
                  delayed_eff_impl="add-then-calc",
+                 delayed_eff_ref=None,
                  vtx_eff_nom_tagconf=None):
         self.phase = phase
+        self.tag = tag
+        self.config = config
+
         self.delayed_eff_mode = delayed_eff_mode
+        if delayed_eff_impl == "new":
+            delayed_eff_impl = "add-then-calc"
         self.delayed_eff_impl = delayed_eff_impl
 
         self.hardcoded = Hardcoded(phase)
@@ -43,7 +49,11 @@ class Calc:
 
         cfg_path = configfile_path(tag, config)
         self.cfg = ConfigFile(cfg_path)
-        # self.delEffCalc = DelayedEffCalc(config_path, self)
+        if delayed_eff_impl == "old":
+            ref_tag, ref_conf = delayed_eff_ref.split("@")
+            self.delEffCalc = DelayedEffCalc(self.cfg['ibdDelayedEmin'],
+                                             self.phase,
+                                             ref_tag, ref_conf)
         self.promptEffCalc = PromptEffCalc(cfg_path)
 
         if vtx_eff_nom_tagconf:
@@ -74,14 +84,20 @@ class Calc:
         # return self.delEffCalc.scale_factor(self.phase, site, det)
         if self.delayed_eff_impl == "calc-then-add":
             return self._livetime_weighted(site, det, "delayedEffRel")
-        else:                   # add-then-calc
+        elif self.delayed_eff_impl == "add-then-calc":
             return self._delEff_addThenCalc(site, det, 6, 12)
+        elif self.delayed_eff_impl == "old":
+            return self.delEffCalc.scale_factor(site, det, 6)
+        raise
 
     def _absDelEff(self, site, det):
         if self.delayed_eff_impl == "calc-then-add":
             return self._livetime_weighted(site, det, "delayedEffAbs")
-        else:
+        elif self.delayed_eff_impl == "add-then-calc":
             return self._delEff_addThenCalc(site, det, 0, 12)
+        elif self.delayed_eff_impl == "old":
+            return self.delEffCalc.scale_factor(site, det, 0)
+        raise
 
     def ibdCount(self, site, det):
         tree = self.files[site].Get(f'ibd_AD{det}')

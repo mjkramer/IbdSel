@@ -5,25 +5,24 @@
 # tag@config used by get_ncap_spec. Ideally, ncap spec is measured using same
 # vertex cut as we are using.
 
-import os
-
 import ROOT as R
 
-from config_file import ConfigFile
+import calc
 from get_ncap_spec import get_ncap_spec
 # from vertex_eff import VertexEffCalc
 
 
 class DelayedEffCalc:
-    def __init__(self, config_path, calc):
-        config = ConfigFile(config_path)
-        self.cut = config["ibdDelayedEmin"]
+    def __init__(self, cut, phase, ref_tag, ref_config):
+        self.cut = cut
         # self.vtxcut = VertexEffCalc.load_cut(config_path)
-        self.calc = calc
+        self.calc = calc.Calc(phase, ref_tag, ref_config)
+        self.ref_tag = ref_tag
+        self.ref_config = ref_config
 
-    def scale_factor(self, phase, site, det):
+    def scale_factor(self, site, det, ref_emin):
         # h = get_ncap_spec(phase, site, det, self.calc, self.vtxcut)
-        h = get_ncap_spec(phase, site, det, self.calc)
+        h = get_ncap_spec(self.calc, site, det)
 
         nom = h.Integral(h.FindBin(self.cut), h.FindBin(12))
         denom = h.Integral(h.FindBin(6), h.FindBin(12))

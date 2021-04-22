@@ -12,12 +12,21 @@ from prod_util import idet as get_idet
 from util import read_theta13_file
 
 
-def get_ncap_spec(phase, site, det, calc,
-                  # vtxcut,
-                  tag="2021_02_03", config="del4MeV"):
-    stage2_file = stage2_pbp_path(site, phase, tag, config)
+def keep(o):
+    R.SetOwnership(o, False)     # don't delete it, python!
+    try:
+        o.SetDirectory(R.gROOT)  # don't delete it, root!
+        # o.SetDirectory(0)
+    except Exception:
+        pass                     # unless you weren't going to anyway
+    return o
 
-    nADs = [6, 8, 7][phase-1]
+
+def get_ncap_spec(calc, site, det):
+    stage2_path = stage2_pbp_path(site, calc.phase, calc.tag, calc.config)
+    stage2_file = R.TFile(stage2_path)
+
+    nADs = [6, 8, 7][calc.phase-1]
 
     hname = f"h_ncap_{nADs}ad_eh{site}_ad{det}"
     htitle = f"Neutron capture spectrum, EH{site}-AD{det} ({nADs}AD)"
@@ -44,7 +53,7 @@ def get_ncap_spec(phase, site, det, calc,
     h_sing.Scale(1/h_sing.Integral())
 
     veto_eff = calc.vetoEff(site, det)
-    mult_eff = calc.multEff(site, det)
+    mult_eff = calc.dmcEff(site, det)
     livetime = calc.livetime(site, det)
     acc_bkg = calc.accBkg(site, det)
 
@@ -52,4 +61,4 @@ def get_ncap_spec(phase, site, det, calc,
     h.Add(h_sing, -total_acc)
     del h_sing
 
-    return h
+    return keep(h)

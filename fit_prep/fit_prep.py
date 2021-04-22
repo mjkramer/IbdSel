@@ -22,8 +22,11 @@ def main():
     ap.add_argument('--delayed-eff-mode', choices=["abs", "rel", "flat"],
                     default="rel")
     ap.add_argument('--delayed-eff-impl',
-                    choices=["add-then-calc", "calc-then-add"],
+                    # new is synonymous with add-then calc
+                    choices=["add-then-calc", "calc-then-add", "old", "new", "none"],
                     default="add-then-calc")
+    ap.add_argument('--delayed-eff-ref',
+                    help="tag@config to use as reference for delayed eff (old)")
     ap.add_argument('--vtx-eff-ref',
                     help="tag@config to use as reference for vertex eff")
     ap.add_argument('--outconfig',
@@ -49,6 +52,7 @@ def main():
     gen_hists(args.tag, args.config, outconfig, bcw=args.bcw)
     gen_text(args.tag, args.config, outconfig,
              args.delayed_eff_mode, args.delayed_eff_impl,
+             args.delayed_eff_ref,
              args.vtx_eff_ref)
 
 
