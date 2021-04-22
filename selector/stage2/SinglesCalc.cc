@@ -1,11 +1,10 @@
+#include "Calculator.hh"        // fine_integral
 #include "SinglesCalc.hh"
 
 #include "external/FukushimaLambertW.hh"
 
 
 #include <TH1F.h>
-
-static double fine_integral(TH1F* h, double x1, double x2);
 
 SinglesCalc::SinglesCalc(TH1F* hSing, double livetime_s,
                          MultCutTool::Cuts singleMultCuts,
@@ -220,27 +219,4 @@ double SinglesCalc::accDailyErr(Site site)
   }
 
   throw;
-}
-
-static double fine_integral(TH1F* h, double x1, double x2)
-{
-  const int bin1 = h->FindBin(x1);
-  const double frac1 =
-    1 - ((x1 - h->GetBinLowEdge(bin1)) / h->GetBinWidth(bin1));
-
-  const int bin2 = h->FindBin(x2);
-  const double frac2 =
-    bin2 == bin1
-    ? -(1 - (x2 - h->GetBinLowEdge(bin2)) / h->GetBinWidth(bin2))
-    : (x2 - h->GetBinLowEdge(bin2)) / h->GetBinWidth(bin2);
-
-  const double middle_integral =
-    bin2 - bin1 < 2
-    ? 0
-    : h->Integral(bin1 + 1, bin2 - 1);
-
-  return
-    frac1 * h->GetBinContent(bin1) +
-    middle_integral +
-    frac2 * h->GetBinContent(bin2);
 }

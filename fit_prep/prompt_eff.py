@@ -62,8 +62,8 @@ class PromptEffCalc:
         return os.environ["LBNL_FIT_HOME"]
 
     def _hist_rel_eff(self, h):
-        igral = h.Integral(h.FindBin(self.emin), h.FindBin(12))
-        igral_nom = h.Integral(h.FindBin(0.7), h.FindBin(12))
+        igral = R.fine_integral(h, self.emin, 12)
+        igral_nom = R.fine_integral(h, 0.7, 12)
         return igral / igral_nom
 
     def _func_rel_eff(self, fn):

@@ -9,6 +9,10 @@ from prod_util import data_dir
 
 from hist_gen import gen_hists
 from text_gen import gen_text
+from util import load_selector
+
+
+load_selector()
 
 
 def main():

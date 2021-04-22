@@ -76,8 +76,8 @@ class Calc:
         h = self.files[site].Get(f"h_ncap_ad{det}")
         emin = self.cfg["ibdDelayedEmin"]
         emax = self.cfg["ibdDelayedEmax"]
-        nom = h.Integral(h.FindBin(emin), h.FindBin(emax))
-        denom = h.Integral(h.FindBin(ref_emin), h.FindBin(ref_emax))
+        nom = R.fine_integral(h, emin, emax)
+        denom = R.fine_integral(h, ref_emin, ref_emax)
         return nom / denom
 
     def _relDelEff(self, site, det):

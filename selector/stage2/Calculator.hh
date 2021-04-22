@@ -43,3 +43,4 @@ protected:
   MultCutTool* multCut = nullptr;
 };
 
+double fine_integral(TH1* h, double x1, double x2);

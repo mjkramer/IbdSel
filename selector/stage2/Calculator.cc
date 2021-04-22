@@ -106,14 +106,13 @@ void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, Singles
     * singCalc.dmcEff() * vetoEff(detector);
   h_ncap->Add(hSingLowD, -accLow);
 
-  w.data.delayedEffAbs = h_ncap->Integral(h_ncap->FindBin(ibdSel->DELAYED_MIN),
-                                       h_ncap->FindBin(ibdSel->DELAYED_MAX)) /
-    h_ncap->Integral(h_ncap->FindBin(ibdSelLow->DELAYED_MIN),
-                     h_ncap->FindBin(ibdSelLow->DELAYED_MAX));
+  w.data.delayedEffAbs = fine_integral(h_ncap.get(),
+                                       ibdSel->DELAYED_MIN, ibdSel->DELAYED_MAX) /
+    fine_integral(h_ncap.get(), ibdSelLow->DELAYED_MIN, ibdSelLow->DELAYED_MAX);
 
-  w.data.delayedEffRel = h_ncap->Integral(h_ncap->FindBin(ibdSel->DELAYED_MIN),
-                                          h_ncap->FindBin(ibdSel->DELAYED_MAX)) /
-    h_ncap->Integral(h_ncap->FindBin(6), h_ncap->FindBin(12));
+  w.data.delayedEffRel = fine_integral(h_ncap.get(),
+                                       ibdSel->DELAYED_MIN, ibdSel->DELAYED_MAX) /
+    fine_integral(h_ncap.get(), 6, 12);
 
   w.data.accDailyLowDelCut = singCalcLow.accDaily();
 
@@ -171,4 +170,27 @@ void Calculator::writeEntries(const char* treename)
 
   for (Det detector : util::ADsFor(site, phase))
     writeEntry(w, detector);
+}
+
+double fine_integral(TH1* h, double x1, double x2)
+{
+  const int bin1 = h->FindBin(x1);
+  const double frac1 =
+    1 - ((x1 - h->GetBinLowEdge(bin1)) / h->GetBinWidth(bin1));
+
+  const int bin2 = h->FindBin(x2);
+  const double frac2 =
+    bin2 == bin1
+    ? -(1 - (x2 - h->GetBinLowEdge(bin2)) / h->GetBinWidth(bin2))
+    : (x2 - h->GetBinLowEdge(bin2)) / h->GetBinWidth(bin2);
+
+  const double middle_integral =
+    bin2 - bin1 < 2
+    ? 0
+    : h->Integral(bin1 + 1, bin2 - 1);
+
+  return
+    frac1 * h->GetBinContent(bin1) +
+    middle_integral +
+    frac2 * h->GetBinContent(bin2);
 }

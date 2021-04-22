@@ -24,7 +24,7 @@ class DelayedEffCalc:
         # h = get_ncap_spec(phase, site, det, self.calc, self.vtxcut)
         h = get_ncap_spec(self.calc, site, det)
 
-        nom = h.Integral(h.FindBin(self.cut), h.FindBin(12))
-        denom = h.Integral(h.FindBin(6), h.FindBin(12))
+        nom = R.fine_integral(h, self.cut, 12)
+        denom = R.fine_integral(h, ref_emin, 12)
 
         return nom / denom
