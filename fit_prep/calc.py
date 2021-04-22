@@ -90,6 +90,15 @@ class Calc:
             return self.delEffCalc.scale_factor(site, det, 6)
         raise
 
+    def _relDelEffForBkg(self, site, det):
+        impl = self.delayed_eff_impl
+        if self.delayed_eff_impl not in ["add-then-calc", "calc-then-add",
+                                         "old"]:
+            self.delayed_eff_impl = "add-then-calc"
+        val = self._relDelEff(site, det)
+        self.delayed_eff_impl = impl
+        return val
+
     def _absDelEff(self, site, det):
         if self.delayed_eff_impl == "calc-then-add":
             return self._livetime_weighted(site, det, "delayedEffAbs")
@@ -122,7 +131,7 @@ class Calc:
 
     def _li9Scale(self, site, det):
         scaleP = self.promptEffCalc.li9_rel_eff(site, det)
-        scaleD = self._relDelEff(site, det)
+        scaleD = self._relDelEffForBkg(site, det)
         scaleV = self.vertexEffCalc.li9_eff()
         return scaleP * scaleD * scaleV
 
@@ -150,7 +159,7 @@ class Calc:
 
     def _fastnScale(self, site, det):
         scaleP = self.promptEffCalc.fastn_rel_eff(site, det)
-        scaleD = self._relDelEff(site, det)
+        scaleD = self._relDelEffForBkg(site, det)
         scaleV = self.vertexEffCalc.fastn_eff()
         return scaleP * scaleD * scaleV
 
@@ -178,7 +187,7 @@ class Calc:
 
     def _alphanScale(self, site, det):
         scaleP = self.promptEffCalc.alphan_rel_eff(site, det)
-        scaleD = self._relDelEff(site, det)
+        scaleD = self._relDelEffForBkg(site, det)
         scaleV = self.vertexEffCalc.alphan_eff()
         return scaleP * scaleD * scaleV
 
