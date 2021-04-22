@@ -109,13 +109,13 @@ void IbdSel::initCuts(const Config *config)
   if (multCutTag == TAG_LOW_DELAYED_EMIN)
     hname = Form("%s_low", hname);
 
-  histP = new TH1F(hname, hname, 20 * PROMPT_MAX, 0, PROMPT_MAX);
+  histP = new TH1F(hname, hname, 40 * PROMPT_MAX, 0, PROMPT_MAX);
 
   hname = Form("h_ibd_delayed_AD%d", det);
   if (multCutTag == TAG_LOW_DELAYED_EMIN)
     hname = Form("%s_low", hname);
 
-  histD = new TH1F(hname, hname, 20 * DELAYED_MAX, 0, DELAYED_MAX);
+  histD = new TH1F(hname, hname, 40 * DELAYED_MAX, 0, DELAYED_MAX);
 }
 
 void IbdSel::finalize(Pipeline& p)
