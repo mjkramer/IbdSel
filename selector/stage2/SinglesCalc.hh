@@ -41,7 +41,6 @@ private:
                            float drop_min, float drop_max);
 
   TH1F* hSing;
-  double eMu;
   double livetime_s;
   MultCutTool::Cuts singleMultCuts, ibdMultCuts;
   double eMuSingles;

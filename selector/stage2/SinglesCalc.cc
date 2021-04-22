@@ -14,7 +14,7 @@ SinglesCalc::SinglesCalc(TH1F* hSing, double livetime_s,
                          double promptMin, double promptMax,
                          double delayedMin, double delayedMax,
                          double dt_max_us) :
-  hSing(hSing), eMu(eMu), livetime_s(livetime_s),
+  hSing(hSing), livetime_s(livetime_s),
   singleMultCuts(singleMultCuts),
   ibdMultCuts(ibdMultCuts),
   eMuSingles(eMuSingles),
