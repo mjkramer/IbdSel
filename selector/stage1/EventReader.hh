@@ -19,6 +19,8 @@ public:
   // CalibStats
   Int_t nHit;
   Float_t Quadrant, MaxQ, MaxQ_2inchPMT, time_PSD, time_PSD1;
+  Float_t time_PSD_local_RMS, Kurtosis;
+  Int_t flasher_ring, flasher_column;
   Float_t NominalCharge;
   Float_t integralRunTime_ms;
 
