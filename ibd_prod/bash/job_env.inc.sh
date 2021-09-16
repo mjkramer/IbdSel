@@ -6,7 +6,8 @@ module load gsl/2.5
 source /global/cfs/projectdirs/dayabay/scratch/mkramer/apps/root-6.18.00-py37/bin/thisroot.sh
 
 eval "$(conda shell.bash hook)"
-conda activate ibdsel1          # $IBDSEL_HOME/doc/conda/ibdsel1.txt
+# /doc/conda/ibdsel1.txt
+conda activate /global/homes/m/mkramer/.conda/envs/ibdsel1
 
 export IBDSEL_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)
 
