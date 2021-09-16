@@ -5,6 +5,9 @@
 # tag@config used by get_ncap_spec. Ideally, ncap spec is measured using same
 # vertex cut as we are using.
 
+# NOTE: Now this isn't fully retired. It's what we use in fit_prep using the
+# "old" implementation. Also this is what we used for the ToyMC studies.
+
 import ROOT as R
 
 import calc
