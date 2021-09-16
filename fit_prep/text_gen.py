@@ -142,6 +142,9 @@ def gen_text_(out_fname, phase, tag, config,
 
 def gen_text(tag, config, outconfig, *a, **kw):
     for phase in [1, 2, 3]:
-        out_fname = fit_text_input_path(phase, tag, outconfig)
+        try:
+            out_fname = fit_text_input_path(phase, tag, outconfig)
+            gen_text_(out_fname, phase, tag, config, *a, **kw)
+        except Exception:
+            print(f"gen_text: Skipping phase {phase}")
 
-        gen_text_(out_fname, phase, tag, config, *a, **kw)

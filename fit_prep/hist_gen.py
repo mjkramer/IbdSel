@@ -93,4 +93,7 @@ def gen_hists_(phase, tag, config, outconfig, bcw=False):
 
 def gen_hists(tag, config, outconfig, bcw=False):
     for phase in [1, 2, 3]:
-        gen_hists_(phase, tag, config, outconfig, bcw=bcw)
+        try:
+            gen_hists_(phase, tag, config, outconfig, bcw=bcw)
+        except Exception:
+            print(f"gen_hists: Skipping phase {phase}")
