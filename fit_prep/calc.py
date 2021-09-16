@@ -1,7 +1,7 @@
 "Calculate the things"
 
 from hardcoded import Hardcoded
-from delayed_eff import DelayedEffCalc
+import delayed_eff as DE
 from prompt_eff import PromptEffCalc
 from vertex_eff import VertexEffCalc, DummyVertexEffCalc
 
@@ -51,9 +51,9 @@ class Calc:
         self.cfg = ConfigFile(cfg_path)
         if delayed_eff_impl == "old":
             ref_tag, ref_conf = delayed_eff_ref.split("@")
-            self.delEffCalc = DelayedEffCalc(self.cfg['ibdDelayedEmin'],
-                                             self.phase,
-                                             ref_tag, ref_conf)
+            self.delEffCalc = DE.DelayedEffCalc(self.cfg['ibdDelayedEmin'],
+                                                self.phase,
+                                                ref_tag, ref_conf)
         self.promptEffCalc = PromptEffCalc(cfg_path)
 
         if vtx_eff_nom_tagconf:
