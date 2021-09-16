@@ -7,7 +7,7 @@ stage1_vars() {
         exit 1
     fi
 
-    trueOutdir=$SCRATCH/p17b/stage1_fbf/$tag
+    trueOutdir=$SCRATCH/IbdSelData/stage1_fbf/$tag
 
     outdir=$(data_dir_for   stage1_fbf   $tag)
     indir=$( data_dir_for   stage1_input $tag)

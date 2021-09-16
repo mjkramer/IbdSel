@@ -17,7 +17,7 @@ stage2_vars() {
 
     export IBDSEL_CONFIGDIR=${IBDSEL_CONFIGDIR:-../static/configs}
 
-    trueOutdir=$SCRATCH/p17b/stage2_dbd/$tag@$configname
+    trueOutdir=$SCRATCH/IbdSelData/stage2_dbd/$tag@$configname
 
     outdir=$(data_dir_for   stage2_dbd   $tag@$configname)
     indir=$( data_dir_for   stage2_input $tag@$configname)
