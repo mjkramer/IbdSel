@@ -14,5 +14,5 @@ merge1_vars $tag
 
 for i in $(seq $nproc); do
     logfile=$(mktemp $logdir/merge1.$tag.$(hostname).XXX.out)
-    python/merge1_worker.py $tag >$logfile 2>&1 &
+    nohup python/merge1_worker.py $tag &>$logfile </dev/null &
 done

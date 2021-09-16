@@ -7,6 +7,7 @@ DEFAULT_CHUNKSIZE = 50
 
 def hadd(paths, outpath):
     inputs = ' '.join(paths)
+    # -f forces recreation of the output file
     os.system(f'hadd -f {outpath} {inputs}')
 
 def hadd_chunked(paths, outpath, chunksize=DEFAULT_CHUNKSIZE):
