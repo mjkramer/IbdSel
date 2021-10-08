@@ -59,6 +59,21 @@ double Li9Calc::get(Site site, MuonBin bin)
   }
 }
 
+double Li9Calc::frac_he8()
+{
+  switch (mode) {
+  case Mode::Nominal:
+  case Mode::NoB12:
+    return FRAC_HE8_NOM;
+  case Mode::Fix15pctHe8:
+    return 0.15;
+  case Mode::NoHe8:
+    return 0;
+  default:
+    throw;
+  }
+}
+
 double Li9Calc::interpolate(unsigned shower_pe,
                             std::function<double(unsigned)> getter)
 {
@@ -104,7 +119,10 @@ double Li9Calc::li9daily_nearest(Site site, double shower_pe, double showerVeto_
   // not n-tagged; WILL be partially removed by shower veto; 3.5 MeV prompt cut:
   const double totHigh = measHighRange(site, shower_pe);
 
-  const double showerVetoSurvProb = exp(-showerVeto_ms / LI9_LIFETIME_MS);
+  const double f = frac_he8();
+  const double showerVetoSurvProb =
+    (1 - f) * exp(-showerVeto_ms / LI9_LIFETIME_MS) +
+    f * exp(-showerVeto_ms / HE8_LIFETIME_MS);
   const double lowPePromptEff =
     site == Site::EH3 ? FAR_LOW_PE_PROMPT_EFF : NEAR_LOW_PE_PROMPT_EFF;
 
