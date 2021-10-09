@@ -5,7 +5,7 @@ _libgcc_mutex=0.1=main
 astroid=2.3.3=pypi_0
 autopep8=1.5=pypi_0
 backcall=0.1.0=py37_0
-ca-certificates=2021.7.5=h06a4308_1
+ca-certificates=2021.9.30=h06a4308_1
 certifi=2021.5.30=py37h06a4308_0
 decorator=4.4.1=py_0
 entrypoints=0.3=pypi_0
@@ -28,6 +28,8 @@ libgcc-ng=9.1.0=hdf63c60_0
 libsodium=1.0.16=h1bed415_0
 libstdcxx-ng=9.1.0=hdf63c60_0
 mccabe=0.6.1=pypi_0
+mysql-connector-c=6.1.11=h597af5e_1
+mysqlclient=2.0.3=py37h2531618_1
 ncurses=6.1=he6710b0_1
 numpy=1.18.1=pypi_0
 openssl=1.1.1l=h7f8727e_0
