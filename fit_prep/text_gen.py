@@ -1,6 +1,6 @@
 "Generate the 'theta13' file"
 
-from calc import Calc
+from calc import Calc, DummyCalc
 
 from prod_util import sitedets, dets_for_phase
 from prod_util import fit_text_input_path
@@ -17,10 +17,13 @@ def gen_text_(out_fname, phase, tag, config,
               delayed_eff_mode, delayed_eff_impl,
               delayed_eff_ref=None,
               vtx_eff_nom_tagconf=None):
-    calc = Calc(phase, tag, config,
-                delayed_eff_mode, delayed_eff_impl,
-                delayed_eff_ref,
-                vtx_eff_nom_tagconf)
+    try:
+        calc = Calc(phase, tag, config,
+                    delayed_eff_mode, delayed_eff_impl,
+                    delayed_eff_ref,
+                    vtx_eff_nom_tagconf)
+    except Exception:
+        calc = DummyCalc(phase)
 
     outf = open(out_fname, 'w')
 
@@ -147,4 +150,3 @@ def gen_text(tag, config, outconfig, *a, **kw):
             gen_text_(out_fname, phase, tag, config, *a, **kw)
         except Exception:
             print(f"gen_text: Skipping phase {phase}")
-

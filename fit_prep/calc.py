@@ -14,6 +14,18 @@ from numpy import sqrt
 import ROOT as R
 
 
+# Used to generate a "zero" file when given an "empty" stage2 file
+# (e.g., will be the case for 6 & 8AD periods when fitting post-P17B)
+class DummyCalc:
+    def __init__(self, phase):
+        self.hardcoded = Hardcoded(phase)
+
+    def __getattr__(self, _funcname):
+        return lambda site, det: 0.0
+
+    def timestamps(self):
+        return self.hardcoded.timestamps()
+
 class Calc:
     "Calculate for a given phase"
 
