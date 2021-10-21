@@ -139,7 +139,7 @@ class Calc:
 
     def accBkgErr(self, site, det):
         # return self._livetime_weighted_squared(site, det, 'accDailyErr')
-        return 0.01 * self.accBkg(site, det)
+        return 0.02 * self.accBkg(site, det)
 
     def _li9Scale(self, site, det):
         scaleP = self.promptEffCalc.li9_rel_eff(site, det)
