@@ -103,6 +103,10 @@ class Calc:
         raise
 
     def _relDelEffForBkg(self, site, det):
+        if self.cfg["ibdDelayedEmin"] == 6.:
+            # HACK to support procut_first, which doesn't have ncap histogram
+            return 1.
+
         impl = self.delayed_eff_impl
         if self.delayed_eff_impl not in ["add-then-calc", "calc-then-add",
                                          "old"]:
@@ -220,7 +224,7 @@ class Calc:
         elif self.delayed_eff_mode == "abs":
             return self._absDelEff(site, det)
         elif self.delayed_eff_mode == "flat":
-            return 0.88
+            return 1.00
         else:
             raise Exception(f"delayed_eff_mode = {self.delayed_eff_mode}???")
 
