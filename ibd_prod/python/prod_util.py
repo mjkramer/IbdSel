@@ -151,9 +151,16 @@ def stage2_pbp_path(site, phase, tag, config):
     return os.path.join(data_dir('stage2_pbp', f'{tag}@{config}'),
                         f'stage2.pbp.eh{site}.{phname}.root')
 
+def configdir_path():
+    return os.getenv('IBDSEL_CONFIGDIR',
+                     os.path.join(os.getenv('IBDSEL_HOME'), 'static/configs'))
+
 def configfile_path(tag, config):
-    return os.path.join(data_dir('stage2_input', f'{tag}@{config}'),
+    path = os.path.join(data_dir('stage2_input', f'{tag}@{config}'),
                         f'config.{config}.txt')
+    if os.path.exists(path):
+        return path
+    return os.path.join(configdir_path(), f'config.{config}.txt')
 
 def fit_hist_ibd_path(phase, tag, config):
     # fitter convention is lowercase "ad"
