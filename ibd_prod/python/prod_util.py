@@ -84,9 +84,12 @@ def chunk_list(L, chunksize):
     for i in range(0, len(L), chunksize):
         yield L[i : i + chunksize]  # yes, kosher even if it points past end
 
+# HACK HACK HACK HACK HACK
 def _call_bash(cmd):
+    cwd = f"{os.environ['IBDSEL_HOME']}/ibd_prod"
     fullcmd = f'source bash/common_vars.inc.sh && {cmd}'
-    return check_output(fullcmd, shell=True).strip().decode()
+    relpath = check_output(fullcmd, shell=True, cwd=cwd).strip().decode()
+    return f"{cwd}/{relpath}"
 
 def input_fname(step, tag):
     return _call_bash(f'input_file_for {step} {tag}')
