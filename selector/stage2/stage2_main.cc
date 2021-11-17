@@ -6,6 +6,7 @@
 #include "Li9Calc.hh"
 #include "MultCut.hh"
 #include "MuonAlg.hh"
+#include "NonUniCorr.hh"
 #include "Readers.hh"
 #include "Selectors.hh"
 #include "VertexCut.hh"
@@ -26,7 +27,7 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
 
   p.makeOutFile(outFile);
 
-  p.makeTool<Config>(confFile);
+  auto& config = p.makeTool<Config>(confFile);
 
   p.makeAlg<MuonReader>();
   p.makeAlg<MuonAlg>(MuonAlg::Purpose::ForIBDs);
@@ -63,6 +64,9 @@ void stage2_main(const char* confFile, const char* inFile, const char* outFile,
 
   // For evaluating delayed cut efficiency:
   p.makeTool<MultCutTool>(TAG_LOW_DELAYED_EMIN);
+
+  if (config.get<bool>("useNewNonUni", false))
+    p.makeTool<NonUniCorrTool>();
 
   p.connect({inFile});
 

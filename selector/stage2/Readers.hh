@@ -6,6 +6,8 @@
 
 #include "../SelectorFramework/core/TimeSyncReader.hh"
 
+class NonUniCorrTool;
+
 class MuonReader : public TimeSyncReader<MuonTree> {
 public:
   MuonReader();
@@ -16,11 +18,16 @@ public:
 class AdReader : public TimeSyncReader<AdTree> {
 public:
   AdReader(Det det, ClockMode clockMode);
+  void connect(Pipeline& p) override;
 
   int rawTag() const override;
   Time timeInTree() override;
 
   const Det det;
+
+private:
+  NonUniCorrTool* nonUniCorr;
+  void postReadCallback() override;
 };
 
 inline
