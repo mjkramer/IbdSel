@@ -7,7 +7,7 @@ source /global/cfs/projectdirs/dayabay/scratch/mkramer/apps/root-6.18.00-py37/bi
 
 eval "$(conda shell.bash hook)"
 # /doc/conda/ibdsel1.txt
-conda activate /global/homes/m/mkramer/.conda/envs/ibdsel1
+conda activate /global/cfs/projectdirs/dayabay/scratch/mkramer/apps/miniconda3/envs/ibdsel1
 
 export IBDSEL_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)
 
