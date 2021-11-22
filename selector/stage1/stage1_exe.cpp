@@ -10,7 +10,7 @@ int main(int argc, char** argv)
   gErrorIgnoreLevel = kError;  // suppress warnings of missing NuWa dictionaries
 
   if (argc != 4 + 1) {
-    std::cerr << "Usage: " << argv[0] << "infile outfile site phase\n";
+    std::cerr << "Usage: " << argv[0] << " infile outfile site phase\n";
     return 1;
   }
 

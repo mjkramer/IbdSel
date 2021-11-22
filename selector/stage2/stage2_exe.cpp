@@ -6,7 +6,7 @@
 int main(int argc, char** argv)
 {
   if (argc != 6 + 1) {
-    std::cerr << "Usage: " << argv[0] << "conffile infile outfile site phase seq";
+    std::cerr << "Usage: " << argv[0] << " conffile infile outfile site phase seq\n";
     return 1;
   }
 
