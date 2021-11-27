@@ -80,7 +80,8 @@ void Calculator::writeDelayedEff(TreeWriter<CalcsTree>& w, Det detector, Singles
 
   // auto h_ncap = std::make_unique<TH1F>("h_ncap", "h_ncap", 160, 4, 12);
   // auto h_ncap = std::unique_ptr<TH1F>((TH1F*)ibdSelLow->histD->Clone());
-  auto h_ncap = std::unique_ptr<TH1F>((TH1F*)hSingLow->Clone(Form("h_ncap_ad%d", int(detector))));
+  auto h_ncap = std::unique_ptr<TH1F>
+    ((TH1F*)hSingLow->Clone(LeakStr("h_ncap_ad%d", int(detector))));
   h_ncap->Reset();
   auto h_ibd = ibdSelLow->histD;
   for (int bin = h_ibd->FindBin(ibdSelLow->DELAYED_MIN);

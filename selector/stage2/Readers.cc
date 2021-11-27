@@ -11,7 +11,7 @@ MuonReader::MuonReader() :
 // -----------------------------------------------------------------------------
 
 AdReader::AdReader(Det det, ClockMode clockMode) :
-  TimeSyncReader({Form("physics_AD%d", int(det))},
+  TimeSyncReader({LeakStr("physics_AD%d", int(det))},
                  clockMode),
   det(det) {}
 

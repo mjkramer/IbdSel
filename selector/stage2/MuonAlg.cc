@@ -53,12 +53,12 @@ void MuonAlg::log(const char* msg, Det det, Time t, const MuonTree* muon) const
   const AdTree& delayed = sel->getCurrent();
 
   const char* maybeMuonTime =
-    muon ? Form(", T_mu %d.%d", muon->time().s, muon->time().ns)
+    muon ? TmpStr(", T_mu %d.%d", muon->time().s, muon->time().ns)
          : "";
 
-  std::cerr << Form("MuonAlg (%s) %d %d, AD%d trig %d%s: %s\n",
-                    selName, delayed.runNo, delayed.fileNo,
-                    det, delayed.trigNo, maybeMuonTime, msg);
+  std::cerr << TmpStr("MuonAlg (%s) %d %d, AD%d trig %d%s: %s\n", selName,
+                      delayed.runNo, delayed.fileNo, det, delayed.trigNo,
+                      maybeMuonTime, msg);
 }
 
 void MuonAlg::connect(Pipeline& p)
@@ -175,7 +175,7 @@ bool MuonAlg::isVetoed(Time t, Det detector) const
     if (first) {
       first = false;
       if (dt_us > -muPreVeto_us)
-        log(Form("MuonAlg is behind! %.3f", dt_us),
+        log(TmpStr("MuonAlg is behind! %.3f", dt_us),
             detector, t, &muon);
     }
 

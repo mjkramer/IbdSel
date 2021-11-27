@@ -12,7 +12,7 @@
 
 AdSaver::AdSaver(Det det) :
   det(det),
-  tree(Form("physics_AD%d", int(det))) {}
+  tree(LeakStr("physics_AD%d", int(det))) {}
 
 void AdSaver::connect(Pipeline& pipeline)
 {

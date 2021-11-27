@@ -25,8 +25,8 @@ void NonUniCorrTool::connect(Pipeline& p)
   TFile infile(path.c_str());
 
   auto getMap = [&](Det det, const char* periodName) {
-    auto name = Form("h_nu_corr_map_%s_r2z_eh%d_ad%d_%s",
-                     desc, stage2::site, det, periodName);
+    auto name = LeakStr("h_nu_corr_map_%s_r2z_eh%d_ad%d_%s",
+                        desc, stage2::site, det, periodName);
     auto h = (TH2F*) infile.Get(name);
     h->SetDirectory(nullptr);   // don't go away!
     return h;

@@ -46,9 +46,9 @@ Algorithm::Status SelectorBase::consume_iter(Iter it)
 SingleSel::SingleSel(Det det, int multCutTag) :
   SelectorBase(det, MuonAlg::Purpose::ForSingles, multCutTag)
 {
-  auto hname = Form("h_single_AD%d", int(det));
+  auto hname = LeakStr("h_single_AD%d", int(det));
   if (multCutTag == TAG_LOW_DELAYED_EMIN)
-    hname = Form("%s_low", hname);
+    hname = LeakStr("%s_low", hname);
 
   // Use fine binning since we're doing integrals in Calculator
   // Go up to 20 MeV so we can calc pre-muon rate (for debugging)
@@ -85,7 +85,7 @@ IbdSel::IbdSel(Det detector, int tag) :
   SelectorBase(detector, MuonAlg::Purpose::ForIBDs, tag)
 {
   if (multCutTag == 0)
-    ibdTree = TreeWriter<IbdTree>(Form("ibd_AD%d", int(detector)));
+    ibdTree = TreeWriter<IbdTree>(LeakStr("ibd_AD%d", int(detector)));
 }
 
 void IbdSel::connect(Pipeline& p)
@@ -105,15 +105,15 @@ void IbdSel::initCuts(const Config *config)
   DT_MIN_US = config->get<float>("ibdDtMinUsec", 1);
   DT_MAX_US = config->get<float>("ibdDtMaxUsec", 200);
 
-  auto hname = Form("h_ibd_AD%d", det);
+  auto hname = LeakStr("h_ibd_AD%d", det);
   if (multCutTag == TAG_LOW_DELAYED_EMIN)
-    hname = Form("%s_low", hname);
+    hname = LeakStr("%s_low", hname);
 
   histP = new TH1F(hname, hname, 40 * PROMPT_MAX, 0, PROMPT_MAX);
 
-  hname = Form("h_ibd_delayed_AD%d", det);
+  hname = LeakStr("h_ibd_delayed_AD%d", det);
   if (multCutTag == TAG_LOW_DELAYED_EMIN)
-    hname = Form("%s_low", hname);
+    hname = LeakStr("%s_low", hname);
 
   histD = new TH1F(hname, hname, 40 * DELAYED_MAX, 0, DELAYED_MAX);
 }
