@@ -7,10 +7,17 @@
 #include "MuonSaver.hh"
 #include "TrigTypeCut.hh"
 
+#include "../common/Misc.hh"
+
+#include <cstdlib>
 #include <string>
 #include <vector>
 
-#include "../common/Misc.hh"
+bool useSCNL()
+{
+  const char* val = getenv("IBDSEL_USE_SCNL");
+  return val && (strcmp(val, "0") != 0);
+}
 
 void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase)
 {
@@ -18,7 +25,7 @@ void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase
 
   p.makeOutFile(outFile);
 
-  p.makeAlg<EventReader>();
+  p.makeAlg<EventReader>(useSCNL());
   p.makeAlg<TrigTypeCut>();
   p.makeAlg<MuonSaver>();
   p.makeAlg<FlasherCut>();
