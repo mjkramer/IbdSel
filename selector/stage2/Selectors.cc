@@ -52,7 +52,18 @@ SingleSel::SingleSel(Det det, int multCutTag) :
 
   // Use fine binning since we're doing integrals in Calculator
   // Go up to 20 MeV so we can calc pre-muon rate (for debugging)
-  hist = new TH1F(hname, hname, 4000, 0, 20);
+  const unsigned nbins = 4000;
+  const float emin = 0, emax = 20;
+
+  hist = new TH1F(hname, hname, nbins, emin, emax);
+
+  for (unsigned iR2 = 0; iR2 < R2_BINS; ++iR2) {
+    for (unsigned iZ = 0; iZ < Z_BINS; ++iZ) {
+      auto hname_px = LeakStr("%s_r2_%d_z_%d", hname, iR2, iZ);
+      hist_pixels[iR2][iZ] = new TH1F(hname_px, hname_px,
+                                      nbins, emin, emax);
+    }
+  }
 }
 
 void SingleSel::initCuts(const Config *config)
@@ -64,8 +75,14 @@ void SingleSel::initCuts(const Config *config)
 
 void SingleSel::finalize(Pipeline& _p)
 {
-  if (multCutTag == 0)
-    hist->Write();
+  if (multCutTag != 0)
+    return;
+
+  hist->Write();
+
+  for (unsigned iR2 = 0; iR2 < R2_BINS; ++iR2)
+    for (unsigned iZ = 0; iZ < Z_BINS; ++iZ)
+      hist_pixels[iR2][iZ]->Write();
 }
 
 void SingleSel::select(Iter it)
@@ -76,6 +93,17 @@ void SingleSel::select(Iter it)
       multCut->singleDmcOk(it, det)) {
 
     hist->Fill(it->energy);
+
+    float x = it->x, y = it->y, z = it->z;
+
+    unsigned iR2 = unsigned((x * x + y * y) / R2_DELTA);
+    if (iR2 >= R2_BINS) iR2 = R2_BINS - 1;
+
+    int iZ = int((z - Z_MIN) / Z_DELTA);
+    if (iZ < 0) iZ = 0;
+    if (iZ >= Z_BINS) iZ = Z_BINS - 1;
+
+    hist_pixels[iR2][iZ]->Fill(it->energy);
   }
 }
 

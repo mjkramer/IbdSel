@@ -62,6 +62,13 @@ public:
   void finalize(Pipeline& p) override;
 
   TH1F* hist;
+
+  static constexpr unsigned R2_BINS = 10;
+  static constexpr unsigned Z_BINS = 10;
+  static constexpr float R2_DELTA = 0.4e6; // mm^2
+  static constexpr float Z_DELTA = 400;    // mm
+  static constexpr float Z_MIN = -2000;    // mm
+  TH1F* hist_pixels[R2_BINS][Z_BINS];
 };
 
 // -----------------------------------------------------------------------------
