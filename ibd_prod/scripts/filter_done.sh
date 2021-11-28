@@ -49,8 +49,16 @@ if [ -n "$pending" ]; then
         $infile >> $infile.omit
 fi
 
+# keep the full original list around, just in case
+if [ ! -f $infile.orig ]; then
+    cp $infile $infile.orig
+fi
+
 cp $infile $infile.prev
 comm -23 <(sort $infile.prev) <(sort $infile.omit) | shuf > $infile
 rm $infile.offset
 
 rm -f $infile.lock $infile.done.lock
+
+# leftovers from jobs killed while trying to grab the lock
+rm -f $(dirname $infile)/_*
