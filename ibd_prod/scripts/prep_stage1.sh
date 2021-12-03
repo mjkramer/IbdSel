@@ -2,9 +2,9 @@
 
 source bash/stage1_vars.inc.sh
 
-P17B_LIST=../static/filelist/paths.physics.good.p17b.v3.sync.txt.gz
-
-LISTFILEPATH=${LISTFILEPATH:-${P17B_LIST}}
+# For backward compatibility, accept LISTFILEPATH in lieu of
+# IBDSEL_FILELIST_PATH
+IBDSEL_FILELIST_PATH=${LISTFILEPATH:-${IBDSEL_FILELIST_PATH}}
 
 while getopts "f:" opt; do
     case $opt in
@@ -22,6 +22,11 @@ tag=$1; shift
 
 if [ -z $tag ]; then
     echo "Specify a tag!"
+    exit 1
+fi
+
+if [ -z $IBDSEL_FILELIST_PATH ]; then
+    echo "Whoops, please set IBDSEL_FILELIST_PATH"
     exit 1
 fi
 
