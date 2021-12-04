@@ -59,7 +59,7 @@ SingleSel::SingleSel(Det det, int multCutTag) :
 
   for (unsigned iR2 = 0; iR2 < R2_BINS; ++iR2) {
     for (unsigned iZ = 0; iZ < Z_BINS; ++iZ) {
-      auto hname_px = LeakStr("%s_r2_%d_z_%d", hname, iR2, iZ);
+      auto hname_px = LeakStr("%s_r2_%d_z_%d", hname, iR2 + 1, iZ + 1);
       hist_pixels[iR2][iZ] = new TH1F(hname_px, hname_px,
                                       nbins, emin, emax);
     }
