@@ -46,15 +46,14 @@ double Calculator::li9Daily(Det detector)
 
 double Calculator::li9DailyErr(Det detector)
 {
-  // XXX For now just use Chris's uncertainties for the nominal cuts. We should
-  // try to be more precise.
+  // From Table 6.6 of thesis (tab:bkgLi9DailyRates)
   switch (site) {
   case Site::EH1:
-    return 0.27 * li9Daily(detector);
+    return 0.33 * li9Daily(detector);
   case Site::EH2:
-    return 0.29 * li9Daily(detector);
+    return 0.32 * li9Daily(detector);
   case Site::EH3:
-    return 0.37 * li9Daily(detector);
+    return 0.30 * li9Daily(detector);
   }
 
   throw;
