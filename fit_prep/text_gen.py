@@ -1,5 +1,7 @@
 "Generate the 'theta13' file"
 
+import traceback
+
 from calc import Calc, DummyCalc
 
 from prod_util import sitedets, dets_for_phase
@@ -149,4 +151,5 @@ def gen_text(tag, config, outconfig, *a, **kw):
             out_fname = fit_text_input_path(phase, tag, outconfig)
             gen_text_(out_fname, phase, tag, config, *a, **kw)
         except Exception:
-            print(f"gen_text: Skipping phase {phase}")
+            print(f"Warning: gen_text: Skipping phase {phase} because:")
+            print(traceback.format_exc())

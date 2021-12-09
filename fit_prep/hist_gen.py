@@ -1,3 +1,5 @@
+import traceback
+
 import numpy as np
 import ROOT as R
 
@@ -96,4 +98,5 @@ def gen_hists(tag, config, outconfig, bcw=False):
         try:
             gen_hists_(phase, tag, config, outconfig, bcw=bcw)
         except Exception:
-            print(f"gen_hists: Skipping phase {phase}")
+            print(f"Warning: gen_hists: Skipping phase {phase} because:")
+            print(traceback.format_exc())
