@@ -62,6 +62,13 @@ SingleSel::SingleSel(Det det, int multCutTag) :
       auto hname_px = LeakStr("%s_r2_%d_z_%d", hname, iR2 + 1, iZ + 1);
       hist_pixels[iR2][iZ] = new TH1F(hname_px, hname_px,
                                       nbins, emin, emax);
+
+      for (unsigned iPhi = 0; iPhi < PHI_BINS; ++iPhi) {
+        auto hname_px_phi = LeakStr("%s_r2_%d_z_%d_phi_%d", hname,
+                                    iR2 + 1, iZ + 1, iPhi);
+        hist_pixels_phi[iR2][iZ][iPhi] =
+          new TH1F(hname_px_phi, hname_px_phi, nbins, emin, emax);
+      }
     }
   }
 }
@@ -81,8 +88,12 @@ void SingleSel::finalize(Pipeline& _p)
   hist->Write();
 
   for (unsigned iR2 = 0; iR2 < R2_BINS; ++iR2)
-    for (unsigned iZ = 0; iZ < Z_BINS; ++iZ)
+    for (unsigned iZ = 0; iZ < Z_BINS; ++iZ) {
       hist_pixels[iR2][iZ]->Write();
+
+      for (unsigned iPhi = 0; iPhi < PHI_BINS; ++iPhi)
+        hist_pixels_phi[iR2][iZ][iPhi]->Write();
+    }
 }
 
 void SingleSel::select(Iter it)
@@ -104,6 +115,12 @@ void SingleSel::select(Iter it)
     if (iZ >= Z_BINS) iZ = Z_BINS - 1;
 
     hist_pixels[iR2][iZ]->Fill(it->energy);
+
+    float phi = atan2(y, x);
+    float delta_phi = 2 * M_PI / PHI_BINS;
+    unsigned iPhi = unsigned((phi + M_PI) / delta_phi);
+
+    hist_pixels_phi[iR2][iZ][iPhi]->Fill(it->energy);
   }
 }
 
