@@ -164,14 +164,16 @@ class Calc:
                 self.li9Bkg(site, det) +
                 self.fastnBkg(site, det) +
                 self.amcBkg(site, det) +
-                self.alphanBkg(site, det))
+                self.alphanBkg(site, det) +
+                self.muonDecayBkg(site, det))
 
     def totalBkgErr(self, site, det):
         return sqrt(self.accBkgErr(site, det)**2 +
                     self.li9BkgErr(site, det)**2 +
                     self.fastnBkgErr(site, det)**2 +
                     self.amcBkgErr(site, det)**2 +
-                    self.alphanBkgErr(site, det)**2)
+                    self.alphanBkgErr(site, det)**2 +
+                    self.muonDecayBkgErr(site, det)**2)
 
     def _fastnScale(self, site, det):
         scaleP = self.promptEffCalc.fastn_rel_eff(site, det)
@@ -214,6 +216,18 @@ class Calc:
     def alphanBkgErr(self, site, det):
         scale = self._alphanScale(site, det)
         return scale * self._hardcoded(site, det, 'alphanBkgErr')
+
+    def _muonDecayScale(self, site, det):
+        # TODO Add efficiencies for prompt/delayed/vertex cuts
+        return 1.
+
+    def muonDecayBkg(self, site, det):
+        scale = self._muonDecayScale(site, det)
+        return scale * self._hardcoded(site, det, 'muonDecayBkg')
+
+    def muonDecayBkgErr(self, site, det):
+        scale = self._muonDecayScale(site, det)
+        return scale * self._hardcoded(site, det, 'muonDecayBkgErr')
 
     def targetMass(self, site, det):
         return self._hardcoded(site, det, 'targetMass')

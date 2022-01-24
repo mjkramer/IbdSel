@@ -123,6 +123,11 @@ def gen_text_(out_fname, phase, tag, config,
     w('# Row 20 ==>  Absolute uncertainty on the alpha-n bkg per live day')
     dump(19, calc.alphanBkg, '%.3g')
     dump(20, calc.alphanBkgErr, '%.3g')
+    w('#')
+    w('# Row 21 ==>  Expected number of muon decay events per live day (AD1 to AD8)')
+    w('# Row 22 ==>  Absolute uncertainty on the muon decay bkg per live day')
+    dump(21, calc.muonDecayBkg, '%.3g')
+    dump(22, calc.muonDecayBkgErr, '%.3g')
 
     outf.close()
 

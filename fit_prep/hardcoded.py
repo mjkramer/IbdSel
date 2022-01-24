@@ -58,6 +58,22 @@ class Hardcoded:
         elif self.phase == 3:
             return [0., 0.03, 0.02, 0.03, 0.02, 0.02, 0.01, 0.02]
 
+    def muonDecayBkg(self):
+        if self.phase == 1:
+            return [0., 0., 0., 0., 0., 0., 0., 0.]
+        elif self.phase == 2:
+            return [0., 0., 0., 0., 0., 0., 0., 0.]
+        elif self.phase == 3:
+            return [0., 1.122, 0.298, 0.298, 0.088, 0.088, 0.088, 0.088]
+
+    def muonDecayBkgErr(self):
+        if self.phase == 1:
+            return [0., 0., 0., 0., 0., 0., 0., 0.]
+        elif self.phase == 2:
+            return [0., 0., 0., 0., 0., 0., 0., 0.]
+        elif self.phase == 3:
+            return [0., 0.139, 0.037, 0.037, 0.011, 0.011, 0.011, 0.011]
+
     def targetMass(self):
         return [19941, 19966, 19891, 19945, 19913, 19991, 19892, 19931]
 
