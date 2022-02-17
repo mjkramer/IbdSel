@@ -25,7 +25,7 @@ void stage1_main(const char* inFile, const char* outFile, Site site, Phase phase
 
   p.makeOutFile(outFile);
 
-  p.makeAlg<EventReader>(useSCNL());
+  p.makeAlg<EventReader>(useSCNL(), getenv("IBDSEL_WP_MASK_FILE"));
   p.makeAlg<TrigTypeCut>();
   p.makeAlg<MuonSaver>();
   p.makeAlg<FlasherCut>();
