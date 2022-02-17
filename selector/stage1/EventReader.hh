@@ -5,6 +5,9 @@
 #include "../SelectorFramework/core/SyncReader.hh"
 #include "../SelectorFramework/core/Util.hh"
 
+#include <set>
+#include <vector>
+
 class EventTree : public TreeBase {
 public:
   EventTree() {}
@@ -23,6 +26,9 @@ public:
   Int_t flasher_ring, flasher_column;
   Float_t NominalCharge;
   Float_t integralRunTime_ms;
+
+  // PoolHits
+  std::vector<int>* hitChannels = nullptr;
 
   Det det() const;
   Time time() const;
@@ -57,9 +63,19 @@ inline bool EventTree::isWP() const
 
 class EventReader : public SyncReader<EventTree> {
 public:
-  EventReader(bool useSCNL=false) :
+  EventReader(bool useSCNL=false, const char* wpMaskFile=nullptr) :
     SyncReader({useSCNL ? "/Event/Rec/AdSimpleNL" : "/Event/Rec/AdSimple",
-        "/Event/Data/CalibStats"},
-      useSCNL /* forwarded to EventTree constructor */)
-  {}
+        "/Event/Data/CalibStats",
+        "/Event/Data/PoolHits"},
+      // remaining args forwarded to EventTree constructor
+      useSCNL)
+  {
+    initWpMasks(wpMaskFile);
+  }
+
+  void postReadCallback() override;
+
+private:
+  void initWpMasks(const char* wpMaskFile);
+  std::set<int> maskedWpChans;
 };

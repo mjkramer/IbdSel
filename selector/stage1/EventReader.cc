@@ -1,5 +1,9 @@
 #include "EventReader.hh"
 
+#include <algorithm>
+#include <fstream>
+#include <iterator>
+
 void EventTree::initBranches()
 {
   BR(detector);
@@ -15,4 +19,26 @@ void EventTree::initBranches()
   BR(integralRunTime_ms);
 
   BR_NAMED(NominalCharge, useSCNL ? "NominalChargeNL" : "NominalCharge");
+
+  BR(hitChannels);
+}
+
+void EventReader::initWpMasks(const char* wpMaskFile)
+{
+  if (wpMaskFile) {
+    std::ifstream f(wpMaskFile);
+    std::copy(std::istream_iterator<int>(f), std::istream_iterator<int>(),
+              std::inserter(maskedWpChans, maskedWpChans.end()));
+  }
+}
+
+void EventReader::postReadCallback()
+{
+  if ((data.detector == 5 || data.detector == 6)
+      && not maskedWpChans.empty()) {
+    for (int chan : *data.hitChannels) {
+      if (maskedWpChans.count(chan))
+        --data.nHit;
+    }
+  }
 }
