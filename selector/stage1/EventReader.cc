@@ -25,7 +25,7 @@ void EventTree::initBranches()
 
 void EventReader::initWpMasks(const char* wpMaskFile)
 {
-  if (wpMaskFile) {
+  if (wpMaskFile && *wpMaskFile != 0) {
     std::ifstream f(wpMaskFile);
     std::copy(std::istream_iterator<int>(f), std::istream_iterator<int>(),
               std::inserter(maskedWpChans, maskedWpChans.end()));
