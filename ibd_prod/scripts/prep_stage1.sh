@@ -34,7 +34,7 @@ stage1_vars $tag
 
 mkdir -p $indir $logdir $trueOutdir
 mkdir -p $(dirname $outdir)
-ln -s $trueOutdir $outdir
+ln -sfn $trueOutdir $outdir
 
 filter_cmd=${filter_cmd:-cat}
 

@@ -37,10 +37,7 @@ stage2_vars $tag@$configname
 mkdir -p $indir $logdir $trueOutdir
 mkdir -p $(dirname $outdir)
 
-# if $outdir already exists, we'll end up making a symlink *inside* it, bad!
-if [ ! -e $outdir ]; then
-    ln -s $trueOutdir $outdir
-fi
+ln -sfn $trueOutdir $outdir
 
 conffile=$indir/config.$configname.txt
 
