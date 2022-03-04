@@ -38,10 +38,10 @@ ln -sfn $trueOutdir $outdir
 
 filter_cmd=${filter_cmd:-cat}
 
-if [[ ${LISTFILEPATH##*.} == "gz" ]]; then
+if [[ ${IBDSEL_FILELIST_PATH##*.} == "gz" ]]; then
     cat_cmd="gunzip -c"
 else
     cat_cmd=cat
 fi
 
-$cat_cmd $LISTFILEPATH | $filter_cmd | shuf > $infile
+$cat_cmd $IBDSEL_FILELIST_PATH | $filter_cmd | shuf > $infile
