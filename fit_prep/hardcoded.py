@@ -58,21 +58,44 @@ class Hardcoded:
         elif self.phase == 3:
             return [0., 0.03, 0.02, 0.03, 0.02, 0.02, 0.01, 0.02]
 
-    def muonDecayBkg(self):
-        if self.phase == 1:
-            return [0., 0., 0., 0., 0., 0., 0., 0.]
-        elif self.phase == 2:
-            return [0., 0., 0., 0., 0., 0., 0., 0.]
-        elif self.phase == 3:
-            return [0., 1.122, 0.298, 0.298, 0.088, 0.088, 0.088, 0.088]
+    def muonDecayBkg(self, extraIwsVeto=False):
+        # IHEP Zhiyuan (doc-12587-v3):
+        # if self.phase == 3:
+        #     return [0., 1.122, 0.298, 0.298, 0.088, 0.088, 0.088, 0.088]
+        # else:
+        #     return [0., 0., 0., 0., 0., 0., 0., 0.]
 
-    def muonDecayBkgErr(self):
-        if self.phase == 1:
-            return [0., 0., 0., 0., 0., 0., 0., 0.]
-        elif self.phase == 2:
-            return [0., 0., 0., 0., 0., 0., 0., 0.]
-        elif self.phase == 3:
-            return [0., 0.139, 0.037, 0.037, 0.011, 0.011, 0.011, 0.011]
+        if extraIwsVeto:
+            # SYSU Baobiao (doc-12602-v9 p23) (divide by ndet)
+            # NOTE Instead of evenly distributing the rates among ADs, use the
+            # ratios from the case without the extra IWS veto? Probably doesn't
+            # matter since the fitter (by default) merges ADs within a hall.
+            if self.phase == 1:
+                return [0., 0., 0., 0., 0., 0., 0., 0.]
+            elif self.phase == 2:
+                return [0.0155, 0.0155, 0.0015, 0.0015, 0.00025, 0.00025, 0.00025, 0.00025]
+            elif self.phase == 3:
+                return [0., 0.234, 0.037, 0.037, 0.00525, 0.00525, 0.00525, 0.00525]
+        else:
+            # SYSU Baobiao (doc-12602-v9 p13)
+            if self.phase == 1:
+                return [0.147, 0.101, 0.066, 0., 0.014, 0.009, 0.012, 0.]
+            elif self.phase == 2:
+                return [0.147, 0.101, 0.066, 0.072, 0.014, 0.009, 0.012, 0.010]
+            elif self.phase == 3:
+                return [0., 1.262, 0.417, 0.408, 0.152, 0.096, 0.060, 0.061]
+
+    def muonDecayBkgErr(self, extraIwsVeto=False):
+        # IHEP Zhiyuan (doc-12587-v3):
+        # if self.phase == 3:
+        #     return [0., 0.139, 0.037, 0.037, 0.011, 0.011, 0.011, 0.011]
+        # else:
+        #     return [0., 0., 0., 0., 0., 0., 0., 0.]
+
+        # SYSU Baobiao (doc-12602-v9 p15,25)
+        relErr = 0.2 if extraIwsVeto else 0.1
+        rates = self.muonDecayBkg(extraIwsVeto)
+        return [relErr * r for r in rates]
 
     def targetMass(self):
         return [19941, 19966, 19891, 19945, 19913, 19991, 19892, 19931]

@@ -19,13 +19,15 @@ class ConfigFile(dict):
 
             key, val = line.split(maxsplit=1)
 
-            try:
-                val = int(val)
-            except ValueError:
+            if val == 'true':
+                val = True
+            elif val == 'false':
+                val = False
+            else:
                 try:
-                    val = float(val)
+                    val = int(val)
                 except ValueError:
-                    pass
+                    val = float(val)
 
             self[key] = val
 

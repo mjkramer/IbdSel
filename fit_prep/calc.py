@@ -223,11 +223,11 @@ class Calc:
 
     def muonDecayBkg(self, site, det):
         scale = self._muonDecayScale(site, det)
-        return scale * self._hardcoded(site, det, 'muonDecayBkg')
+        return scale * self._hardcoded(site, det, 'muonDecayBkg', self.cfg['extraIwsVeto'])
 
     def muonDecayBkgErr(self, site, det):
         scale = self._muonDecayScale(site, det)
-        return scale * self._hardcoded(site, det, 'muonDecayBkgErr')
+        return scale * self._hardcoded(site, det, 'muonDecayBkgErr', self.cfg['extraIwsVeto'])
 
     def targetMass(self, site, det):
         return self._hardcoded(site, det, 'targetMass')
@@ -264,6 +264,6 @@ class Calc:
     def timestamps(self):
         return self.hardcoded.timestamps()
 
-    def _hardcoded(self, site, det, name):
+    def _hardcoded(self, site, det, name, *a):
         i = idet(site, det)
-        return self.hardcoded.__getattribute__(name)()[i]
+        return self.hardcoded.__getattribute__(name)(*a)[i]
