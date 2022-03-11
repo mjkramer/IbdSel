@@ -10,6 +10,7 @@
 class MuonSaver : public SimpleAlg<EventReader> {
   static constexpr int WP_MIN_NHIT = 12;
   static constexpr float AD_MIN_CHG = 3000;
+  static constexpr int IWP_EXTRA_MIN_NHIT = 5;
 
 public:
   MuonSaver();

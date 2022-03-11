@@ -16,5 +16,15 @@ Algorithm::Status trigTypeCut(const EventReader::Data& e)
       return Algorithm::Status::SkipToNext;
   }
 
+  // NOTE SYSU requires a mult trigger for WP muons, so let's do the same
+  // (especially since we're using their muon-decay bkg rates). As of
+  // end-of-data-taking, the hardware NHIT threshold for the IWP is 6, while for
+  // the OWP it is 7 (8) near (far). So this cut should have minimal effect on
+  // regular (n>12) WP muons, but it could make a difference for the extra 7-12
+  // hit IWP veto (for cases where the hardware and software NHIT differ).
+  const unsigned int kMult = 0x10000100;
+  if (e.isWP() && not ((e.triggerType & kMult) == kMult))
+    return Algorithm::Status::SkipToNext;
+
   return Algorithm::Status::Continue;
 }

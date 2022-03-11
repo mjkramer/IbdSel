@@ -34,5 +34,8 @@ Status MuonSaver::consume(const EventReader::Data& e)
   else if (e.isWP() && e.nHit > WP_MIN_NHIT)
     put(e.nHit);
 
+  else if (Det(e.detector) == Det::IWS && e.nHit > IWP_EXTRA_MIN_NHIT)
+    put(e.nHit);
+
   return Status::Continue;
 }
