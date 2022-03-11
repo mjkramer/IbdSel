@@ -33,6 +33,7 @@ private:
   bool isWP(const MuonTree& e) const;
   bool isShower(const MuonTree& e) const;
   bool isAD(const MuonTree& e) const;
+  bool isExtraIws(const MuonTree& e) const;
   void log(const MuonTree& muon, const char* msg);
   float nomPostVeto_us(const MuonTree& e) const;
   float effVeto_us(const MuonTree& e, size_t idet) const;
@@ -50,11 +51,16 @@ private:
   double showerMuChgCut;
   double showerMuPostVeto_us;
 
+  bool extraIwsVeto;
+  int extraIwsNhitAtLeast;
+  float extraIwsPostVeto_us;
+
   bool vetoAroundGaps = false;
 
   Time lastWpTime;
   Time lastAdTime[4];
   Time lastShowerTime[4];
+  Time lastExtraIwsTime;
 
   RingBuf<MuonTree> muonBuf;
   double vetoTime_s_[4] = {0};

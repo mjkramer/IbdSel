@@ -39,6 +39,10 @@ void MuonAlg::initCuts(const Config* config)
 
 #undef F
 #undef I
+
+  extraIwsVeto = config->get<bool>("extraIwsVeto");
+  extraIwsNhitAtLeast = config->get<int>("extraIwsNhitAtLeast");
+  extraIwsPostVeto_us = config->get<float>("extraIwsPostVeto_us");
 }
 
 void MuonAlg::log(const char* msg, Det det, Time t, const MuonTree* muon) const
@@ -79,8 +83,9 @@ inline Time MuonAlg::endOfLastVeto(size_t idet) const
   const Time wpEnd = lastWpTime.shifted_us(wpMuPostVeto_us);
   const Time adEnd = lastAdTime[idet].shifted_us(adMuPostVeto_us);
   const Time showerEnd = lastShowerTime[idet].shifted_us(showerMuPostVeto_us);
+  const Time extraIwsEnd = lastExtraIwsTime.shifted_us(extraIwsPostVeto_us);
 
-  return std::max({wpEnd, adEnd, showerEnd});
+  return std::max({wpEnd, adEnd, showerEnd, extraIwsEnd});
 }
 
 inline bool MuonAlg::isWP(const MuonTree& e) const
@@ -98,6 +103,12 @@ inline bool MuonAlg::isAD(const MuonTree& e) const
   return e.inAD() && e.strength > adMuChgCut && !isShower(e);
 }
 
+inline bool MuonAlg::isExtraIws(const MuonTree& e) const
+{
+  return e.detector == Det::IWS
+    && e.strength >= extraIwsNhitAtLeast && e.strength <= wpMuNhitCut;
+}
+
 inline float MuonAlg::nomPostVeto_us(const MuonTree& e) const
 {
   if (isWP(e))
@@ -106,6 +117,8 @@ inline float MuonAlg::nomPostVeto_us(const MuonTree& e) const
     return showerMuPostVeto_us;
   else if (isAD(e))
     return adMuPostVeto_us;
+  else if (isExtraIws(e))
+    return extraIwsPostVeto_us;
   else
     throw std::runtime_error("What kind of muon is this?");
 }
@@ -147,6 +160,12 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
       lastShowerTime[idet] = e.time();
     else
       lastAdTime[idet] = e.time();
+  }
+
+  else if (isExtraIws(e)) {
+    for (size_t idet = 0; idet < 4; ++idet)
+      vetoTime_s_[idet] += 1e-6 * effVeto_us(e, idet);
+    lastExtraIwsTime = e.time();
   }
 
   muonBuf.put(e);

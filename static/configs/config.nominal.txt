@@ -50,3 +50,10 @@ singleDmcEmaxBefore 99999
 singleDmcUsecAfter 200
 singleDmcEminAfter 6
 singleDmcEmaxAfter 12
+
+useNewNonUni false
+newNonUniAlphasOnly false
+
+extraIwsVeto false
+extraIwsNhitAtLeast 7
+extraIwsPostVeto_us 10
