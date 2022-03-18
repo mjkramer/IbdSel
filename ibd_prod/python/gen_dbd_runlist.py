@@ -38,7 +38,7 @@ def main():
         print("You must set DBPASS!")
         return
 
-    listfile = gzip.open(args.listfile) if args.listfile.endswith("gz") \
+    listfile = gzip.open(args.listfile, 'rt') if args.listfile.endswith("gz") \
         else open(args.listfile)
 
     files = {parse_path(line) for line in listfile}

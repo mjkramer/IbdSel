@@ -2,13 +2,13 @@
 # python, ROOT, and the ibdsel3 virtualenv were set up on Cori.
 
 module purge
-module load gcc/10.1.0
-module load cmake/3.21.3
+module load gcc/11.2.0
+# module load cmake/3.21.3
 export CC=gcc CXX=g++ LD=ld
 
 openssldir=/global/cfs/cdirs/dune/users/mkramer/apps/openssl-1.1.1l
 pydir=/global/cfs/cdirs/dune/users/mkramer/apps/mypy310
-rootdir=/global/cfs/cdirs/dayabay/scratch/mkramer/apps/root-6.24.06-mypy310
+rootdir=/global/cfs/cdirs/dayabay/scratch/mkramer/apps/root-6.24.06-mypy310-2
 venvdir=/global/cfs/cdirs/dayabay/scratch/mkramer/venvs/ibdsel3
 
 export PATH=$openssldir/bin:$PATH
