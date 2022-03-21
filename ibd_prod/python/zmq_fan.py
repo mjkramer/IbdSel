@@ -8,6 +8,7 @@ invocation.
 
 import argparse
 from multiprocessing import Process
+import os
 import zmq
 
 from prod_io import ListReaderBase, ListWriterBase, LockfileListReader, LockfileListWriter
@@ -50,8 +51,9 @@ class ZmqListWriter(ListWriterBase):
 class InputBuffer:
     def __init__(self, infile, chunksize, timeout_mins=None):
         ctx = zmq.Context()
+        self.sockpath = f'{sockdir()}/{INPUTREADER_SOCK_NAME}.ipc'
         self.sock = ctx.socket(zmq.REP)
-        self.sock.bind('ipc://%s/%s.ipc' % (sockdir(), INPUTREADER_SOCK_NAME))
+        self.sock.bind(f'ipc://{self.sockpath}')
 
         self.reader = LockfileListReader(infile, chunksize=chunksize, timeout_mins=timeout_mins)
         self.done = False       # to avoid grabbing the lock when we know it's all over
@@ -61,7 +63,7 @@ class InputBuffer:
             msg = self.sock.recv_string()
 
             if msg == 'QUIT':
-                return
+                break
 
             item = ''
 
@@ -73,11 +75,15 @@ class InputBuffer:
 
             self.sock.send_string(item)
 
+        self.sock.unbind(f'ipc://{self.sockpath}')
+        os.remove(self.sockpath)
+
 class OutputBuffer:
     def __init__(self, outfile, chunksize):
         ctx = zmq.Context()
+        self.sockpath = f'{sockdir()}/{DONELOGGER_SOCK_NAME}.ipc'
         self.sock = ctx.socket(zmq.PULL)
-        self.sock.bind('ipc://%s/%s.ipc' % (sockdir(), DONELOGGER_SOCK_NAME))
+        self.sock.bind(f'ipc://{self.sockpath}')
 
         self.writer = LockfileListWriter(outfile, chunksize=chunksize)
 
@@ -87,9 +93,12 @@ class OutputBuffer:
                 item = self.sock.recv_string()
 
                 if item == 'QUIT':
-                    return
+                    break
 
                 self.writer.put(item)
+
+        self.sock.unbind(f'ipc://{self.sockpath}')
+        os.remove(self.sockpath)
 
 def main():
     ap = argparse.ArgumentParser()
