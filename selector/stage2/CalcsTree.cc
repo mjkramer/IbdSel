@@ -21,4 +21,6 @@ void CalcsTree::initBranches()
   BR(nPreMuons); BR(nPlusLikeSingles); BR(nPromptLikeSingles); BR(nDelayedLikeSingles);
   BR(preMuonHz); BR(plusLikeHz); BR(promptLikeHz); BR(delayedLikeHz);
   BR(vetoEffSingles); BR(dmcEffSingles);
+
+  BR(nCandidates);
 }

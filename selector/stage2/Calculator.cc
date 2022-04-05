@@ -161,6 +161,8 @@ void Calculator::writeEntry(TreeWriter<CalcsTree>& w, Det detector)
 
   writeDelayedEff(w, detector, singCalc, vetoEffSingles, ibdSel);
 
+  w.data.nCandidates = ibdSel->histP->GetEntries();
+
   w.fill();
 }
 

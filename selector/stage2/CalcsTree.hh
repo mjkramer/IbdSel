@@ -26,5 +26,7 @@ public:
   Float_t preMuonHz, plusLikeHz, promptLikeHz, delayedLikeHz;
   Float_t vetoEffSingles, dmcEffSingles;
 
+  UInt_t nCandidates;
+
   void initBranches() override;
 };
