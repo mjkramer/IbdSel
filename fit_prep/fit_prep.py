@@ -20,7 +20,8 @@ def main():
     ap.add_argument('tag')
     ap.add_argument('config')
     ap.add_argument('--bcw', action='store_true',
-                    help='Use BCW binning')
+                    help='Use BCW binning (deprecated, use --binning instead)')
+    ap.add_argument('--binning', choices=['lbnl', 'bcw', 'ihep'], default='lbnl')
     ap.add_argument('--suffix')
     ap.add_argument('--pars-after-suffix', type=int)
     ap.add_argument('--delayed-eff-mode', choices=["abs", "rel", "flat"],
@@ -36,6 +37,10 @@ def main():
     ap.add_argument('--outconfig',
                     help='Manually specify name of output config')
     args = ap.parse_args()
+
+    # Keep --bcw around for backward compatibility
+    if args.bcw:
+        args.binning = 'bcw'
 
     if args.suffix:
         if args.pars_after_suffix:
@@ -53,7 +58,7 @@ def main():
     outdir = data_dir('fit_input', f'{args.tag}@{outconfig}')
     os.system(f'mkdir -p {outdir}')
 
-    gen_hists(args.tag, args.config, outconfig, bcw=args.bcw)
+    gen_hists(args.tag, args.config, outconfig, args.binning)
     gen_text(args.tag, args.config, outconfig,
              args.delayed_eff_mode, args.delayed_eff_impl,
              args.delayed_eff_ref,

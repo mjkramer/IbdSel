@@ -9,6 +9,7 @@ from prod_util import fit_hist_ibd_path, fit_hist_acc_path
 
 nbins_lbnl = 37
 nbins_bcw = 26
+nbins_ihep = 29
 nbins_fine = 240
 
 
@@ -33,11 +34,25 @@ def binning_bcw(emin=0.7):
     return edges
 
 
+def binning_ihep(emin=0.7):
+    edges = np.concatenate([[emin],
+                            np.arange(1, 7.01, 0.25),
+                            [7.5, 8, 9.5, 12]])
+    assert len(edges) == 1 + nbins_ihep
+    return edges
+
+
+def get_binning(binning, *a, **kw):
+    assert binning in ['lbnl', 'bcw', 'ihep']
+    fn = eval(f'binning_{binning}')
+    return fn(*a, **kw)
+
+
 def binning_fine():
     return np.linspace(0, 12, 1 + nbins_fine)
 
 
-def gen_hists_(phase, tag, config, outconfig, bcw=False):
+def gen_hists_(phase, tag, config, outconfig, binning):
     path_ibd = fit_hist_ibd_path(phase, tag, outconfig)
     path_acc = fit_hist_acc_path(phase, tag, outconfig)
     f_ibd = R.TFile(path_ibd, 'RECREATE')
@@ -58,26 +73,26 @@ def gen_hists_(phase, tag, config, outconfig, bcw=False):
             name_acc_coarse = f'h_accidental_eprompt_inclusive_{suffix}'
             name_acc_fine = f'h_accidental_eprompt_fine_inclusive_{suffix}'
 
-            nbins = nbins_bcw if bcw else nbins_lbnl
             emin = min_energy(tag, config)
-            binning = binning_bcw(emin) if bcw else binning_lbnl(emin)
+            edges = get_binning(binning, emin)
+            nbins = len(edges) - 1
 
             if h_ibd:
                 h_ibd_coarse = h_ibd.Rebin(nbins, name_ibd_coarse,
-                                           binning)
+                                           edges)
                 h_ibd_fine = h_ibd.Rebin(nbins_fine, name_ibd_fine,
                                          binning_fine())
                 h_acc_coarse = h_acc.Rebin(nbins, name_acc_coarse,
-                                           binning)
+                                           edges)
                 h_acc_fine = h_acc.Rebin(nbins_fine, name_acc_fine,
                                          binning_fine())
             else:
                 h_ibd_coarse = R.TH1F(name_ibd_coarse, name_ibd_coarse,
-                                      nbins, binning)
+                                      nbins, edges)
                 h_ibd_fine = R.TH1F(name_ibd_fine, name_ibd_fine,
                                     nbins_fine, binning_fine())
                 h_acc_coarse = R.TH1F(name_acc_coarse, name_acc_coarse,
-                                      nbins, binning)
+                                      nbins, edges)
                 h_acc_fine = R.TH1F(name_acc_fine, name_acc_fine,
                                     nbins_fine, binning_fine())
 
@@ -93,10 +108,10 @@ def gen_hists_(phase, tag, config, outconfig, bcw=False):
     f_acc.Close()
 
 
-def gen_hists(tag, config, outconfig, bcw=False):
+def gen_hists(tag, config, outconfig, binning='lbnl'):
     for phase in [1, 2, 3]:
         try:
-            gen_hists_(phase, tag, config, outconfig, bcw=bcw)
+            gen_hists_(phase, tag, config, outconfig, binning)
         except Exception:
             print(f"Warning: gen_hists: Skipping phase {phase} because:")
             print(traceback.format_exc())
