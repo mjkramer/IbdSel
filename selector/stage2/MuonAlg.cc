@@ -144,13 +144,11 @@ float MuonAlg::effVeto_us(const MuonTree& e, size_t idet) const
 
 Algorithm::Status MuonAlg::consume(const MuonTree& e)
 {
-  if (!isWP(e) && !isAD(e) && !isShower(e))
-    return Status::Continue;
-
   if (isWP(e)) {
     for (size_t idet = 0; idet < 4; ++idet)
       vetoTime_s_[idet] += 1e-6 * effVeto_us(e, idet);
     lastWpTime = e.time();
+    muonBuf.put(e);
   }
 
   else if (isAD(e) || isShower(e)) {
@@ -160,15 +158,15 @@ Algorithm::Status MuonAlg::consume(const MuonTree& e)
       lastShowerTime[idet] = e.time();
     else
       lastAdTime[idet] = e.time();
+    muonBuf.put(e);
   }
 
-  else if (isExtraIws(e)) {
+  else if (extraIwsVeto && isExtraIws(e)) {
     for (size_t idet = 0; idet < 4; ++idet)
       vetoTime_s_[idet] += 1e-6 * effVeto_us(e, idet);
     lastExtraIwsTime = e.time();
+    muonBuf.put(e);
   }
-
-  muonBuf.put(e);
 
   return Status::Continue;
 }
